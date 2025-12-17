@@ -1,0 +1,889 @@
+/* frontend/src/styles/pages/chat.css */
+
+/* ========== Page Layout ========== */
+.chat-page {
+  min-height: calc(100vh - 80px);
+  background: #f9fafb;
+  padding: 2rem 0;
+}
+
+.chat-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.chat-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  height: calc(100vh - 160px);
+  min-height: 600px;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ========== Sidebar ========== */
+.chat-sidebar {
+  width: 320px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+}
+
+.sidebar-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar-icon {
+  width: 24px;
+  height: 24px;
+  color: #2563eb;
+}
+
+.sidebar-title-text {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #1f2937;
+}
+
+.sidebar-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.filter-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filter-text {
+  color: #4b5563;
+}
+
+.online-count {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.sidebar-users {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0;
+}
+
+.user-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.user-item:hover {
+  background: #e5e7eb;
+}
+
+.user-item-active {
+  background: #dbeafe;
+  border-left: 3px solid #2563eb;
+}
+
+.user-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-status {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.no-users {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* ========== Chat Main Area ========== */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.chat-no-user {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+/* ========== Chat Header ========== */
+.chat-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+}
+
+.chat-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chat-header-avatar {
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.chat-header-avatar .avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chat-header-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1f2937;
+  margin: 0;
+}
+
+.chat-header-status {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.chat-header-close {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s;
+  color: #6b7280;
+}
+
+.chat-header-close:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* ========== Messages ========== */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #f9fafb;
+}
+
+.message {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.message-sent {
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  flex-shrink: 0;
+}
+
+.message-avatar .avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+}
+
+.message-sent .message-content {
+  align-items: flex-end;
+}
+
+.message-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 0.25rem;
+}
+
+.message-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  background: #e5e7eb;
+  word-wrap: break-word;
+}
+
+.message-sent .message-bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.message-image {
+  max-width: 200px;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-text {
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.no-messages {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+/* ========== Message Input ========== */
+.message-input-container {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+}
+
+.image-preview {
+  margin-bottom: 0.75rem;
+}
+
+.image-preview-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.preview-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-input-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-wrapper {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.message-input {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.message-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.hidden {
+  display: none;
+}
+
+.image-btn {
+  padding: 0.625rem;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6b7280;
+}
+
+.image-btn:hover {
+  background: #f3f4f6;
+  color: #2563eb;
+}
+
+.image-btn-active {
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.send-btn {
+  padding: 0.625rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.send-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ========== No Chat Selected ========== */
+.no-chat-selected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  background: #f9fafb;
+}
+
+.no-chat-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.no-chat-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.no-chat-icon {
+  width: 64px;
+  height: 64px;
+  background: #dbeafe;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 2s infinite;
+}
+
+.no-chat-icon .icon {
+  width: 32px;
+  height: 32px;
+  color: #2563eb;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.no-chat-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.no-chat-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* ========== Skeleton Loading ========== */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Avatar Skeleton */
+.avatar-skeleton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-avatar-skeleton {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+/* Time Skeleton */
+.time-skeleton {
+  width: 50px;
+  height: 12px;
+  margin-bottom: 8px;
+}
+
+/* Bubble Skeleton */
+.bubble-skeleton {
+  width: 180px;
+  height: 50px;
+  border-radius: 1rem;
+}
+
+/* Name Skeleton */
+.name-skeleton {
+  width: 100px;
+  height: 16px;
+  margin-bottom: 6px;
+}
+
+/* Status Skeleton */
+.status-skeleton {
+  width: 60px;
+  height: 14px;
+}
+
+/* ========== Sidebar Profile Button ========== */
+.sidebar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.sidebar-profile-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.sidebar-profile-btn:hover {
+  border-color: #2563eb;
+  transform: scale(1.05);
+}
+
+.sidebar-profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== Chat Header Actions ========== */
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chat-header-btn {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  color: #6b7280;
+}
+
+.chat-header-btn:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.profile-btn:hover {
+  color: #2563eb;
+}
+
+.close-btn:hover {
+  color: #ef4444;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .chat-page {
+    padding: 0;
+  }
+  
+  .chat-wrapper {
+    height: calc(100vh - 80px);
+    border-radius: 0;
+  }
+
+  .chat-sidebar {
+    width: 80px;
+  }
+
+  .sidebar-title-text,
+  .sidebar-filter,
+  .user-info {
+    display: none;
+  }
+
+  .user-avatar-wrapper {
+    margin: 0 auto;
+  }
+
+  .message-content {
+    max-width: 85%;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-sidebar {
+    width: 60px;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
+/* Add these styles to your chat.css file */
+
+/* ========== User Item with Menu ========== */
+.user-item-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-item-wrapper .user-item {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
+.user-menu-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  color: #9ca3af;
+  opacity: 0;
+  transition: all 0.2s;
+}
+
+.user-item-wrapper:hover .user-menu-btn {
+  opacity: 1;
+}
+
+.user-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #4b5563;
+}
+
+/* ========== Dropdown Menu ========== */
+.user-dropdown-menu {
+  position: absolute;
+  right: 8px;
+  top: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 150px;
+  z-index: 100;
+  overflow: hidden;
+  animation: slideDown 0.15s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #374151;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+.dropdown-item.delete-item {
+  color: #dc2626;
+}
+
+.dropdown-item.delete-item:hover {
+  background: #fef2f2;
+}
+
+/* ========== Delete Confirmation Modal ========== */
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.delete-modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  animation: scaleIn 0.2s ease-out;
+  overflow: hidden;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  color: #9ca3af;
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.delete-modal-content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.delete-modal-icon {
+  width: 64px;
+  height: 64px;
+  background: #fef2f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  color: #dc2626;
+}
+
+.delete-modal-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.75rem 0;
+}
+
+.delete-modal-content p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.delete-modal-content p strong {
+  color: #1f2937;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-cancel,
+.btn-delete {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.btn-delete {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #b91c1c;
+}
+
+/* ========== Responsive Adjustments ========== */
+@media (max-width: 768px) {
+  .user-menu-btn {
+    opacity: 1;
+  }
+  
+  .delete-modal {
+    margin: 1rem;
+  }
+  
+  .delete-modal-actions {
+    flex-direction: column;
+  }
+  
+  .btn-cancel,
+  .btn-delete {
+    width: 100%;
+  }
+}
