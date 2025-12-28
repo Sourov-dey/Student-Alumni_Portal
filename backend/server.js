@@ -23,6 +23,7 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import verificationRoutes from "./src/routes/verificationRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -122,6 +123,7 @@ app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/verification", verificationRoutes);
 app.use("/api/messages", chatRoutes);
+
 
 // 404 + error handler
 app.use(notFound);
