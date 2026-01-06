@@ -3,27 +3,64 @@ import Message from "../models/Message.js";
 import User from "../models/User.js";
 import { getReceiverSocketId, io } from "../../server.js";
 
-// Get users for sidebar (exclude current user)
+// Get all users for search (exclude current user)
 export const getUsersForSidebar = async (req, res, next) => {
   try {
     console.log("📋 getUsersForSidebar called");
-    console.log("👤 Logged in user:", req.user);
-
     const loggedInUserId = req.user._id;
-    console.log("👤 User ID:", loggedInUserId);
 
     // Get all users EXCEPT the logged-in user
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
     }).select("name email avatarUrl role");
 
-    console.log(`✅ Found ${filteredUsers.length} users`);
-    console.log("Users:", filteredUsers);
-
+    console.log(`✅ Found ${filteredUsers.length} users for search`);
     res.status(200).json(filteredUsers);
   } catch (error) {
     console.error("❌ Error in getUsersForSidebar:", error.message);
-    console.error("Stack:", error.stack);
+    next(error);
+  }
+};
+
+// Get only users you've had conversations with
+export const getConversationUsers = async (req, res, next) => {
+  try {
+    console.log("💬 getConversationUsers called for user:", req.user._id);
+    const loggedInUserId = req.user._id;
+
+    // Find all messages where user is sender or receiver
+    const messages = await Message.find({
+      $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
+    }).select("senderId receiverId");
+
+    console.log(`📊 Found ${messages.length} total messages for user`);
+
+    // Extract unique user IDs (excluding current user)
+    const userIds = new Set();
+    messages.forEach((msg) => {
+      const senderIdStr = msg.senderId.toString();
+      const receiverIdStr = msg.receiverId.toString();
+      const loggedInUserIdStr = loggedInUserId.toString();
+
+      if (senderIdStr !== loggedInUserIdStr) {
+        userIds.add(senderIdStr);
+      }
+      if (receiverIdStr !== loggedInUserIdStr) {
+        userIds.add(receiverIdStr);
+      }
+    });
+
+    console.log(`👥 Found ${userIds.size} unique conversation partners`);
+
+    // Fetch user details for all conversation partners
+    const conversationUsers = await User.find({
+      _id: { $in: Array.from(userIds) },
+    }).select("name email avatarUrl role");
+
+    console.log(`✅ Returning ${conversationUsers.length} conversation users`);
+    res.status(200).json(conversationUsers);
+  } catch (error) {
+    console.error("❌ Error in getConversationUsers:", error.message);
     next(error);
   }
 };
@@ -34,6 +71,8 @@ export const getMessages = async (req, res, next) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    console.log(`📬 Fetching messages between ${senderId} and ${receiverId}`);
+
     const messages = await Message.find({
       $or: [
         { senderId: senderId, receiverId: receiverId },
@@ -43,6 +82,7 @@ export const getMessages = async (req, res, next) => {
       .sort({ createdAt: 1 })
       .select("-__v");
 
+    console.log(`✅ Found ${messages.length} messages`);
     res.status(200).json(messages);
   } catch (error) {
     console.error("❌ Error in getMessages:", error.message);
@@ -57,10 +97,13 @@ export const sendMessage = async (req, res, next) => {
     const { text, image } = req.body;
     const senderId = req.user._id;
 
+    console.log(`📤 Sending message from ${senderId} to ${receiverId}`);
+
     if (!text && !image) {
       return res.status(400).json({ error: "Text or image is required" });
     }
 
+    // Create and save the message
     const newMessage = new Message({
       senderId: senderId,
       receiverId: receiverId,
@@ -69,14 +112,42 @@ export const sendMessage = async (req, res, next) => {
     });
 
     await newMessage.save();
+    console.log(`✅ Message saved to database:`, newMessage._id);
 
-    // Send via Socket.IO
+    // Get sender details to send to receiver
+    const senderDetails = await User.findById(senderId).select(
+      "name email avatarUrl role"
+    );
+    console.log(`👤 Sender details:`, senderDetails.name);
+
+    // Send to receiver via Socket.IO if they're online
     const receiverSocketId = getReceiverSocketId(receiverId);
+
     if (receiverSocketId) {
+      console.log(`🔌 Receiver is ONLINE, socket ID: ${receiverSocketId}`);
+
+      // Send the new message
       io.to(receiverSocketId).emit("newMessage", newMessage);
+      console.log(`📨 Sent newMessage event to receiver`);
+
+      // Notify receiver about new conversation (so sender appears in their sidebar)
+      io.to(receiverSocketId).emit("newConversation", {
+        _id: senderDetails._id,
+        name: senderDetails.name,
+        email: senderDetails.email,
+        avatarUrl: senderDetails.avatarUrl,
+        role: senderDetails.role,
+      });
+      console.log(`🆕 Sent newConversation event to receiver`);
+    } else {
+      console.log(
+        `⚠️ Receiver ${receiverId} is OFFLINE - they'll see message on login`
+      );
     }
 
+    // IMPORTANT: Return success - the frontend will reload conversation list
     res.status(201).json(newMessage);
+    console.log(`✅ Message send complete`);
   } catch (error) {
     console.error("❌ Error in sendMessage:", error.message);
     next(error);
@@ -106,11 +177,11 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
-// 🔻 NEW: Delete entire conversation with a user
+// Delete entire conversation with a user
 export const deleteConversation = async (req, res, next) => {
   try {
-    const { id: otherUserId } = req.params; // user you’re chatting with
-    const userId = req.user._id;            // logged-in user
+    const { id: otherUserId } = req.params;
+    const userId = req.user._id;
 
     const result = await Message.deleteMany({
       $or: [
@@ -120,7 +191,7 @@ export const deleteConversation = async (req, res, next) => {
     });
 
     console.log(
-      `🗑️ Deleted conversation between ${userId} and ${otherUserId}. Deleted: ${result.deletedCount}`
+      `🗑️ Deleted conversation between ${userId} and ${otherUserId}. Deleted: ${result.deletedCount} messages`
     );
 
     return res.status(200).json({
@@ -133,7 +204,7 @@ export const deleteConversation = async (req, res, next) => {
   }
 };
 
-// 🔻 NEW: Delete a single message
+// Delete a single message
 export const deleteMessage = async (req, res, next) => {
   try {
     const { messageId } = req.params;
@@ -145,7 +216,7 @@ export const deleteMessage = async (req, res, next) => {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // Optional: only allow sender to delete their message
+    // Only allow sender to delete their message
     if (message.senderId.toString() !== userId.toString()) {
       return res
         .status(403)
