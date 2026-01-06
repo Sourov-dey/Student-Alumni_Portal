@@ -25,6 +25,7 @@ import verificationRoutes from "./src/routes/verificationRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -34,8 +35,8 @@ const app = express();
 await connectDB();
 
 // ---------- Parsers (MUST come before routes) ----------
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 // Static uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
