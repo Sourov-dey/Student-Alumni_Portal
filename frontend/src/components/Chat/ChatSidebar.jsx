@@ -1,34 +1,100 @@
 // frontend/src/components/chat/ChatSidebar.jsx
-import React, { useEffect, useState } from "react"; 
-import { useChatStore } from "../../store/useChatStore"; 
-import { useAuth } from "../../context/AuthContext"; 
-import SidebarSkeleton from "./SidebarSkeleton"; 
-import { Users, MoreVertical, Trash2, X } from "lucide-react"; 
+import React, { useEffect, useState } from "react";
+import { useChatStore } from "../../store/useChatStore";
+import { useAuth } from "../../context/AuthContext";
+import SidebarSkeleton from "./SidebarSkeleton";
+import { Users, MoreVertical, Trash2, X, Search } from "lucide-react";
 
 const ChatSidebar = ({ onOpenProfile }) => {
-  const { 
-    getUsers, 
-    users, 
-    selectedUser, 
-    setSelectedUser, 
-    isUsersLoading, 
+  const {
+    getUsers,
+    users,
+    selectedUser,
+    setSelectedUser,
     onlineUsers,
     deleteChat,
-    hiddenUsers 
+    hiddenUsers,
+    getConversationUsers,
+    conversationUsers,
+    isConversationUsersLoading,
+    addToConversations,
   } = useChatStore();
+
   const { user: authUser } = useAuth();
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-  const [menuOpenFor, setMenuOpenFor] = useState(null); // Track which user's menu is open
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // Track delete confirmation modal
+  const [menuOpenFor, setMenuOpenFor] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
+  // Load conversation users on mount
   useEffect(() => {
-    getUsers();
-  }, [getUsers]);
+    console.log("🔄 ChatSidebar mounted, loading conversation users...");
+    getConversationUsers();
+  }, []);
 
-  // Filter out hidden users and apply online filter
-  const filteredUsers = users
-    .filter((user) => !hiddenUsers?.includes(user._id))
-    .filter((user) => (showOnlineOnly ? onlineUsers.includes(user._id) : true));
+  // Debug: Log conversation users whenever they change
+  useEffect(() => {
+    console.log("📊 Conversation users updated:", conversationUsers.length);
+    console.log(
+      "👥 Users in sidebar:",
+      conversationUsers.map((u) => u.name)
+    );
+  }, [conversationUsers]);
+
+  // Filter conversation users (exclude hidden)
+  const filteredConversationUsers = conversationUsers.filter(
+    (user) => !hiddenUsers?.includes(user._id)
+  );
+
+  console.log(
+    "🔍 Filtered conversation users:",
+    filteredConversationUsers.length
+  );
+
+  // Handle search
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    console.log("🔍 Searching for:", searchQuery);
+
+    // Get all users if not already loaded
+    if (users.length === 0) {
+      await getUsers();
+    }
+
+    // Filter users based on search query
+    const query = searchQuery.toLowerCase().trim();
+    const results = users.filter((user) => {
+      const name = (user.name || "").toLowerCase();
+      const email = (user.email || "").toLowerCase();
+      return name.includes(query) || email.includes(query);
+    });
+
+    console.log("✅ Search results:", results.length);
+    setSearchResults(results);
+  };
+
+  // CRITICAL: Handle selecting a user from search results
+  const handleSelectSearchResult = (user) => {
+    console.log("🎯 User clicked from search:", user.name, "ID:", user._id);
+
+    // STEP 1: Add to conversations FIRST (this updates the sidebar)
+    addToConversations(user);
+
+    // STEP 2: Set as selected user (this opens the chat)
+    setSelectedUser(user);
+
+    // STEP 3: Close search UI
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+
+    console.log("✅ User selection complete");
+  };
 
   const handleMenuToggle = (e, userId) => {
     e.stopPropagation();
@@ -44,7 +110,6 @@ const ChatSidebar = ({ onOpenProfile }) => {
   const confirmDelete = () => {
     if (deleteConfirm) {
       deleteChat(deleteConfirm._id);
-      // If the deleted user was selected, clear selection
       if (selectedUser?._id === deleteConfirm._id) {
         setSelectedUser(null);
       }
@@ -60,12 +125,27 @@ const ChatSidebar = ({ onOpenProfile }) => {
   useEffect(() => {
     const handleClickOutside = () => setMenuOpenFor(null);
     if (menuOpenFor) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
     }
   }, [menuOpenFor]);
 
-  if (isUsersLoading) return <SidebarSkeleton />;
+  // Handle search on Enter key
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === "Enter" && showSearch && searchQuery.trim()) {
+        e.preventDefault();
+        handleSearch();
+      }
+    };
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [showSearch, searchQuery]);
+
+  if (isConversationUsersLoading) {
+    console.log("⏳ Loading conversation users...");
+    return <SidebarSkeleton />;
+  }
 
   return (
     <aside className="chat-sidebar">
@@ -73,46 +153,64 @@ const ChatSidebar = ({ onOpenProfile }) => {
         <div className="sidebar-title-row">
           <div className="sidebar-title">
             <Users className="sidebar-icon" />
-            <span className="sidebar-title-text">Contacts</span>
+            <span className="sidebar-title-text">Messages</span>
           </div>
-          
+
           {/* Profile Button */}
-          <button 
-            className="sidebar-profile-btn" 
+          <button
+            className="sidebar-profile-btn"
             onClick={onOpenProfile}
             title="My Profile"
           >
-            <img 
-              src={authUser?.avatarUrl || "/avatar.png"} 
-              alt="My Profile" 
+            <img
+              src={authUser?.avatarUrl || "/avatar.png"}
+              alt="My Profile"
               className="sidebar-profile-img"
             />
           </button>
         </div>
-        
-        <div className="sidebar-filter">
-          <label className="filter-label">
-            <input
-              type="checkbox"
-              checked={showOnlineOnly}
-              onChange={(e) => setShowOnlineOnly(e.target.checked)}
-              className="filter-checkbox"
-            />
-            <span className="filter-text">Show online only</span>
-          </label>
-          <span className="online-count">
-            ({onlineUsers.length > 0 ? onlineUsers.length - 1 : 0} online)
-          </span>
+
+        {/* Search Button */}
+        <div className="sidebar-search-section">
+          <button
+            className="search-toggle-btn"
+            onClick={() => setShowSearch(!showSearch)}
+          >
+            <Search size={12} />
+            <span>Search Users</span>
+          </button>
         </div>
+
+        {/* Search Input (shown when search is active) */}
+        {showSearch && (
+          <div className="search-input-wrapper">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+            <button className="search-btn" onClick={handleSearch}>
+              <Search size={16} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="sidebar-users">
-        {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
-          filteredUsers.map((user) => (
-            <div key={user._id} className="user-item-wrapper">
+        {/* Show search results if searching */}
+        {showSearch && searchResults.length > 0 ? (
+          <>
+            <div className="search-results-header">
+              <span>Search Results ({searchResults.length})</span>
+            </div>
+            {searchResults.map((user) => (
               <button
-                onClick={() => setSelectedUser(user)}
-                className={`user-item ${selectedUser?._id === user._id ? "user-item-active" : ""}`}
+                key={user._id}
+                onClick={() => handleSelectSearchResult(user)}
+                className="user-item"
               >
                 <div className="user-avatar-wrapper">
                   <img
@@ -127,38 +225,81 @@ const ChatSidebar = ({ onOpenProfile }) => {
 
                 <div className="user-info">
                   <div className="user-name">{user.name}</div>
-                  <div className="user-status">
-                    {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-                  </div>
+                  <div className="user-email">{user.email}</div>
                 </div>
               </button>
-
-              {/* More Options Button */}
-              <button 
-                className="user-menu-btn"
-                onClick={(e) => handleMenuToggle(e, user._id)}
-              >
-                <MoreVertical size={18} />
-              </button>
-
-              {/* Dropdown Menu */}
-              {menuOpenFor === user._id && (
-                <div className="user-dropdown-menu" onClick={(e) => e.stopPropagation()}>
-                  <button 
-                    className="dropdown-item delete-item"
-                    onClick={(e) => handleDeleteClick(e, user)}
-                  >
-                    <Trash2 size={16} />
-                    <span>Delete Chat</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          ))
+            ))}
+          </>
+        ) : showSearch && searchQuery ? (
+          <div className="no-users">No users found</div>
         ) : (
-          <div className="no-users">
-            {showOnlineOnly ? "No online users" : "No users found"}
-          </div>
+          /* Show conversation users (people you've chatted with or clicked on) */
+          <>
+            {filteredConversationUsers.length > 0 ? (
+              filteredConversationUsers.map((user) => (
+                <div key={user._id} className="user-item-wrapper">
+                  <button
+                    onClick={() => {
+                      console.log("📱 Conversation user clicked:", user.name);
+                      setSelectedUser(user);
+                    }}
+                    className={`user-item ${
+                      selectedUser?._id === user._id ? "user-item-active" : ""
+                    }`}
+                  >
+                    <div className="user-avatar-wrapper">
+                      <img
+                        src={user.avatarUrl || "/avatar.png"}
+                        alt={user.name}
+                        className="user-avatar"
+                      />
+                      {onlineUsers.includes(user._id) && (
+                        <span className="online-indicator" />
+                      )}
+                    </div>
+
+                    <div className="user-info">
+                      <div className="user-name">{user.name}</div>
+                      <div className="user-status">
+                        {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* More Options Button */}
+                  <button
+                    className="user-menu-btn"
+                    onClick={(e) => handleMenuToggle(e, user._id)}
+                  >
+                    <MoreVertical size={18} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {menuOpenFor === user._id && (
+                    <div
+                      className="user-dropdown-menu"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="dropdown-item delete-item"
+                        onClick={(e) => handleDeleteClick(e, user)}
+                      >
+                        <Trash2 size={16} />
+                        <span>Delete Chat</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="no-users">
+                <p>No conversations yet</p>
+                <p className="no-users-hint">
+                  Use the search button above to find users and start chatting
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -175,8 +316,8 @@ const ChatSidebar = ({ onOpenProfile }) => {
               </div>
               <h3>Delete Chat?</h3>
               <p>
-                Delete chat with <strong>{deleteConfirm.name}</strong>? 
-                This will remove them from your chat list.
+                Delete chat with <strong>{deleteConfirm.name}</strong>? This
+                will remove them from your chat list.
               </p>
               <div className="delete-modal-actions">
                 <button className="btn-cancel" onClick={cancelDelete}>
