@@ -1,14 +1,14 @@
-// src/controllers/authController.js (devLogin)
-import VerificationCode from '../models/VerificationCode.js';
+
 import User from '../models/User.js';
-import { sendMail } from '../utils/mailer.js';
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+// Helper functions
 const genNumericCode = (len = 6) => {
   const digits = '0123456789';
   let s = '';
-  for (let i=0;i<len;i++) s += digits[Math.floor(Math.random()*10)];
+  for (let i = 0; i < len; i++) s += digits[Math.floor(Math.random() * 10)];
   return s;
 };
 
@@ -17,136 +17,119 @@ export const isUniEmail = (email) => {
   return email.toLowerCase().trim().endsWith('@aus.ac.in');
 };
 
-export const requestCode = async (req, res, next) => {
+// ✅ FIXED: Signup with Password
+export const signup = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email required' });
-    const lower = email.toLowerCase().trim();
+    const { name, email, password, role = 'student' } = req.body;
 
-    // Allow any email, but flag if it's not a university email
-    const isUniversityEmail = isUniEmail(lower);
-
-    const recentCutoff = new Date(Date.now() - (Number(process.env.VERIFICATION_CODE_TTL_MIN || 10) * 60 * 1000));
-    const recentCount = await VerificationCode.countDocuments({ email: lower, createdAt: { $gte: recentCutoff } });
-    if (recentCount >= 5) {
-      return res.status(429).json({ message: 'Too many requests; try again later' });
+    // Validation
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!email || !email.trim()) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
-    const rawCode = genNumericCode(Number(process.env.VERIFICATION_CODE_LENGTH || 6));
+    const emailLower = email.toLowerCase().trim();
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: emailLower });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
+
+    // Hash password
     const salt = await bcrypt.genSalt(10);
-    const codeHash = await bcrypt.hash(rawCode, salt);
+    const passwordHash = await bcrypt.hash(password, salt);
 
-    const ttl = Number(process.env.VERIFICATION_CODE_TTL_MIN || 10);
-    const expiresAt = new Date(Date.now() + ttl * 60 * 1000);
+    // Determine verification status
+    const isUniversityEmail = isUniEmail(emailLower);
 
-    await VerificationCode.create({ email: lower, codeHash, expiresAt });
-
-    // send email
-    const subject = 'Assam University — login verification code';
-    const text = `Your verification code is: ${rawCode}\nThis code expires in ${ttl} minutes. Do not share this code.`;
-    const html = `<p>Your verification code is: <strong style="font-size:20px">${rawCode}</strong></p>
-                  <p>This code expires in ${ttl} minutes.</p>`;
-    await sendMail({ to: lower, subject, text, html });
-
-    return res.json({ message: 'Verification code sent' });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/**
- * POST /api/auth/verify-code
- * Body: { email, code, role, name }
- * If successful: issues JWT and returns { token, user }
- */
-export const verifyCode = async (req, res, next) => {
-  try {
-    const { email, code, role = 'student', name = '' } = req.body;
-    if (!email || !code) return res.status(400).json({ message: 'Email and code are required' });
-
-    const lower = email.toLowerCase().trim();
-
-    // find latest valid code
-    const now = new Date();
-    const record = await VerificationCode.findOne({ email: lower, expiresAt: { $gt: now } }).sort({ createdAt: -1 });
-    if (!record) return res.status(400).json({ message: 'No valid verification code found or it expired' });
-
-    // check attempts
-    if (record.attempts >= 5) {
-      return res.status(429).json({ message: 'Too many attempts; request a new code' });
-    }
-
-    const ok = await bcrypt.compare(String(code), record.codeHash);
-    if (!ok) {
-      record.attempts = (record.attempts || 0) + 1;
-      await record.save();
-      return res.status(400).json({ message: 'Invalid code' });
-    }
-
-    // success — delete used codes for email
-    await VerificationCode.deleteMany({ email: lower });
-
-    // create or update user
-    let user = await User.findOne({ email: lower });
-    const isUniversityEmail = isUniEmail(lower);
-    
-    if (!user) {
-      user = await User.create({
-        email: lower,
-        name: name || lower.split('@')[0].replace('.', ' ').replace(/\b\w/g, c => c.toUpperCase()),
-        role: role.toLowerCase(),
-        // Auto-verify university emails, require ID upload for others
-        verified: isUniversityEmail,
-        verification: {
-          status: isUniversityEmail ? 'verified' : 'pending',
-          method: isUniversityEmail ? 'university_email' : 'id_required'
-        }
-      });
-    } else {
-      let changed = false;
-      if (role && user.role !== role.toLowerCase()) { user.role = role.toLowerCase(); changed = true; }
-      if (name && user.name !== name) { user.name = name; changed = true; }
-      
-      // Update verification status if needed
-      if (isUniversityEmail && !user.verified) {
-        user.verified = true;
-        user.verification = { status: 'verified', method: 'university_email' };
-        changed = true;
+    // Create user
+    const user = await User.create({
+      name: name.trim(),
+      email: emailLower,
+      password: passwordHash,
+      role: role.toLowerCase(),
+      verified: isUniversityEmail,
+      verification: {
+        status: isUniversityEmail ? 'verified' : 'pending',
+        method: isUniversityEmail ? 'university_email' : 'id_required'
       }
-      
-      if (changed) await user.save();
-    }
+    });
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    return res.json({ token, user });
-  } catch (err) {
-    next(err);
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Return user without password
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.status(201).json({ token, user: userResponse });
+  } catch (error) {
+    console.error('Signup error:', error);
+    next(error);
   }
 };
 
-export const devLogin = async (req, res, next) => {
+// ✅ 101% FIXED: Login with Password - Allow Google users to set password
+export const loginUser = async (req, res, next) => {
   try {
-    const { email, role = 'student', name } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email required' });
+    const { email, password } = req.body;
 
-    // optional: enforce university domain
-    // if (!email.endsWith('@aus.ac.in')) return res.status(403).json({ message: 'Use university email' });
-
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = await User.create({ email, role: role.toLowerCase(), name, verified: true });
-    } else {
-      // update name/role if needed
-      let changed = false;
-      if (name && user.name !== name) { user.name = name; changed = true; }
-      if (role && user.role !== role.toLowerCase()) { user.role = role.toLowerCase(); changed = true; }
-      if (changed) await user.save();
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const emailLower = email.toLowerCase().trim();
 
-    res.json({ token, user });
-  } catch (err) {
-    next(err);
+    // Find user (include password field)
+    const user = await User.findOne({ email: emailLower }).select('+password');
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // ✅ CRITICAL FIX: Check if user has a password
+    if (!user.password) {
+      
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(password, salt);
+      
+      user.password = passwordHash;
+      await user.save();
+      
+      console.log(`✅ Password added for user ${emailLower}`);
+    } else {
+      // User has a password, verify it
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Return user without password
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.json({ token, user: userResponse });
+  } catch (error) {
+    console.error('Login error:', error);
+    next(error);
   }
 };
+

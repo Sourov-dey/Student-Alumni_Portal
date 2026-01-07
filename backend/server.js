@@ -21,7 +21,7 @@ import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import applicationRoutes from "./src/routes/applicationRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
-import verificationRoutes from "./src/routes/verificationRoutes.js";
+
 import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 
@@ -142,7 +142,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/verification", verificationRoutes);
+
 app.use("/api/messages", chatRoutes);
 app.use("/api/groups", groupRoutes); // ✅ GROUP ROUTES MOUNTED
 console.log("✅ All API routes mounted successfully");

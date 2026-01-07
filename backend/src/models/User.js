@@ -28,8 +28,14 @@ const userSchema = new mongoose.Schema(
       status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
       method: { type: String, enum: ['university_email', 'id_card', 'id_required'], default: 'id_required' },
       updatedAt: Date
-    }
+    },
+      password: {
+    type: String,
+    required: true, // Not required because Google users won't have it
+    select: false    // Don't include in queries by default for security
   },
+  },
+  
   { timestamps: true }
 );
 

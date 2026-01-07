@@ -1,8 +1,9 @@
-// frontend/src/App.jsx
+
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import Signup from './pages/Signup'; 
 import Jobs from './pages/Jobs';
 import JobDetail from './pages/JobDetail';
 import PostJob from './pages/PostJob';
@@ -28,6 +29,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} /> 
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/verify-id" element={<VerifyId />} />     
           <Route path="/jobs/:id" element={<JobDetail />} />
@@ -41,5 +43,5 @@ export default function App() {
         </Routes>
       </main>
     </div>
-  )
+  );
 }

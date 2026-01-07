@@ -79,7 +79,7 @@ export default function Hero() {
 
       // Animate images
       tl.fromTo(
-        imagesRef.current.querySelectorAll(".hero-img"),
+        imagesRef.current.querySelectorAll(".image-card"),
         {
           opacity: 0,
           scale: 0.9,
@@ -96,7 +96,7 @@ export default function Hero() {
       );
 
       // Floating animation for images
-      gsap.to(imagesRef.current.querySelectorAll(".hero-img"), {
+      gsap.to(imagesRef.current.querySelectorAll(".image-card"), {
         y: -20,
         duration: 2,
         repeat: -1,
@@ -131,6 +131,7 @@ export default function Hero() {
 
   return (
     <section className="hero" ref={heroRef}>
+      {/* Dynamic Background Elements */}
       <div className="hero-background">
         <div className="gradient-orb orb-1"></div>
         <div className="gradient-orb orb-2"></div>
@@ -140,16 +141,16 @@ export default function Hero() {
       <div className="hero-container">
         <div className="hero-content">
           <h1 className="hero-title" ref={titleRef}>
-            Assam University Careers
+            Assam University <br /> Careers
           </h1>
           <p className="hero-subtitle" ref={subtitleRef}>
-            Connecting students, alumni, and companies through opportunities.
+            Connecting students, alumni, and companies through a unified ecosystem of professional opportunities.
           </p>
 
           {/* Call to Action Button */}
           <div className="hero-actions" ref={buttonRef}>
             <Link to="/jobs" className="btn-primary">
-              <span>Browse Jobs</span>
+              <span>Browse Opportunities</span>
               <svg
                 className="btn-arrow"
                 width="20"
@@ -168,7 +169,7 @@ export default function Hero() {
             </Link>
           </div>
 
-          {/* Stats Section */}
+          {/* Glassmorphic Stats Section */}
           <div className="hero-stats" ref={statsRef}>
             <div className="stat-item">
               <div className="stat-icon">💼</div>
@@ -194,7 +195,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Hero Images */}
+        {/* 3D Floating Hero Images */}
         <div className="hero-images" ref={imagesRef}>
           <div className="image-card image-card-1">
             <img src="/campus.jpg" alt="Campus Life" className="hero-img" />
@@ -216,7 +217,7 @@ export default function Hero() {
         <div className="scroll-mouse">
           <div className="scroll-wheel"></div>
         </div>
-        <span className="scroll-text">Scroll to explore</span>
+        <span className="scroll-text">Explore Below</span>
       </div>
     </section>
   );

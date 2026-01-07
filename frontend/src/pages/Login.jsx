@@ -1,224 +1,211 @@
+
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import http from '../api/http';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import GoogleSignIn from '../components/GoogleSignIn';
+
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('student');
-  const [name, setName] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [codeRequested, setCodeRequested] = useState(false);
-  const [codeSending, setCodeSending] = useState(false);
-  const [code, setCode] = useState('');
-  const [verifying, setVerifying] = useState(false);
-  const [infoMsg, setInfoMsg] = useState('');
-
   const { login } = useAuth();
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
-  const isValidEmail = (e) => /\S+@\S+\.\S+/.test(e);
-  const UNI_DOMAIN = 'aus.ac.in';
-  const isUniEmail = (addr) => {
-    if (!addr) return false;
-    return addr.toLowerCase().endsWith(`@${UNI_DOMAIN}`);
+  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setError('');
   };
 
-  // Request verification code
-  const sendCode = async () => {
-    setError('');
-    setInfoMsg('');
-    if (!email || !isValidEmail(email)) {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.email || !isValidEmail(formData.email)) {
       setError('Please enter a valid email address');
       return;
     }
-    if (!name.trim()) {
-      setError('Please enter your name');
+    
+    if (!formData.password) {
+      setError('Please enter your password');
       return;
     }
-    try {
-      setCodeSending(true);
-      await http.post('/api/auth/request-code', { email: email.trim() });
-      setCodeRequested(true);
-      if (isUniEmail(email)) {
-        setInfoMsg('Code sent — check your Assam University email. It expires in 10 minutes.');
-      } else {
-        setInfoMsg('Code sent — check your email. You will need to verify your identity after login.');
-      }
-    } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to send code');
-    } finally {
-      setCodeSending(false);
-    }
-  };
 
-  // Verify code and log in
-  const verify = async () => {
+    setLoading(true);
     setError('');
-    if (!code || code.trim().length === 0) return setError('Please enter the code');
+
     try {
-      setVerifying(true);
-      const res = await http.post('/api/auth/verify-code', {
-        email: email.trim(),
-        code: code.trim(),
-        role: role.toLowerCase(),
-        name: name.trim()
+      const response = await http.post('/api/auth/login', {
+        email: formData.email.toLowerCase().trim(),
+        password: formData.password
       });
-      const { token, user } = res.data || {};
+
+      const { token, user } = response.data;
+      
       if (!token || !user) {
-        setError('Verification failed');
-        setVerifying(false);
+        setError('Login failed. Please try again.');
         return;
       }
-      
+
+      // Log the user in
       login(token, user);
-      
-      // If non-university email and verification required, redirect to ID verification
-      if (!isUniEmail(email) && !user.isVerified) {
-        nav('/verify-id');
-      } else {
-        nav('/jobs');
-      }
+
+      // Navigate to appropriate page
+      navigate('/jobs');
     } catch (err) {
-      setError(err?.response?.data?.message || 'Verification failed');
+      console.error('Login error:', err);
+      setError(err?.response?.data?.message || 'Invalid email or password');
     } finally {
-      setVerifying(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: 520, padding: 20, margin: '0 auto' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>Sign In</h2>
+    <div style={{ 
+      maxWidth: 480, 
+      padding: 20, 
+      margin: '80px auto',
+      background: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+    }}>
+      <h2 style={{ textAlign: 'center', marginBottom: 8, color: '#1f2937' }}>
+        Welcome Back
+      </h2>
+      <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: 24, fontSize: '0.9em' }}>
+        Sign in to your account
+      </p>
 
-      <div style={{ marginBottom: 24, textAlign: 'center' }}>
+      <form onSubmit={handleSubmit} noValidate>
+        {/* Email */}
         <div style={{ marginBottom: 16 }}>
-          <div id="gsi-button"></div>
-        </div>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: 8,
-          margin: '16px 0',
-          color: '#666',
-          fontSize: '0.9em'
-        }}>
-          <div style={{ flex: 1, height: '1px', background: '#ddd' }}></div>
-          <div>or</div>
-          <div style={{ flex: 1, height: '1px', background: '#ddd' }}></div>
-        </div>
-      </div>
-
-      <form onSubmit={(e) => e.preventDefault()} noValidate>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', marginBottom: 6 }}>Email address</label>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: 6, 
+            fontWeight: 500, 
+            color: '#374151',
+            fontSize: '0.9em'
+          }}>
+            Email Address
+          </label>
           <input
-            autoFocus
             type="email"
-            value={email}
-            onChange={(e) => { setEmail(e.target.value); setError(''); setInfoMsg(''); }}
-            placeholder="Enter your email address"
-            style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ddd' }}
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="your.email@example.com"
+            autoComplete="email"
+            autoFocus
+            required
+            style={{ 
+              width: '100%', 
+              padding: '10px 12px', 
+              borderRadius: 6, 
+              border: '1px solid #d1d5db',
+              fontSize: '0.95em',
+              outline: 'none'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
           />
-          {isValidEmail(email) && !codeRequested && (
-            <div style={{ marginTop: 8, color: '#666', fontSize: '0.9em' }}>
-              We will send a verification code to your registered email address
-               {/* {isUniEmail(email) ? 
-                'We will send a verification code to your Assam University email.' :
-                'We will send a verification code to your email. After verification, you will need to verify your identity by uploading an ID card.'
-              }  */}
-            </div>
-          )}
         </div>
 
-        {!codeRequested ? (
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', marginBottom: 6 }}>Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-                style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ddd' }}
-              />
-            </div>
+        {/* Password */}
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: 6, 
+            fontWeight: 500, 
+            color: '#374151',
+            fontSize: '0.9em'
+          }}>
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            required
+            style={{ 
+              width: '100%', 
+              padding: '10px 12px', 
+              borderRadius: 6, 
+              border: '1px solid #d1d5db',
+              fontSize: '0.95em',
+              outline: 'none'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+          />
+        </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', marginBottom: 6 }}>Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ddd' }}
-              >
-                <option value="student">Student</option>
-                <option value="alumni">Alumni</option>
-              </select>
-            </div>
-
-            <button 
-              type="button" 
-              onClick={sendCode} 
-              disabled={codeSending || !isValidEmail(email) || !name.trim()} 
-              style={{ 
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 6,
-                background: codeSending || !isValidEmail(email) || !name.trim() ? '#9fbfe6' : '#0b63b7',
-                color: '#fff',
-                border: 'none',
-                marginTop: 35,
-                cursor: codeSending || !isValidEmail(email) || !name.trim() ? 'not-allowed' : 'pointer',
-                fontWeight: 600
-              }}
-            >
-              {codeSending ? 'Sending verification code...' : 'Send verification code'}
-            </button>
-          </div>
-        ) : (
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', marginBottom: 6 }}>Verification Code</label>
-            <input 
-              type="text"
-              value={code} 
-              onChange={(e) => setCode(e.target.value)} 
-              placeholder="Enter the 6-digit code"
-              style={{ 
-                width: '100%', 
-                padding: 8, 
-                borderRadius: 6, 
-                border: '1px solid #ddd', 
-                marginBottom: 12 
-              }} 
-            />
-            <button
-              type="button"
-              onClick={verify}
-              disabled={verifying || !code}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 6,
-                background: verifying || !code ? '#9fbfe6' : '#0b63b7',
-                color: '#fff',
-                border: 'none',
-                cursor: verifying || !code ? 'not-allowed' : 'pointer',
-                fontWeight: 600
-              }}
-            >
-              {verifying ? 'Verifying...' : 'Verify & Continue'}
-            </button>
-          </div>
-        )}
-
+        {/* Error Message */}
         {error && (
-          <div style={{ color: '#d32f2f', marginTop: 12, fontSize: '0.9em', textAlign: 'center' }}>{error}</div>
+          <div style={{ 
+            color: '#dc2626', 
+            background: '#fef2f2',
+            padding: '12px',
+            borderRadius: 6,
+            marginBottom: 16, 
+            fontSize: '0.9em',
+            border: '1px solid #fecaca'
+          }}>
+            {error}
+          </div>
         )}
-        {infoMsg && (
-          <div style={{ color: '#388e3c', marginTop: 12, fontSize: '0.9em', textAlign: 'center', padding: '12px', background: '#f1f8f1', borderRadius: 6 }}>{infoMsg}</div>
-        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: '100%',
+            padding: '12px',
+            borderRadius: 6,
+            background: loading ? '#9ca3af' : '#2563eb',
+            color: '#fff',
+            border: 'none',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontWeight: 600,
+            fontSize: '1em',
+            transition: 'background 0.2s'
+          }}
+          onMouseEnter={(e) => !loading && (e.target.style.background = '#1d4ed8')}
+          onMouseLeave={(e) => !loading && (e.target.style.background = '#2563eb')}
+        >
+          {loading ? 'Signing In...' : 'Sign In'}
+        </button>
       </form>
+
+      {/* Signup Link */}
+      <div style={{ 
+        marginTop: 24, 
+        textAlign: 'center', 
+        color: '#6b7280',
+        fontSize: '0.9em'
+      }}>
+        Don't have an account?{' '}
+        <Link 
+          to="/signup" 
+          style={{ 
+            color: '#2563eb', 
+            textDecoration: 'none',
+            fontWeight: 500
+          }}
+        >
+          Create Account
+        </Link>
+      </div>
     </div>
   );
 }
