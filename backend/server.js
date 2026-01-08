@@ -21,7 +21,7 @@ import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import applicationRoutes from "./src/routes/applicationRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
-import verificationRoutes from "./src/routes/verificationRoutes.js";
+
 import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 
@@ -34,8 +34,8 @@ const app = express();
 await connectDB();
 
 // ---------- Parsers (MUST come before routes) ----------
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 // Static uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -101,17 +101,17 @@ io.on("connection", (socket) => {
   // Handle disconnection
   socket.on("disconnect", () => {
     console.log("❌ User disconnected:", socket.id);
-    
+
     // Find and remove the user from the map
     const disconnectedUserId = Object.keys(userIdToSocketIdMap).find(
       (uid) => userIdToSocketIdMap[uid] === socket.id
     );
-    
+
     if (disconnectedUserId) {
       delete userIdToSocketIdMap[disconnectedUserId];
       console.log(`👋 User ${disconnectedUserId} removed from online list`);
       console.log("👥 Online users:", getOnlineUsers().length);
-      
+
       // Broadcast updated online users
       io.emit("getOnlineUsers", getOnlineUsers());
     }
@@ -142,9 +142,8 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/verification", verificationRoutes);
 app.use("/api/messages", chatRoutes);
-app.use("/api/groups", groupRoutes); // ✅ GROUP ROUTES MOUNTED
+app.use("/api/groups", groupRoutes);
 console.log("✅ All API routes mounted successfully");
 
 // 404 + error handler (MUST be LAST)
@@ -152,7 +151,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // ---------- Boot server ----------
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log(`✅ API running on PORT:${PORT}`);
 });

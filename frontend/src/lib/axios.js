@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: import.meta.env.MODE === 'development' ? 'http://localhost:5000' : '/',
+  baseURL:
+    import.meta.env.MODE === "development" ? "http://localhost:5000" : "/",
   withCredentials: true,
 });
 

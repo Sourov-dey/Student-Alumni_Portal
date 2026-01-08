@@ -1,19 +1,19 @@
-// frontend/src/App.jsx
+// frontend/src/App.jsx - UPDATED VERSION
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import Signup from './pages/Signup'; // ✅ ADD THIS IMPORT
 import Jobs from './pages/Jobs';
 import JobDetail from './pages/JobDetail';
 import PostJob from './pages/PostJob';
 import Chat from './pages/Chat';
 import { useAuth } from './context/AuthContext';
-import NotificationBell from './components/NotificationBell';
 import Navbar from './components/Navbar';
 import NotificationsPage from './pages/Notifications';
 import VerifyId from './pages/verifyId';
 import AdminVerifications from './pages/AdminVerifications';
-import ApplicationVerifyModal from './components/ApplicationVerifyModal';
+
 
 export default function App() {
   const auth = useAuth();
@@ -28,6 +28,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} /> 
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/verify-id" element={<VerifyId />} />     
           <Route path="/jobs/:id" element={<JobDetail />} />
@@ -41,5 +42,5 @@ export default function App() {
         </Routes>
       </main>
     </div>
-  )
+  );
 }
