@@ -1,5 +1,5 @@
 import axios from "axios";
-const http = axios.create({ baseURL: "http://localhost:5000" });
+const http = axios.create({ baseURL: "http://localhost:5000" ,withCredentials: true,});
 
 export const attachToken = (token) => {
   if (token) http.defaults.headers.common.Authorization = `Bearer ${token}`;
