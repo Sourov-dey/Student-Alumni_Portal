@@ -25,6 +25,8 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -146,7 +148,8 @@ app.use("/api/messages", chatRoutes);
 app.use("/api/groups", groupRoutes);
 console.log("✅ All API routes mounted successfully");
 
-// 404 + error handler (MUST be LAST)
+
+// 404 + error handler
 app.use(notFound);
 app.use(errorHandler);
 
