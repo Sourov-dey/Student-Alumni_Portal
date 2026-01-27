@@ -13,6 +13,8 @@ import Navbar from './components/Navbar';
 import NotificationsPage from './pages/Notifications';
 import VerifyId from './pages/verifyId';
 import AdminVerifications from './pages/AdminVerifications';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 
 export default function App() {
@@ -28,6 +30,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/signup" element={<Signup />} /> 
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/verify-id" element={<VerifyId />} />     

@@ -9,7 +9,7 @@ import {
   updateProfile,
   deleteConversation,
   deleteMessage,
-} from "../controllers/chatController.js";
+} from "../controllers/ChatController.js";
 
 const router = express.Router();
 

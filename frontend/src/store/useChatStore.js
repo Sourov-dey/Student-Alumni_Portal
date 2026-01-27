@@ -1,8 +1,6 @@
-// frontend/src/store/useChatStore.js
+// frontend/src/store/useChatStore.js - FIXED VERSION
 import { create } from "zustand";
 import http from "../api/http";
-
-const BASE_URL = "http://localhost:5000";
 
 // Get hidden users from localStorage
 const getHiddenUsers = () => {
@@ -18,7 +16,7 @@ const saveHiddenUsers = (users) => {
   localStorage.setItem("hiddenChatUsers", JSON.stringify(users));
 };
 
-// Get pending conversations from localStorage (users clicked but no messages yet)
+// Get pending conversations from localStorage
 const getPendingConversations = () => {
   try {
     return JSON.parse(localStorage.getItem("pendingConversations") || "[]");
@@ -53,7 +51,7 @@ export const useChatStore = create((set, get) => ({
         console.log("🆕 New conversation notification received:", userData);
 
         try {
-          const res = await http.get(`${BASE_URL}/api/messages/conversations`);
+          const res = await http.get("/api/messages/conversations");
           console.log("🔄 Reloaded conversation users after notification");
 
           const pendingConversations = get().pendingConversations;
@@ -76,9 +74,7 @@ export const useChatStore = create((set, get) => ({
 
         if (!isFromCurrentChat) {
           try {
-            const res = await http.get(
-              `${BASE_URL}/api/messages/conversations`
-            );
+            const res = await http.get("/api/messages/conversations");
 
             const pendingConversations = get().pendingConversations;
             const dbUserIds = res.data.map((u) => u._id);
@@ -101,53 +97,83 @@ export const useChatStore = create((set, get) => ({
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
-      console.log("🔡 Fetching all users...");
-      const res = await http.get(`${BASE_URL}/api/messages/users`);
-      console.log("✅ Users fetched:", res.data.length);
-      set({ users: res.data });
+      console.log("🔥 Fetching users for chat search from /api/users/for-chat");
+
+      const res = await http.get("/api/users/for-chat");
+
+      console.log(`✅ Fetched ${res.data.length} users for search`);
+      console.log(
+        "👥 Users:",
+        res.data.map((u) => `${u.name} (${u.email})`).join(", ")
+      );
+
+      if (!res.data || !Array.isArray(res.data)) {
+        console.error("❌ Invalid response from server:", res.data);
+        set({ users: [], isUsersLoading: false });
+        return;
+      }
+
+      set({ users: res.data, isUsersLoading: false });
     } catch (error) {
       console.error("❌ Error fetching users:", error);
-    } finally {
-      set({ isUsersLoading: false });
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
+      // ✅ ADDED: More helpful error message
+      if (error.response?.status === 401) {
+        console.error("🔴 AUTHENTICATION ERROR: Token may be invalid or missing");
+        console.error("🔍 Check localStorage for 'au_token'");
+      }
+      
+      set({ isUsersLoading: false, users: [] });
     }
   },
 
   getConversationUsers: async () => {
-    set({ isConversationUsersLoading: true });
-    try {
-      console.log("💬 Fetching conversation users...");
-      const res = await http.get(`${BASE_URL}/api/messages/conversations`);
-      console.log("✅ Conversation users fetched from DB:", res.data.length);
+  set({ isConversationUsersLoading: true });
+  try {
+    console.log("💬 Fetching conversation users...");
+    
+    // 🔍 DEBUG: Check token before request
+    const token = localStorage.getItem("au_token");
+    console.log("  Token in localStorage:", token ? "✅ Present" : "❌ Missing");
+    
+    const res = await http.get("/api/messages/conversations");
+    console.log("✅ Conversation users fetched from DB:", res.data.length);
 
-      const pendingConversations = get().pendingConversations;
-      console.log(
-        "📋 Pending conversations from localStorage:",
-        pendingConversations.length
-      );
+    const pendingConversations = get().pendingConversations;
+    console.log("📋 Pending conversations from localStorage:", pendingConversations.length);
 
-      const dbUserIds = res.data.map((u) => u._id);
-      const uniquePending = pendingConversations.filter(
-        (u) => !dbUserIds.includes(u._id)
-      );
+    const dbUserIds = res.data.map((u) => u._id);
+    const uniquePending = pendingConversations.filter(
+      (u) => !dbUserIds.includes(u._id)
+    );
 
-      const allConversations = [...res.data, ...uniquePending];
-      console.log("✅ Total conversation users:", allConversations.length);
+    const allConversations = [...res.data, ...uniquePending];
+    console.log("✅ Total conversation users:", allConversations.length);
 
-      set({ conversationUsers: allConversations });
-    } catch (error) {
-      console.error("❌ Error fetching conversation users:", error);
-    } finally {
-      set({ isConversationUsersLoading: false });
+    set({ conversationUsers: allConversations });
+  } catch (error) {
+    console.error("❌ Error fetching conversation users:", error);
+    
+    // ✅ ENHANCED ERROR LOGGING
+    if (error.response?.status === 401) {
+      console.error("🔴 AUTHENTICATION ERROR: Token may be invalid or missing");
+      console.error("📍 Check these things:");
+      console.error("  1. localStorage has 'au_token'?", !!localStorage.getItem("au_token"));
+      console.error("  2. Token value:", localStorage.getItem("au_token")?.substring(0, 20) + "...");
+      console.error("  3. Request headers:", error.config?.headers);
     }
-  },
+  } finally {
+    set({ isConversationUsersLoading: false });
+  }
+},
 
-  // Add user to conversations immediately when clicked
   addToConversations: (user) => {
     console.log("🔵 addToConversations called for:", user.name);
 
     const { conversationUsers, pendingConversations, hiddenUsers } = get();
 
-    // Check if user is hidden
     if (hiddenUsers.includes(user._id)) {
       console.log("⚠️ User is hidden, removing from hidden list first");
       const newHiddenUsers = hiddenUsers.filter((id) => id !== user._id);
@@ -155,7 +181,6 @@ export const useChatStore = create((set, get) => ({
       set({ hiddenUsers: newHiddenUsers });
     }
 
-    // Check if already exists in conversation users
     const existsInConversations = conversationUsers.some(
       (u) => u._id === user._id
     );
@@ -167,10 +192,8 @@ export const useChatStore = create((set, get) => ({
 
     console.log("➕ Adding user to conversation list NOW");
 
-    // Add to conversation users immediately
     const updatedConversations = [...conversationUsers, user];
 
-    // Add to pending conversations in localStorage
     const existsInPending = pendingConversations.some(
       (u) => u._id === user._id
     );
@@ -182,7 +205,6 @@ export const useChatStore = create((set, get) => ({
       console.log("💾 Saved to localStorage");
     }
 
-    // Update state
     set({
       conversationUsers: updatedConversations,
       pendingConversations: updatedPending,
@@ -205,7 +227,7 @@ export const useChatStore = create((set, get) => ({
   getMessages: async (userId) => {
     set({ isMessagesLoading: true });
     try {
-      const res = await http.get(`${BASE_URL}/api/messages/${userId}`);
+      const res = await http.get(`/api/messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
       console.error("❌ Error fetching messages:", error);
@@ -220,7 +242,7 @@ export const useChatStore = create((set, get) => ({
       console.log("📤 Sending message to:", selectedUser._id);
 
       const res = await http.post(
-        `${BASE_URL}/api/messages/send/${selectedUser._id}`,
+        `/api/messages/send/${selectedUser._id}`,
         messageData
       );
 
@@ -232,9 +254,7 @@ export const useChatStore = create((set, get) => ({
 
       console.log("🔄 Reloading conversation users after send...");
       try {
-        const conversationRes = await http.get(
-          `${BASE_URL}/api/messages/conversations`
-        );
+        const conversationRes = await http.get("/api/messages/conversations");
 
         const pendingConversations = get().pendingConversations;
         const dbUserIds = conversationRes.data.map((u) => u._id);
@@ -322,7 +342,7 @@ export const useChatStore = create((set, get) => ({
 
   deleteChatWithMessages: async (userId) => {
     try {
-      await http.delete(`${BASE_URL}/api/messages/conversation/${userId}`);
+      await http.delete(`/api/messages/conversation/${userId}`);
 
       const {
         hiddenUsers,

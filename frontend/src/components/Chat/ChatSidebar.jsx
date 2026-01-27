@@ -4,11 +4,11 @@ import { useChatStore } from "../../store/useChatStore";
 import { useAuth } from "../../context/AuthContext";
 import SidebarSkeleton from "./SidebarSkeleton";
 import { Users, MoreVertical, Trash2, X, Search } from "lucide-react";
+import http from "../../api/http";
+
 
 const ChatSidebar = ({ onOpenProfile }) => {
   const {
-    getUsers,
-    users,
     selectedUser,
     setSelectedUser,
     onlineUsers,
@@ -20,209 +20,158 @@ const ChatSidebar = ({ onOpenProfile }) => {
     addToConversations,
   } = useChatStore();
 
-  const { user: authUser } = useAuth();
+  const { user: authUser, token } = useAuth();
+
   const [menuOpenFor, setMenuOpenFor] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
-  // Load conversation users on mount
+  /* =====================================================
+     LOAD CONVERSATION USERS
+  ===================================================== */
   useEffect(() => {
-    console.log("🔄 ChatSidebar mounted, loading conversation users...");
     getConversationUsers();
   }, []);
 
-  // Debug: Log conversation users whenever they change
-  useEffect(() => {
-    console.log("📊 Conversation users updated:", conversationUsers.length);
-    console.log(
-      "👥 Users in sidebar:",
-      conversationUsers.map((u) => u.name)
-    );
-  }, [conversationUsers]);
+  /* =====================================================
+     🔍 BACKEND SEARCH (THE REAL FIX)
+  ===================================================== */
+ useEffect(() => {
+  if (!showSearch || !searchQuery.trim()) {
+    setSearchResults([]);
+    return;
+  }
 
-  // Filter conversation users (exclude hidden)
-  const filteredConversationUsers = conversationUsers.filter(
-    (user) => !hiddenUsers?.includes(user._id)
-  );
+  const controller = new AbortController();
 
-  console.log(
-    "🔍 Filtered conversation users:",
-    filteredConversationUsers.length
-  );
+  const searchUsers = async () => {
+    try {
+      setSearchLoading(true);
+      console.log("🔍 Calling backend search:", searchQuery);
 
-  // Handle search
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
+      const res = await http.get(
+        `/api/users/search?q=${encodeURIComponent(searchQuery)}`,
+        { signal: controller.signal }
+      );
+
+      console.log("✅ Search success:", res.data);
+      setSearchResults(res.data);
+    } catch (err) {
+      if (err.name !== "CanceledError") {
+        console.error("❌ Search failed:", err);
+        setSearchResults([]);
+      }
+    } finally {
+      setSearchLoading(false);
     }
-
-    console.log("🔍 Searching for:", searchQuery);
-
-    // Get all users if not already loaded
-    if (users.length === 0) {
-      await getUsers();
-    }
-
-    // Filter users based on search query
-    const query = searchQuery.toLowerCase().trim();
-    const results = users.filter((user) => {
-      const name = (user.name || "").toLowerCase();
-      const email = (user.email || "").toLowerCase();
-      return name.includes(query) || email.includes(query);
-    });
-
-    console.log("✅ Search results:", results.length);
-    setSearchResults(results);
   };
 
-  // CRITICAL: Handle selecting a user from search results
+  const delay = setTimeout(searchUsers, 300);
+  return () => {
+    clearTimeout(delay);
+    controller.abort();
+  };
+}, [searchQuery, showSearch]);
+
+
+
+  /* =====================================================
+     HANDLERS
+  ===================================================== */
   const handleSelectSearchResult = (user) => {
-    console.log("🎯 User clicked from search:", user.name, "ID:", user._id);
-
-    // STEP 1: Add to conversations FIRST (this updates the sidebar)
     addToConversations(user);
-
-    // STEP 2: Set as selected user (this opens the chat)
     setSelectedUser(user);
 
-    // STEP 3: Close search UI
     setShowSearch(false);
     setSearchQuery("");
     setSearchResults([]);
-
-    console.log("✅ User selection complete");
   };
 
-  const handleMenuToggle = (e, userId) => {
-    e.stopPropagation();
-    setMenuOpenFor(menuOpenFor === userId ? null : userId);
-  };
-
-  const handleDeleteClick = (e, user) => {
-    e.stopPropagation();
-    setMenuOpenFor(null);
-    setDeleteConfirm(user);
-  };
-
-  const confirmDelete = () => {
-    if (deleteConfirm) {
-      deleteChat(deleteConfirm._id);
-      if (selectedUser?._id === deleteConfirm._id) {
-        setSelectedUser(null);
-      }
-      setDeleteConfirm(null);
-    }
-  };
-
-  const cancelDelete = () => {
-    setDeleteConfirm(null);
-  };
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setMenuOpenFor(null);
-    if (menuOpenFor) {
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
-    }
-  }, [menuOpenFor]);
-
-  // Handle search on Enter key
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === "Enter" && showSearch && searchQuery.trim()) {
-        e.preventDefault();
-        handleSearch();
-      }
-    };
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [showSearch, searchQuery]);
+  const filteredConversationUsers = conversationUsers.filter(
+    (u) => !hiddenUsers?.includes(u._id)
+  );
 
   if (isConversationUsersLoading) {
-    console.log("⏳ Loading conversation users...");
     return <SidebarSkeleton />;
   }
 
+  /* =====================================================
+     RENDER
+  ===================================================== */
   return (
     <aside className="chat-sidebar">
       <div className="sidebar-header">
         <div className="sidebar-title-row">
           <div className="sidebar-title">
             <Users className="sidebar-icon" />
-            <span className="sidebar-title-text">Messages</span>
+            <span>Messages</span>
           </div>
 
-          {/* Profile Button */}
           <button
             className="sidebar-profile-btn"
             onClick={onOpenProfile}
-            title="My Profile"
           >
             <img
               src={authUser?.avatarUrl || "/avatar.png"}
-              alt="My Profile"
-              className="sidebar-profile-img"
+              alt="Profile"
             />
           </button>
         </div>
 
-        {/* Search Button */}
-        <div className="sidebar-search-section">
-          <button
-            className="search-toggle-btn"
-            onClick={() => setShowSearch(!showSearch)}
-          >
-            <Search size={12} />
-            <span>Search Users</span>
-          </button>
-        </div>
+        <button
+          className="search-toggle-btn"
+          onClick={() => {
+            setShowSearch(!showSearch);
+            setSearchQuery("");
+            setSearchResults([]);
+          }}
+        >
+          <Search size={14} />
+          <span>Search Users</span>
+        </button>
 
-        {/* Search Input (shown when search is active) */}
         {showSearch && (
           <div className="search-input-wrapper">
             <input
               type="text"
-              className="search-input"
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
             />
-            <button className="search-btn" onClick={handleSearch}>
-              <Search size={16} />
+            <button onClick={() => setShowSearch(false)}>
+              <X size={16} />
             </button>
           </div>
         )}
       </div>
 
       <div className="sidebar-users">
-        {/* Show search results if searching */}
-        {showSearch && searchResults.length > 0 ? (
+        {showSearch ? (
           <>
-            <div className="search-results-header">
-              <span>Search Results ({searchResults.length})</span>
-            </div>
+            {searchLoading && <p className="muted">Searching...</p>}
+
+            {!searchLoading && searchQuery && searchResults.length === 0 && (
+              <div className="no-users">
+                <p>No users found matching "{searchQuery}"</p>
+              </div>
+            )}
+
             {searchResults.map((user) => (
               <button
                 key={user._id}
-                onClick={() => handleSelectSearchResult(user)}
                 className="user-item"
+                onClick={() => handleSelectSearchResult(user)}
               >
-                <div className="user-avatar-wrapper">
-                  <img
-                    src={user.avatarUrl || "/avatar.png"}
-                    alt={user.name}
-                    className="user-avatar"
-                  />
-                  {onlineUsers.includes(user._id) && (
-                    <span className="online-indicator" />
-                  )}
-                </div>
-
+                <img
+                  src={user.avatarUrl || "/avatar.png"}
+                  alt={user.name}
+                  className="user-avatar"
+                />
                 <div className="user-info">
                   <div className="user-name">{user.name}</div>
                   <div className="user-email">{user.email}</div>
@@ -230,107 +179,43 @@ const ChatSidebar = ({ onOpenProfile }) => {
               </button>
             ))}
           </>
-        ) : showSearch && searchQuery ? (
-          <div className="no-users">No users found</div>
         ) : (
-          /* Show conversation users (people you've chatted with or clicked on) */
           <>
-            {filteredConversationUsers.length > 0 ? (
-              filteredConversationUsers.map((user) => (
-                <div key={user._id} className="user-item-wrapper">
-                  <button
-                    onClick={() => {
-                      console.log("📱 Conversation user clicked:", user.name);
-                      setSelectedUser(user);
-                    }}
-                    className={`user-item ${
-                      selectedUser?._id === user._id ? "user-item-active" : ""
-                    }`}
-                  >
-                    <div className="user-avatar-wrapper">
-                      <img
-                        src={user.avatarUrl || "/avatar.png"}
-                        alt={user.name}
-                        className="user-avatar"
-                      />
-                      {onlineUsers.includes(user._id) && (
-                        <span className="online-indicator" />
-                      )}
-                    </div>
-
-                    <div className="user-info">
-                      <div className="user-name">{user.name}</div>
-                      <div className="user-status">
-                        {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* More Options Button */}
-                  <button
-                    className="user-menu-btn"
-                    onClick={(e) => handleMenuToggle(e, user._id)}
-                  >
-                    <MoreVertical size={18} />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {menuOpenFor === user._id && (
-                    <div
-                      className="user-dropdown-menu"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        className="dropdown-item delete-item"
-                        onClick={(e) => handleDeleteClick(e, user)}
-                      >
-                        <Trash2 size={16} />
-                        <span>Delete Chat</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
+            {filteredConversationUsers.length === 0 ? (
               <div className="no-users">
                 <p>No conversations yet</p>
                 <p className="no-users-hint">
-                  Use the search button above to find users and start chatting
+                  Use search to start chatting
                 </p>
               </div>
+            ) : (
+              filteredConversationUsers.map((user) => (
+                <button
+                  key={user._id}
+                  className={`user-item ${
+                    selectedUser?._id === user._id ? "active" : ""
+                  }`}
+                  onClick={() => setSelectedUser(user)}
+                >
+                  <img
+                    src={user.avatarUrl || "/avatar.png"}
+                    alt={user.name}
+                    className="user-avatar"
+                  />
+                  <div className="user-info">
+                    <div className="user-name">{user.name}</div>
+                    <div className="user-status">
+                      {onlineUsers.includes(user._id)
+                        ? "Online"
+                        : "Offline"}
+                    </div>
+                  </div>
+                </button>
+              ))
             )}
           </>
         )}
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="delete-modal-overlay" onClick={cancelDelete}>
-          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={cancelDelete}>
-              <X size={20} />
-            </button>
-            <div className="delete-modal-content">
-              <div className="delete-modal-icon">
-                <Trash2 size={32} />
-              </div>
-              <h3>Delete Chat?</h3>
-              <p>
-                Delete chat with <strong>{deleteConfirm.name}</strong>? This
-                will remove them from your chat list.
-              </p>
-              <div className="delete-modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>
-                  Cancel
-                </button>
-                <button className="btn-delete" onClick={confirmDelete}>
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </aside>
   );
 };

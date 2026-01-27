@@ -34,7 +34,7 @@ const app = express();
 
 // ---------- Database Connection FIRST ----------
 await connectDB();
-
+import User from './src/models/User.js';
 // ---------- Parsers (MUST come before routes) ----------
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));

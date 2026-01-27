@@ -4,7 +4,7 @@ import { validate } from "../middleware/validate.js";
 import { devLoginSchema } from "../validators/authSchemas.js";
 import { issueJWT, requireAuth } from "../middleware/auth.js";
 import User from "../models/User.js";
-import { signup, loginUser } from "../controllers/authController.js"; 
+import { signup, loginUser,forgotPassword,resetPassword } from "../controllers/authController.js"; 
 
 const router = Router();
 
@@ -13,8 +13,9 @@ router.get("/health", (_req, res) => res.json({ ok: true, scope: "auth" }));
 
 
 router.post("/signup", signup);
-console.log("signup route mounted correctly");
+
 router.post("/login", loginUser);  
+
 
 // Dev login (for testing)
 router.post(
@@ -56,5 +57,8 @@ router.get("/me", requireAuth, (req, res) => {
 router.post("/me", requireAuth, (req, res) => {
   res.json({ user: req.user });
 });
+
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 export default router;

@@ -1,8 +1,9 @@
-// frontend/src/pages/Login.jsx
+// frontend/src/pages/Login.jsx - FIXED & RESPONSIVE
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import http from '../api/http';
 import { useAuth } from '../context/AuthContext';
+import '../styles/auth.css';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -11,21 +12,41 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setError(''); // Clear error when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.email || !isValidEmail(formData.email)) {
+    
+    // Client-side validation
+    const email = formData.email.trim().toLowerCase();
+    const password = formData.password;
+
+    if (!email) {
+      setError('Email is required');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
       setError('Please enter a valid email address');
       return;
     }
-    if (!formData.password) {
-      setError('Please enter your password');
+
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
 
@@ -33,161 +54,141 @@ export default function Login() {
     setError('');
 
     try {
+      console.log('🔐 Attempting login for:', email);
+      
       const response = await http.post('/api/auth/login', {
-        email: formData.email.toLowerCase().trim(),
-        password: formData.password
+        email: email,
+        password: password
       });
 
+      console.log('✅ Login response received:', response.data);
+
       const { token, user } = response.data;
-      if (!token || !user) {
-        setError('Login failed. Please try again.');
+
+      // Validate response data
+      if (!token) {
+        console.error('❌ No token received from server');
+        setError('Login failed: Invalid server response');
         return;
       }
 
+      if (!user || !user._id) {
+        console.error('❌ No user data received from server');
+        setError('Login failed: Invalid user data');
+        return;
+      }
+
+      console.log('✅ Login successful for user:', user.email);
+
+      // Store credentials and navigate
       login(token, user);
       navigate('/jobs');
     } catch (err) {
-      setError(err?.response?.data?.message || 'Invalid email or password');
+      console.error('❌ Login error:', err);
+
+      // Handle different error scenarios
+      if (err.response) {
+        // Server responded with an error
+        const status = err.response.status;
+        const message = err.response.data?.message;
+
+        if (status === 401) {
+          setError('Invalid email or password');
+        } else if (status === 404) {
+          setError('Account not found. Please sign up first.');
+        } else if (status === 400) {
+          setError(message || 'Invalid login credentials');
+        } else if (status === 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          setError(message || 'Login failed. Please try again.');
+        }
+      } else if (err.request) {
+        // Request made but no response
+        setError('Network error. Please check your connection.');
+      } else {
+        // Something else happened
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Styles based on your uploaded screenshot
-  const styles = {
-    pageWrapper: {
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'radial-gradient(circle at center, #1e4aba 0%, #102a7a 100%)',
-      fontFamily: "'Inter', sans-serif",
-      padding: '20px'
-    },
-    card: {
-      width: '100%',
-      maxWidth: '440px',
-      backgroundColor: '#2557d6', // Bright blue from screenshot
-      borderRadius: '24px',
-      padding: '40px 32px',
-      boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-      border: '1px solid rgba(255,255,255,0.1)'
-    },
-    headerText: {
-      color: '#ffffff',
-      fontSize: '28px',
-      fontWeight: '700',
-      textAlign: 'center',
-      margin: '0 0 4px 0'
-    },
-    subHeaderText: {
-      color: 'rgba(255,255,255,0.7)',
-      fontSize: '14px',
-      textAlign: 'center',
-      marginBottom: '32px'
-    },
-    label: {
-      display: 'block',
-      color: '#ffffff',
-      fontSize: '13px',
-      fontWeight: '600',
-      marginBottom: '8px',
-      marginLeft: '4px'
-    },
-    inputField: {
-      width: '100%',
-      padding: '14px 16px',
-      marginBottom: '20px',
-      borderRadius: '12px',
-      border: 'none',
-      backgroundColor: '#1a41a8', // Darker blue for "inset" look
-      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)', // 3D Inset effect
-      color: '#ffffff',
-      fontSize: '15px',
-      outline: 'none',
-      boxSizing: 'border-box'
-    },
-    submitBtn: {
-      width: '100%',
-      padding: '14px',
-      marginTop: '10px',
-      borderRadius: '12px',
-      border: 'none',
-      backgroundColor: loading ? '#d1d5db' : '#eef2ff', // Light grayish-white button
-      color: '#1e4aba',
-      fontSize: '16px',
-      fontWeight: '700',
-      cursor: loading ? 'not-allowed' : 'pointer',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      transition: 'all 0.2s ease'
-    },
-    footerLink: {
-      textAlign: 'center',
-      marginTop: '24px',
-      fontSize: '14px',
-      color: 'rgba(255,255,255,0.8)'
-    }
-  };
-
   return (
-    <div style={styles.pageWrapper}>
-      <div style={styles.card}>
-        <h1 style={styles.headerText}>Welcome Back</h1>
-        <p style={styles.subHeaderText}>Assam University Alumni-Student Portal</p>
+    <div className="auth-page-wrapper">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1 className="auth-title">Welcome Back</h1>
+          <p className="auth-subtitle">Assam University Alumni-Student Portal</p>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label style={styles.label}>Email Address</label>
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email Address
+            </label>
             <input
               type="email"
+              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email address"
-              style={styles.inputField}
+              className="form-input"
+              autoComplete="email"
+              disabled={loading}
               required
             />
           </div>
 
-          <div>
-            <label style={styles.label}>Password</label>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
             <input
               type="password"
+              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••"
-              style={styles.inputField}
+              placeholder="••••••••"
+              className="form-input"
+              autoComplete="current-password"
+              disabled={loading}
               required
             />
           </div>
 
           {error && (
-            <div style={{ 
-              color: '#ff8a8a', 
-              fontSize: '13px', 
-              marginBottom: '16px', 
-              textAlign: 'center',
-              fontWeight: '500' 
-            }}>
-              {error}
+            <div className="error-message" role="alert">
+              <span className="error-icon">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
-          <button 
-            type="submit" 
-            disabled={loading} 
-            style={styles.submitBtn}
-            onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#ffffff')}
-            onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = '#eef2ff')}
+          <button
+            type="submit"
+            disabled={loading}
+            className={`submit-btn ${loading ? 'loading' : ''}`}
           >
-            {loading ? 'Processing...' : 'Sign In'}
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Processing...
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
+          <div className="auth-footer">
+  <Link to="/forgot-password">Forgot your password?</Link>
+</div>
         </form>
 
-        <div style={styles.footerLink}>
+        <div className="auth-footer">
           Don't have an account?{' '}
-          <Link to="/signup" style={{ color: '#ffffff', fontWeight: '700', textDecoration: 'none' }}>
+          <Link to="/signup" className="auth-link">
             Sign Up
           </Link>
         </div>
