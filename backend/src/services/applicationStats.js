@@ -1,5 +1,5 @@
 // src/services/applicationStats.js
-import Application from '../models/Application.js';
+import Application from '../models/application.js';
 
 export const getApplicationStats = async (jobIds) => {
   if (!jobIds || !jobIds.length) return {};

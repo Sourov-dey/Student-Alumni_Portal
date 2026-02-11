@@ -1,7 +1,7 @@
 // backend/src/controllers/groupController.js - COMPLETE FILE WITH ALL FUNCTIONS
 
-import Group from "../models/Group.js";
-import GroupMessage from "../models/GroupMessage.js";
+import Group from "../models/group.js";
+import GroupMessage from "../models/groupMessage.js";
 import User from "../models/User.js";
 import { io, getReceiverSocketId } from "../../server.js";
 

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Application from "../models/Application.js";
+import Application from "../models/application.js";
 import Job from "../models/job.js";
 import path from 'path';
 

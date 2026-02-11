@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuth } from "../context/AuthContext";
-import ChatSidebar from "../components/chat/ChatSidebar";
-import NoChatSelected from "../components/chat/NoChatSelected";
-import ChatContainer from "../components/chat/ChatContainer";
+import ChatSidebar from "../components/Chat/ChatSidebar";
+import NoChatSelected from "../components/Chat/NoChatSelected";
+import ChatContainer from "../components/Chat/ChatContainer";
 import ChatProfilePage from "../components/Chat/ChatProfilePage";
 import GroupChatInterface from "../components/groupChat/GroupChatInterface";
 import { debugAuthState, verifyToken } from "../utils/tokenUtils";
