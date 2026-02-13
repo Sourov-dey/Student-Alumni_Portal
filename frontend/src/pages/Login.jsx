@@ -120,7 +120,9 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-header">
           <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle">Assam University Alumni-Student Portal</p>
+          <p className="auth-subtitle" style={{ color: "black"}}>
+            Assam University Alumni-Student Portal
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
@@ -186,7 +188,9 @@ export default function Login() {
 </div>
         </form>
 
-        <div className="auth-footer">
+        <div className="auth-footer"
+        style={{ color: "#000000"}}
+        >
           Don't have an account?{' '}
           <Link to="/signup" className="auth-link">
             Sign Up
