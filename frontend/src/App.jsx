@@ -12,7 +12,7 @@ import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import NotificationsPage from './pages/Notifications';
 import VerifyId from './pages/verifyId';
-import AdminVerifications from './pages/AdminVerifications';
+import AdminPanel from './pages/AdminPanel';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
@@ -31,17 +31,17 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/signup" element={<Signup />} /> 
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/jobs" element={<Jobs />} />
-          <Route path="/verify-id" element={<VerifyId />} />     
+          <Route path="/verify-id" element={<VerifyId />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/post-job" element={<PostJob />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/admin/verifications" element={<AdminVerifications />} />
-          <Route 
-            path="/chat" 
-            element={user ? <Chat /> : <Navigate to="/login" />} 
+          <Route path="/admin/*" element={<AdminPanel />} />
+          <Route
+            path="/chat"
+            element={user ? <Chat /> : <Navigate to="/login" />}
           />
         </Routes>
       </main>

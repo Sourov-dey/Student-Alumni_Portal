@@ -31,8 +31,12 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: [true, 'Role is required'],
-      enum: ['student', 'alumni'],
+      enum: ['student', 'alumni', 'admin'],
       default: 'student'
+    },
+    verified: {
+      type: Boolean,
+      default: false
     },
     avatarUrl: {
       type: String,
@@ -63,12 +67,12 @@ const userSchema = new mongoose.Schema(
       default: true
     },
     resetPasswordToken: {
-  type: String,
-  select: false
-},
-resetPasswordExpire: {
-  type: Date
-}
+      type: String,
+      select: false
+    },
+    resetPasswordExpire: {
+      type: Date
+    }
 
   },
   {
@@ -84,13 +88,13 @@ userSchema.index({ createdAt: -1 });
 // ========== INSTANCE METHODS ==========
 
 // Method to compare passwords (can be used as alternative)
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   const bcrypt = await import('bcryptjs');
   return await bcrypt.default.compare(candidatePassword, this.password);
 };
 
 // Method to get public profile (without sensitive data)
-userSchema.methods.toPublicJSON = function() {
+userSchema.methods.toPublicJSON = function () {
   return {
     _id: this._id,
     name: this.name,
@@ -101,7 +105,7 @@ userSchema.methods.toPublicJSON = function() {
     graduationYear: this.graduationYear,
     bio: this.bio,
     skills: this.skills,
-    
+
     createdAt: this.createdAt,
     updatedAt: this.updatedAt
   };

@@ -11,6 +11,7 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
     role: "student",
+    adminSecret: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,12 +60,16 @@ export default function Signup() {
     setError("");
 
     try {
-      const response = await http.post("/api/auth/signup", {
+      const payload = {
         name: formData.name.trim(),
         email: formData.email.toLowerCase().trim(),
         password: formData.password,
         role: formData.role,
-      });
+      };
+      if (formData.role === "admin") {
+        payload.adminSecret = formData.adminSecret;
+      }
+      const response = await http.post("/api/auth/signup", payload);
 
       const { token, user } = response.data;
       if (!token || !user) {
@@ -222,8 +227,48 @@ export default function Signup() {
               <option value="alumni" style={{ color: "#000" }}>
                 Alumni
               </option>
+              <option value="admin" style={{ color: "#000" }}>
+                Admin
+              </option>
             </select>
           </div>
+
+          {formData.role === "admin" && (
+            <div style={{ marginBottom: "20px" }}>
+              <label style={labelStyle}>Admin Secret Code</label>
+              <input
+                type="password"
+                name="adminSecret"
+                value={formData.adminSecret}
+                onChange={handleChange}
+                placeholder="Enter admin secret code"
+                style={{
+                  ...inputStyle,
+                  borderColor: "rgba(251, 191, 36, 0.4)",
+                }}
+                onFocus={(e) => {
+                  e.target.style.background = "rgba(255, 255, 255, 0.1)";
+                  e.target.style.borderColor = "rgba(251, 191, 36, 0.6)";
+                  e.target.style.boxShadow = "0 0 0 4px rgba(251, 191, 36, 0.2)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.background = "rgba(0, 0, 0, 0.2)";
+                  e.target.style.borderColor = "rgba(251, 191, 36, 0.4)";
+                  e.target.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.3)";
+                }}
+              />
+              <p
+                style={{
+                  color: "rgba(251, 191, 36, 0.8)",
+                  fontSize: "0.75rem",
+                  marginTop: "6px",
+                  paddingLeft: "4px",
+                }}
+              >
+                ⚠️ Admin access requires a secret code from the portal administrator.
+              </p>
+            </div>
+          )}
 
           <div
             style={{

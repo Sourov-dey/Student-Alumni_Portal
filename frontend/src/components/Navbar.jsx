@@ -89,6 +89,13 @@ export default function Navbar() {
                 active={location.pathname === "/chat"}
               />
             )}
+            {user && user.role === "admin" && (
+              <NavLink
+                to="/admin"
+                label="Admin"
+                active={location.pathname.startsWith("/admin")}
+              />
+            )}
           </div>
 
           {/* Right Action Section */}
@@ -210,6 +217,13 @@ export default function Navbar() {
                   to="/chat"
                   label="Chat"
                   active={location.pathname === "/chat"}
+                />
+              )}
+              {user && user.role === "admin" && (
+                <NavLink
+                  to="/admin"
+                  label="Admin"
+                  active={location.pathname.startsWith("/admin")}
                 />
               )}
             </div>

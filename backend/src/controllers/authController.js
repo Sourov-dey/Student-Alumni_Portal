@@ -8,10 +8,18 @@ import User from '../models/User.js';
    ============================ */
 export const signup = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, adminSecret } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Admin secret gate — only allow admin role with correct secret
+    if (role === 'admin') {
+      const ADMIN_SECRET = process.env.ADMIN_SECRET || '90210';
+      if (!adminSecret || adminSecret !== ADMIN_SECRET) {
+        return res.status(403).json({ message: 'Invalid admin secret code' });
+      }
     }
 
     if (password.length < 6) {

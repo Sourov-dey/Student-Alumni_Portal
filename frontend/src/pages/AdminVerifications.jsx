@@ -131,7 +131,7 @@ export default function AdminVerifications() {
                       {doc.url ? (
                         <button
                           className="link"
-                          onClick={() => setPreview({ url: doc.url, mime: doc.mime })}
+                          onClick={() => setPreview({ url: `http://localhost:5000${doc.url}`, mime: doc.mime })}
                         >
                           Preview
                         </button>
