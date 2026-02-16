@@ -25,6 +25,7 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 import verifyRoutes from "./src/routes/verifyRoutes.js";
+import notificationRoutes from "./src/routes/notificationRoutes.js";
 
 
 
@@ -148,6 +149,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/messages", chatRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/verify", verifyRoutes);
+app.use("/api/notifications", notificationRoutes);
 console.log("✅ All API routes mounted successfully");
 
 

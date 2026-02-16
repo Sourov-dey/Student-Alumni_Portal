@@ -126,9 +126,18 @@ export default function Navbar() {
                   <div className="user-profile-tag">
                     <div className="user-details">
                       <span className="user-email-text">{user.email}</span>
-                      <span className={`role-badge ${user.role}`}>
-                        {user.role}
-                      </span>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <span className={`role-badge ${user.role}`}>
+                          {user.role}
+                        </span>
+                        {user.role !== "admin" && (
+                          user.verified ? (
+                            <span title="Verified" style={{ fontSize: 14, cursor: "default" }}>✅</span>
+                          ) : (
+                            <Link to="/verify-id" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}>Verify</Link>
+                          )
+                        )}
+                      </div>
                     </div>
                     <button
                       onClick={handleLogout}
@@ -234,9 +243,19 @@ export default function Navbar() {
                 <div className="mobile-user-info">
                   <div className="user-details">
                     <span className="user-email-text">{user.email}</span>
-                    <span className={`role-badge ${user.role}`}>
-                      {user.role}
-                    </span>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <span className={`role-badge ${user.role}`}>
+                        {user.role}
+                      </span>
+                      {user.role !== "admin" && (
+                        user.verified ? (
+                          <span title="Verified" style={{ fontSize: 14, cursor: "default" }}>✅</span>
+                        ) : (
+                          <Link to="/verify-id" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}
+                            onClick={() => setShowMobileMenu(false)}>Verify</Link>
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
 

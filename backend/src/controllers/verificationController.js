@@ -1,5 +1,6 @@
 import Verification from "../models/Verification.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 /**
  * POST /api/verify/id-card
@@ -59,6 +60,36 @@ export const submitIdCard = async (req, res, next) => {
 };
 
 /**
+ * GET /api/verify/status
+ * Authenticated user checks their own verification status.
+ */
+export const getMyVerificationStatus = async (req, res, next) => {
+    try {
+        const verification = await Verification.findOne({ user: req.user._id })
+            .sort({ submittedAt: -1 })
+            .lean();
+
+        if (!verification) {
+            return res.json({ status: "none", verification: null });
+        }
+
+        res.json({
+            status: verification.status,
+            verification: {
+                _id: verification._id,
+                status: verification.status,
+                submittedAt: verification.submittedAt,
+                reviewedAt: verification.reviewedAt,
+                reviewNote: verification.reviewNote || "",
+            },
+        });
+    } catch (err) {
+        console.error("❌ Get verification status error:", err);
+        next(err);
+    }
+};
+
+/**
  * GET /api/admin/verifications?status=pending
  * Admin lists all verifications, optionally filtered by status.
  */
@@ -110,6 +141,14 @@ export const approveVerification = async (req, res, next) => {
         // Mark user as verified
         await User.findByIdAndUpdate(verification.user, { verified: true });
 
+        // Create in-app notification for the user
+        await Notification.create({
+            user: verification.user,
+            type: "verification",
+            message: "Your ID verification has been approved! ✅",
+            payload: { verificationId: verification._id, status: "verified" },
+        });
+
         console.log(`✅ Verification ${id} approved by admin ${req.user._id}`);
 
         res.json({
@@ -146,6 +185,14 @@ export const rejectVerification = async (req, res, next) => {
         verification.reviewedBy = req.user._id;
         verification.reviewedAt = new Date();
         await verification.save();
+
+        // Create in-app notification for the user
+        await Notification.create({
+            user: verification.user,
+            type: "verification",
+            message: "Your ID verification was rejected. Please re-submit.",
+            payload: { verificationId: verification._id, status: "rejected", note: verification.reviewNote },
+        });
 
         console.log(`❌ Verification ${id} rejected by admin ${req.user._id}`);
 

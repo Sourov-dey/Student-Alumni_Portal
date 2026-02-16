@@ -6,11 +6,12 @@ const notificationSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", index: true, required: true },
     type: {
       type: String,
-      enum: ["message", "chat_request", "chat_accept", "system"],
+      enum: ["message", "chat_request", "chat_accept", "system", "verification"],
       required: true,
       index: true,
     },
     payload: { type: mongoose.Schema.Types.Mixed, default: {} }, // e.g. { conversationId, messageId }
+    message: { type: String, default: "" },
     read: { type: Boolean, default: false, index: true },
     readAt: { type: Date },
   },
