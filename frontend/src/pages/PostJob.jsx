@@ -35,7 +35,7 @@ export default function PostJob() {
       </div>
     </div>
   );
-  
+
   if (user.role !== 'alumni' && user.role !== 'admin') {
     return (
       <div className="access-denied-container">
@@ -106,7 +106,7 @@ export default function PostJob() {
 
       const created = res.data?.job || res.data?.data || res.data;
       const id = created?._id || created?.id;
-      
+
       setTimeout(() => {
         if (id) {
           nav(`/jobs/${id}`);
@@ -151,13 +151,13 @@ export default function PostJob() {
                 Job Title
                 <span className="required">*</span>
               </label>
-              <input 
-                name="title" 
-                value={form.title} 
-                onChange={handleChange} 
+              <input
+                name="title"
+                value={form.title}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="e.g. Senior Software Engineer"
-                required 
+                required
               />
             </div>
 
@@ -168,13 +168,13 @@ export default function PostJob() {
                 Company Name
                 <span className="required">*</span>
               </label>
-              <input 
-                name="company" 
-                value={form.company} 
-                onChange={handleChange} 
+              <input
+                name="company"
+                value={form.company}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="e.g. Microsoft"
-                required 
+                required
               />
             </div>
 
@@ -185,12 +185,12 @@ export default function PostJob() {
                   <MapPin size={18} />
                   Location
                 </label>
-                <input 
-                  name="location" 
-                  value={form.location} 
-                  onChange={handleChange} 
+                <input
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
                   className="form-input"
-                  placeholder="Guwahati or Remote" 
+                  placeholder="Some Place or Remote"
                 />
               </div>
 
@@ -199,12 +199,12 @@ export default function PostJob() {
                   <Tag size={18} />
                   Department
                 </label>
-                <input 
-                  name="department" 
-                  value={form.department} 
-                  onChange={handleChange} 
+                <input
+                  name="department"
+                  value={form.department}
+                  onChange={handleChange}
                   className="form-input"
-                  placeholder="e.g. CSE, ECE" 
+                  placeholder="e.g. CSE, ECE"
                 />
               </div>
             </div>
@@ -215,9 +215,9 @@ export default function PostJob() {
                 <Clock size={18} />
                 Employment Type
               </label>
-              <select 
-                name="type" 
-                value={form.type} 
+              <select
+                name="type"
+                value={form.type}
                 onChange={handleChange}
                 className="form-select"
               >
@@ -236,14 +236,14 @@ export default function PostJob() {
                 Job Description
                 <span className="required">*</span>
               </label>
-              <textarea 
-                name="description" 
-                value={form.description} 
-                onChange={handleChange} 
-                rows={8} 
+              <textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                rows={8}
                 className="form-textarea"
                 placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
-                required 
+                required
               />
               <div className="form-hint">
                 {form.description.length}/2000 characters
@@ -273,7 +273,7 @@ export default function PostJob() {
               <div className="requirements-preview">
                 <div className="preview-label">Requirements Preview:</div>
                 <div className="requirements-tags">
-                  {form.requirements.split(',').map((req, i) => 
+                  {form.requirements.split(',').map((req, i) =>
                     req.trim() && (
                       <span key={i} className="requirement-tag">
                         {req.trim()}
@@ -307,16 +307,16 @@ export default function PostJob() {
 
             {/* Action Buttons */}
             <div className="form-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => nav('/jobs')}
                 className="btn-secondary"
                 disabled={loading}
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-primary"
                 disabled={loading}
               >
