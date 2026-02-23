@@ -4,17 +4,17 @@ import { validate } from "../middleware/validate.js";
 import { devLoginSchema } from "../validators/authSchemas.js";
 import { issueJWT, requireAuth } from "../middleware/auth.js";
 import User from "../models/User.js";
-import { signup, loginUser,forgotPassword,resetPassword } from "../controllers/authController.js"; 
+import { signup, loginUser, forgotPassword, resetPassword, sendOtp } from "../controllers/authController.js";
 
 const router = Router();
 
 // Health check
 router.get("/health", (_req, res) => res.json({ ok: true, scope: "auth" }));
 
-
+router.post("/send-otp", sendOtp);
 router.post("/signup", signup);
 
-router.post("/login", loginUser);  
+router.post("/login", loginUser);
 
 
 // Dev login (for testing)

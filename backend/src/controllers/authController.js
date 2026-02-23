@@ -2,16 +2,99 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User.js';
+import Otp from '../models/Otp.js';
+import { sendOtpEmail } from '../utils/emailService.js';
+
+// Verify reCAPTCHA token using Google's API
+const verifyCaptcha = async (token) => {
+  try {
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `secret=${secretKey}&response=${token}`,
+    });
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('❌ reCAPTCHA verification error:', error);
+    return false;
+  }
+};
+
+/* ============================
+   SEND OTP
+   ============================ */
+export const sendOtp = async (req, res) => {
+  try {
+    const { email, captchaToken } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    if (!captchaToken) {
+      return res.status(400).json({ message: 'reCAPTCHA token is required' });
+    }
+
+    // Verify captcha
+    const isHuman = await verifyCaptcha(captchaToken);
+    if (!isHuman) {
+      return res.status(403).json({ message: 'Failed reCAPTCHA verification' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Check if email already registered
+    const existingUser = await User.findOne({ email: normalizedEmail });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
+
+    // Generate 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash OTP before saving
+    const salt = await bcrypt.genSalt(10);
+    const hashedOtp = await bcrypt.hash(otpCode, salt);
+
+    // Save/Update OTP in DB (upsert based on email)
+    await Otp.findOneAndUpdate(
+      { email: normalizedEmail },
+      { otp: hashedOtp, createdAt: Date.now() },
+      { upsert: true, new: true }
+    );
+
+    // Send email
+    const emailSent = await sendOtpEmail(normalizedEmail, otpCode);
+
+    if (emailSent) {
+      const responseData = { message: 'OTP sent successfully' };
+      // In development mode without SMTP, include OTP in response for testing
+      if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        responseData.devOtp = otpCode;
+        responseData.message = 'OTP generated (dev mode — check response or console)';
+      }
+      res.status(200).json(responseData);
+    } else {
+      res.status(500).json({ message: 'Failed to send OTP email. Please try again later.' });
+    }
+  } catch (error) {
+    console.error('❌ sendOtp error:', error);
+    res.status(500).json({ message: 'Server error during OTP generation' });
+  }
+};
+
 
 /* ============================
    SIGNUP
    ============================ */
 export const signup = async (req, res) => {
   try {
-    const { name, email, password, role, adminSecret } = req.body;
+    const { name, email, password, role, adminSecret, otp } = req.body;
 
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ message: 'All fields are required' });
+    if (!name || !email || !password || !role || !otp) {
+      return res.status(400).json({ message: 'All fields and OTP are required' });
     }
 
     // Admin secret gate — only allow admin role with correct secret
@@ -28,8 +111,10 @@ export const signup = async (req, res) => {
         .json({ message: 'Password must be at least 6 characters' });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     const existingUser = await User.findOne({
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
     });
 
     if (existingUser) {
@@ -38,12 +123,26 @@ export const signup = async (req, res) => {
         .json({ message: 'Email already registered' });
     }
 
+    // Verify OTP
+    const otpRecord = await Otp.findOne({ email: normalizedEmail });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'OTP expired or not found' });
+    }
+
+    const isOtpValid = await bcrypt.compare(otp, otpRecord.otp);
+    if (!isOtpValid) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    // Clear OTP after successful use
+    await Otp.deleteOne({ email: normalizedEmail });
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
       name: name.trim(),
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       password: hashedPassword,
       role,
     });
@@ -78,12 +177,22 @@ export const signup = async (req, res) => {
    ============================ */
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, captchaToken } = req.body;
 
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: 'Email and password are required' });
+    }
+
+    if (!captchaToken) {
+      return res.status(400).json({ message: 'reCAPTCHA token is required' });
+    }
+
+    // Verify captcha
+    const isHuman = await verifyCaptcha(captchaToken);
+    if (!isHuman) {
+      return res.status(403).json({ message: 'Failed reCAPTCHA verification' });
     }
 
     const user = await User.findOne({

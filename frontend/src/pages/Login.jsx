@@ -1,6 +1,6 @@
-// frontend/src/pages/Login.jsx - FIXED & RESPONSIVE
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import ReCAPTCHA from "react-google-recaptcha";
 import http from '../api/http';
 import { useAuth } from '../context/AuthContext';
 import '../styles/auth.css';
@@ -9,8 +9,13 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const recaptchaRef = useRef(null);
+
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,7 +30,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Client-side validation
     const email = formData.email.trim().toLowerCase();
     const password = formData.password;
@@ -50,15 +55,21 @@ export default function Login() {
       return;
     }
 
+    if (!captchaToken) {
+      setError("Please verify that you are a human");
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       console.log('🔐 Attempting login for:', email);
-      
+
       const response = await http.post('/api/auth/login', {
         email: email,
-        password: password
+        password: password,
+        captchaToken: captchaToken
       });
 
       console.log('✅ Login response received:', response.data);
@@ -110,6 +121,10 @@ export default function Login() {
         // Something else happened
         setError('An unexpected error occurred. Please try again.');
       }
+
+      // Reset captcha on failure
+      if (recaptchaRef.current) recaptchaRef.current.reset();
+      setCaptchaToken("");
     } finally {
       setLoading(false);
     }
@@ -120,7 +135,7 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-header">
           <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle" style={{ color: "black"}}>
+          <p className="auth-subtitle" style={{ color: "black" }}>
             Assam University Alumni-Student Portal
           </p>
         </div>
@@ -162,6 +177,14 @@ export default function Login() {
             />
           </div>
 
+          <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center" }}>
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={recaptchaSiteKey}
+              onChange={(token) => setCaptchaToken(token)}
+            />
+          </div>
+
           {error && (
             <div className="error-message" role="alert">
               <span className="error-icon">⚠️</span>
@@ -184,12 +207,12 @@ export default function Login() {
             )}
           </button>
           <div className="auth-footer">
-  <Link to="/forgot-password">Forgot your password?</Link>
-</div>
+            <Link to="/forgot-password">Forgot your password?</Link>
+          </div>
         </form>
 
         <div className="auth-footer"
-        style={{ color: "#000000"}}
+          style={{ color: "#000000" }}
         >
           Don't have an account?{' '}
           <Link to="/signup" className="auth-link">
