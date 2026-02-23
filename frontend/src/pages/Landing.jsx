@@ -82,18 +82,33 @@ export default function Landing() {
       );
     }
 
-   
+
   }, [featured]);
 
   const alumniStories = [
     {
-      
+      id: 1,
+      name: 'Priya Sharma',
+      year: 2018,
+      department: 'Computer Science',
+      quote: 'The alumni network helped me land my dream job at a leading tech firm. The mentorship I received was invaluable.',
+      role: 'Software Engineer at Google',
     },
     {
-    
+      id: 2,
+      name: 'Rahul Das',
+      year: 2019,
+      department: 'Electronics',
+      quote: 'Connecting with seniors through this portal opened doors I never knew existed. Truly a game-changer for my career.',
+      role: 'Product Manager at Microsoft',
     },
     {
-     
+      id: 3,
+      name: 'Ananya Bora',
+      year: 2020,
+      department: 'Biotechnology',
+      quote: 'From campus to corporate — the guidance from our alumni community made the transition seamless and exciting.',
+      role: 'Research Scientist at CSIR',
     },
   ];
 
@@ -102,7 +117,28 @@ export default function Landing() {
       <Hero user={user} />
 
       {/* Stats Section */}
-    
+      <section className="stats-section">
+        <div className="container">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">💼</div>
+              <span className="stat-number">{stats.jobs}+</span>
+              <span className="stat-label">Job Opportunities</span>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🏢</div>
+              <span className="stat-number">{stats.companies}+</span>
+              <span className="stat-label">Partner Companies</span>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🎓</div>
+              <span className="stat-number">{stats.alumni}+</span>
+              <span className="stat-label">Alumni Connected</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* Featured Opportunities */}
       <section className="featured-section" ref={featuredRef}>
@@ -154,21 +190,15 @@ export default function Landing() {
           <div className="stories-grid">
             {alumniStories.map((story) => (
               <article key={story.id} className="story-card">
-                <div className="story-image">
-                  <img src={story.image} alt={story.title} />
-                  <span className="story-category">{story.category}</span>
-                </div>
                 <div className="story-content">
-                  <h3 className="story-title">{story.title}</h3>
-                  <p className="story-excerpt">{story.excerpt}</p>
+                  <div className="story-quote-icon">💬</div>
+                  <p className="story-excerpt">{story.quote}</p>
                   <div className="story-meta">
                     <div className="story-author">
-                      <span className="author-name">{story.author}</span>
-                      <span className="author-year">Class of {story.year}</span>
+                      <span className="author-name">{story.name}</span>
+                      <span className="author-role">{story.role}</span>
+                      <span className="author-year">{story.department} · Class of {story.year}</span>
                     </div>
-                    <a href={story.link} className="story-link">
-                      Read Story →
-                    </a>
                   </div>
                 </div>
               </article>

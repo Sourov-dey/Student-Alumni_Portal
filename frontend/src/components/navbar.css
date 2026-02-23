@@ -2,13 +2,13 @@
 
 /* ========== Global Variables ========== */
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --primary-blue: #2563eb;
-  --primary-dark: #1e40af;
-  --text-main: #1e293b;
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.45);
+  --primary-blue: #4f46e5;
+  --primary-dark: #3730a3;
+  --text-main: #0f172a;
   --text-muted: #64748b;
-  --shadow-3d: 0 4px 0 #1e40af, 0 8px 15px rgba(37, 99, 235, 0.2);
+  --shadow-3d: 0 4px 0 #3730a3, 0 8px 15px rgba(79, 70, 229, 0.2);
   --navbar-height: 70px;
 }
 
@@ -277,6 +277,7 @@
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -363,6 +364,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -390,6 +392,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -595,7 +598,7 @@
   }
 
   /* Hide "Post Job" button on mobile, show in menu */
-  .user-control-group > .btn-primary {
+  .user-control-group>.btn-primary {
     display: none;
   }
 }
@@ -767,6 +770,7 @@
 
 /* ========== Reduced Motion ========== */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -777,7 +781,8 @@
 }
 
 /* ========== High DPI Screens ========== */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
   .brand-logo {
     image-rendering: -webkit-optimize-contrast;
   }
