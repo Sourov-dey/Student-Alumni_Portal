@@ -15,6 +15,8 @@ import VerifyId from './pages/verifyId';
 import AdminPanel from './pages/AdminPanel';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AlumniMap from './pages/AlumniMap';
+import Profile from './pages/Profile';
 
 
 export default function App() {
@@ -38,6 +40,8 @@ export default function App() {
           <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/post-job" element={<PostJob />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/alumni-map" element={<AlumniMap />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/admin/*" element={<AdminPanel />} />
           <Route
             path="/chat"

@@ -89,6 +89,20 @@ export default function Navbar() {
                 active={location.pathname === "/chat"}
               />
             )}
+            {user && (
+              <NavLink
+                to="/alumni-map"
+                label="Map"
+                active={location.pathname === "/alumni-map"}
+              />
+            )}
+            {user && (
+              <NavLink
+                to="/profile"
+                label="Profile"
+                active={location.pathname === "/profile"}
+              />
+            )}
             {user && user.role === "admin" && (
               <NavLink
                 to="/admin"
@@ -226,6 +240,20 @@ export default function Navbar() {
                   to="/chat"
                   label="Chat"
                   active={location.pathname === "/chat"}
+                />
+              )}
+              {user && (
+                <NavLink
+                  to="/alumni-map"
+                  label="Map"
+                  active={location.pathname === "/alumni-map"}
+                />
+              )}
+              {user && (
+                <NavLink
+                  to="/profile"
+                  label="Profile"
+                  active={location.pathname === "/profile"}
                 />
               )}
               {user && user.role === "admin" && (

@@ -43,6 +43,14 @@ const userSchema = new mongoose.Schema(
       default: '/avatar.png'
     },
     // Additional fields as needed
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other', 'prefer-not-to-say'],
+      trim: true
+    },
+    dateOfBirth: {
+      type: Date
+    },
     department: {
       type: String,
       trim: true
@@ -62,6 +70,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true
     }],
+    location: {
+      city: { type: String, trim: true },
+      country: { type: String, trim: true },
+      coordinates: {
+        lat: { type: Number },
+        lng: { type: Number }
+      }
+    },
     isActive: {
       type: Boolean,
       default: true
@@ -101,11 +117,14 @@ userSchema.methods.toPublicJSON = function () {
     email: this.email,
     role: this.role,
     avatarUrl: this.avatarUrl,
+    gender: this.gender,
+    dateOfBirth: this.dateOfBirth,
+    phone: this.phone,
     department: this.department,
     graduationYear: this.graduationYear,
     bio: this.bio,
     skills: this.skills,
-
+    location: this.location,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt
   };

@@ -10,9 +10,9 @@ export const getUsers = async (req, res) => {
     console.log('\n' + '='.repeat(80));
     console.log('🔥 GET USERS FOR CHAT - DETAILED DEBUG');
     console.log('='.repeat(80));
-    
+
     const currentUserId = req.user?._id || req.user?.id;
-    
+
     console.log('📋 Request Details:');
     console.log('  - Current User ID:', currentUserId);
     console.log('  - Current User Name:', req.user?.name);
@@ -28,7 +28,7 @@ export const getUsers = async (req, res) => {
     const allUsers = await User.find({})
       .select('name email avatarUrl role createdAt')
       .lean();
-    
+
     console.log('\n👥 ALL Users in Database:');
     allUsers.forEach((u, i) => {
       console.log(`  ${i + 1}. ${u.name} (${u.email}) [ID: ${u._id}]`);
@@ -51,7 +51,7 @@ export const getUsers = async (req, res) => {
 
     console.log('\n✅ Query Results:');
     console.log('  - Users found (excluding current user):', users.length);
-    
+
     if (users.length > 0) {
       console.log('\n👥 Users Being Returned:');
       users.forEach((u, i) => {
@@ -75,10 +75,10 @@ export const getUsers = async (req, res) => {
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
     console.error('='.repeat(80) + '\n');
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       message: 'Failed to fetch users',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -91,7 +91,7 @@ export const getAllUsersForGroups = async (req, res) => {
     console.log('\n' + '='.repeat(80));
     console.log('🔥 GET ALL USERS FOR GROUPS');
     console.log('='.repeat(80));
-    
+
     const currentUserId = req.user?._id || req.user?.id;
     const currentUserName = req.user?.name;
 
@@ -104,7 +104,7 @@ export const getAllUsersForGroups = async (req, res) => {
       .lean();
 
     console.log(`✅ Found ${users.length} total users`);
-    
+
     if (users.length > 0) {
       console.log('👥 All users:');
       users.forEach((u, i) => {
@@ -121,9 +121,9 @@ export const getAllUsersForGroups = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Get All Users Error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to fetch users',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -160,9 +160,9 @@ export const searchUsers = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Search Users Error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to search users',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -175,7 +175,7 @@ export const getUserById = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id)
-      .select('name email avatarUrl role createdAt department graduationYear bio skills')
+      .select('name email avatarUrl role createdAt department graduationYear bio skills gender dateOfBirth phone location verified')
       .lean();
 
     if (!user) {
@@ -186,9 +186,9 @@ export const getUserById = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Get User By ID Error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Failed to fetch user',
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -197,14 +197,14 @@ export const getUserById = async (req, res) => {
 export const updateUserById = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true, 
+      new: true,
       runValidators: true,
     }).select("-password -__v");
-    
+
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -214,15 +214,15 @@ export const uploadAvatar = async (req, res, next) => {
     if (!req.file) return res.status(400).json({ message: "Avatar file missing" });
     const url = `/${req.file.path.replace(/\\/g, "/")}`;
     const user = await User.findByIdAndUpdate(
-      req.params.id, 
-      { avatarUrl: url }, 
+      req.params.id,
+      { avatarUrl: url },
       { new: true }
     ).select("-password");
-    
+
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ message: "Avatar uploaded", avatarUrl: url, user });
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -232,15 +232,15 @@ export const uploadResume = async (req, res, next) => {
     if (!req.file) return res.status(400).json({ message: "Resume file missing (PDF)" });
     const url = `/${req.file.path.replace(/\\/g, "/")}`;
     const user = await User.findByIdAndUpdate(
-      req.params.id, 
-      { resumeUrl: url }, 
+      req.params.id,
+      { resumeUrl: url },
       { new: true }
     ).select("-password");
-    
+
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ message: "Resume uploaded", resumeUrl: url, user });
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -250,13 +250,36 @@ export const listUsers = async (req, res, next) => {
     const role = req.query.role;
     const filter = {};
     if (role) filter.role = role;
-    
+
     const items = await User.find(filter)
       .select('name email department role avatarUrl createdAt')
       .limit(200);
-      
+
     res.json({ items, total: items.length });
-  } catch (err) { 
-    next(err); 
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Get all alumni who have shared their location
+ */
+export const getAlumniLocations = async (req, res) => {
+  try {
+    const alumni = await User.find({
+      role: 'alumni',
+      'location.coordinates.lat': { $exists: true },
+      'location.coordinates.lng': { $exists: true },
+    })
+      .select('name avatarUrl department graduationYear location')
+      .lean();
+
+    res.status(200).json(alumni);
+  } catch (error) {
+    console.error('❌ Get Alumni Locations Error:', error);
+    res.status(500).json({
+      message: 'Failed to fetch alumni locations',
+      error: error.message,
+    });
   }
 };

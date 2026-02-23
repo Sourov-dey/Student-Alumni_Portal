@@ -207,7 +207,9 @@ export default function Login() {
             )}
           </button>
           <div className="auth-footer">
-            <Link to="/forgot-password">Forgot your password?</Link>
+            <Link to="/forgot-password" style={{ color: "#000000" }}>
+              Forgot your password?
+            </Link>
           </div>
         </form>
 
