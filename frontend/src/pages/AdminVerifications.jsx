@@ -67,6 +67,13 @@ export default function AdminVerifications() {
 
   const canReview = user?.role === "admin";
 
+  /** Get color for AI confidence */
+  const getConfidenceColor = (confidence) => {
+    if (confidence >= 75) return "#059669";
+    if (confidence >= 40) return "#d97706";
+    return "#dc2626";
+  };
+
   return (
     <div className="av-wrap">
       <header className="av-header">
@@ -106,6 +113,7 @@ export default function AdminVerifications() {
                 <th>Role</th>
                 <th>Method</th>
                 <th>Status</th>
+                <th>AI Verdict</th>
                 <th>Submitted</th>
                 <th>Doc</th>
                 {canReview && <th style={{ width: 160 }}>Actions</th>}
@@ -115,6 +123,7 @@ export default function AdminVerifications() {
               {filtered.map((v) => {
                 const u = v.user || {};
                 const doc = v.idDoc || {};
+                const ai = v.aiResult || null;
                 const submitted =
                   v.submittedAt
                     ? new Date(v.submittedAt).toLocaleString()
@@ -125,7 +134,38 @@ export default function AdminVerifications() {
                     <td>{u.email || "-"}</td>
                     <td>{u.role || "-"}</td>
                     <td>{v.method}</td>
-                    <td className={`pill pill-${v.status}`}>{v.status}</td>
+                    <td>
+                      <span className={`pill pill-${v.status}`}>
+                        {v.status}
+                      </span>
+                      {v.reviewedByAI && (
+                        <span className="ai-badge" title="Decision made by AI">🤖</span>
+                      )}
+                    </td>
+                    <td>
+                      {ai && ai.confidence > 0 ? (
+                        <div className="ai-verdict">
+                          <span
+                            className="ai-conf"
+                            style={{ color: getConfidenceColor(ai.confidence) }}
+                          >
+                            {ai.confidence}%
+                          </span>
+                          <span className="ai-validity">
+                            {ai.isValid ? "✓ Valid" : "✗ Invalid"}
+                          </span>
+                          {ai.reason && (
+                            <div className="ai-reason" title={ai.reason}>
+                              {ai.reason.length > 60
+                                ? ai.reason.slice(0, 60) + "…"
+                                : ai.reason}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
                     <td>{submitted}</td>
                     <td>
                       {doc.url ? (
@@ -148,6 +188,19 @@ export default function AdminVerifications() {
                             </button>
                             <button className="btn reject" onClick={() => reject(v._id)}>
                               Reject
+                            </button>
+                          </div>
+                        ) : v.reviewedByAI ? (
+                          <div className="actions">
+                            <button
+                              className="btn override"
+                              title="Override AI decision"
+                              onClick={() => {
+                                if (v.status === "verified") reject(v._id);
+                                else approve(v._id);
+                              }}
+                            >
+                              Override
                             </button>
                           </div>
                         ) : (

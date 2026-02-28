@@ -23,6 +23,7 @@ export default function VerifyId() {
   const [file, setFile] = useState(null);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [msg, setMsg] = useState({ type: "", text: "" });
 
   // Fetch verification status on mount
@@ -35,6 +36,8 @@ export default function VerifyId() {
   }, [user]);
 
   const currentStatus = verificationData?.status || "none";
+  const aiResult = verificationData?.verification?.aiResult || null;
+  const reviewedByAI = verificationData?.verification?.reviewedByAI || false;
 
   const onPick = (e) => {
     const f = e.target.files?.[0];
@@ -67,10 +70,20 @@ export default function VerifyId() {
 
     try {
       setSubmitting(true);
-      await http.post("/api/verify/id-card", fd, {
+      const submitRes = await http.post("/api/verify/id-card", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setMsg({ type: "success", text: "Verification submitted. You'll be notified after review." });
+      const respMsg = submitRes.data?.message || "Verification submitted.";
+      const respStatus = submitRes.data?.verification?.status;
+
+      if (respStatus === "verified") {
+        setMsg({ type: "success", text: respMsg });
+      } else if (respStatus === "rejected") {
+        setMsg({ type: "error", text: respMsg });
+      } else {
+        setMsg({ type: "success", text: respMsg });
+      }
+
       // Refresh status
       const res = await http.get("/api/verify/status");
       setVerificationData(res.data);
@@ -79,6 +92,21 @@ export default function VerifyId() {
       setMsg({ type: "error", text: apiMsg });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const cancelVerification = async () => {
+    if (!window.confirm("Cancel your pending verification? You can then submit a new one.")) return;
+    try {
+      setCancelling(true);
+      await http.delete("/api/verify/cancel");
+      setMsg({ type: "success", text: "Verification cancelled. You can now submit a new one." });
+      const res = await http.get("/api/verify/status");
+      setVerificationData(res.data);
+    } catch (err) {
+      setMsg({ type: "error", text: err?.response?.data?.message || "Cancel failed." });
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -104,16 +132,16 @@ export default function VerifyId() {
             : currentStatus === "rejected" ? "linear-gradient(135deg, #fef2f2, #fee2e2)"
               : "linear-gradient(135deg, #f8fafc, #f1f5f9)",
         border: `1px solid ${currentStatus === "verified" ? "#a7f3d0"
-            : currentStatus === "pending" ? "#fde68a"
-              : currentStatus === "rejected" ? "#fca5a5"
-                : "#e2e8f0"
+          : currentStatus === "pending" ? "#fde68a"
+            : currentStatus === "rejected" ? "#fca5a5"
+              : "#e2e8f0"
           }`,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 32 }}>
             {currentStatus === "verified" ? "✅" : currentStatus === "pending" ? "⏳" : currentStatus === "rejected" ? "❌" : "📋"}
           </span>
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 700, color: "#1e293b" }}>
               {currentStatus === "verified" && "Your ID is Verified"}
               {currentStatus === "pending" && "Verification Pending"}
@@ -121,8 +149,34 @@ export default function VerifyId() {
               {currentStatus === "none" && "Not Yet Verified"}
             </div>
             <div style={{ fontSize: 14, color: "#64748b", marginTop: 4 }}>
-              {currentStatus === "verified" && "Your identity has been confirmed by an admin. You have full access."}
-              {currentStatus === "pending" && `Submitted on ${new Date(verificationData.verification.submittedAt).toLocaleDateString()}. An admin will review shortly.`}
+              {currentStatus === "verified" && (
+                <>
+                  Your identity has been confirmed{reviewedByAI ? " by AI" : " by an admin"}. You have full access.
+                </>
+              )}
+              {currentStatus === "pending" && (
+                <>
+                  {`Submitted on ${new Date(verificationData.verification.submittedAt).toLocaleDateString()}. AI is analyzing your document or an admin will review shortly.`}
+                  <button
+                    onClick={cancelVerification}
+                    disabled={cancelling}
+                    style={{
+                      display: "inline-block",
+                      marginLeft: 12,
+                      padding: "4px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #fca5a5",
+                      background: "#fff",
+                      color: "#dc2626",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: cancelling ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {cancelling ? "Cancelling…" : "Cancel & Re-submit"}
+                  </button>
+                </>
+              )}
               {currentStatus === "rejected" && (
                 <>
                   Your submission was rejected{verificationData?.verification?.reviewNote ? `: "${verificationData.verification.reviewNote}"` : "."}
@@ -131,9 +185,42 @@ export default function VerifyId() {
               )}
               {currentStatus === "none" && "Upload your university ID card below to get verified."}
             </div>
+
+            {/* AI confidence badge */}
+            {aiResult && aiResult.confidence > 0 && (
+              <div style={{
+                marginTop: 10,
+                padding: "8px 14px",
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.7)",
+                border: "1px solid #e2e8f0",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 13,
+              }}>
+                <span style={{ fontSize: 16 }}>🤖</span>
+                <div>
+                  <span style={{ fontWeight: 600, color: "#334155" }}>AI Analysis </span>
+                  <span style={{
+                    fontWeight: 700,
+                    color: aiResult.confidence >= 75 ? "#059669"
+                      : aiResult.confidence >= 40 ? "#d97706"
+                        : "#dc2626",
+                  }}>
+                    {aiResult.confidence}% confidence
+                  </span>
+                  {aiResult.reason && (
+                    <div style={{ color: "#64748b", marginTop: 2 }}>{aiResult.reason}</div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {verificationData?.verification?.reviewedAt && (currentStatus === "verified" || currentStatus === "rejected") && (
               <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
                 Reviewed on {new Date(verificationData.verification.reviewedAt).toLocaleDateString()}
+                {reviewedByAI && " (by AI)"}
               </div>
             )}
           </div>
@@ -144,9 +231,8 @@ export default function VerifyId() {
       {currentStatus !== "verified" && currentStatus !== "pending" && (
         <>
           <p style={{ color: "#4b5563" }}>
-            Upload a clear image or PDF of your Assam University ID card. An admin will
-            review and approve. You can use a non-university email; this upload links your
-            account to your identity.
+            Upload a clear image or PDF of your Assam University ID card. Our AI will
+            analyze it instantly. If the AI is unsure, an admin will review manually.
           </p>
 
           <form onSubmit={submit}>
@@ -192,7 +278,7 @@ export default function VerifyId() {
                 border: "none", cursor: submitting ? "not-allowed" : "pointer", fontWeight: 600,
               }}
             >
-              {submitting ? "Submitting…" : "Submit for review"}
+              {submitting ? "🤖 Analyzing your ID…" : "Submit for AI Verification"}
             </button>
 
             {msg.text && (

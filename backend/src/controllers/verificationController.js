@@ -1,26 +1,32 @@
+import path from "path";
 import Verification from "../models/Verification.js";
 import User from "../models/User.js";
 import Notification from "../models/Notification.js";
+import { analyzeIdCard } from "../services/aiVerification.js";
 
 /**
  * POST /api/verify/id-card
  * Authenticated user uploads their university ID card for verification.
  * Expects multipart form with field "idcard" (file), plus "emailUsed" and optional "note".
+ *
+ * After saving, the AI service analyzes the document and may auto-approve,
+ * auto-reject, or leave it pending for admin review.
  */
 export const submitIdCard = async (req, res, next) => {
     try {
         const userId = req.user._id;
 
-        // Check if user already has a pending verification
+        // Check if user already has a pending or verified verification
         const existing = await Verification.findOne({
             user: userId,
-            status: "pending",
+            status: { $in: ["pending", "verified"] },
         });
 
         if (existing) {
-            return res.status(400).json({
-                message: "You already have a pending verification. Please wait for admin review.",
-            });
+            const msg = existing.status === "verified"
+                ? "Your ID is already verified."
+                : "You already have a pending verification. Please wait for review.";
+            return res.status(400).json({ message: msg });
         }
 
         if (!req.file) {
@@ -45,12 +51,76 @@ export const submitIdCard = async (req, res, next) => {
 
         console.log(`✅ Verification submitted by user ${userId}:`, verification._id);
 
+        // ─── AI Verification (runs inline before response) ───
+        const filePath = path.join(process.cwd(), fileUrl);
+        const userInfo = {
+            name: req.user.name,
+            email: req.user.email,
+            department: req.user.department || "",
+            role: req.user.role,
+        };
+
+        const aiResult = await analyzeIdCard(filePath, req.file.mimetype, userInfo);
+
+        // Store AI result
+        verification.aiResult = {
+            isValid: aiResult.isValid,
+            confidence: aiResult.confidence,
+            reason: aiResult.reason,
+            analyzedAt: new Date(),
+        };
+
+        let responseMessage = "";
+
+        if (aiResult.decision === "verified") {
+            // Auto-approve
+            verification.status = "verified";
+            verification.reviewedByAI = true;
+            verification.reviewedAt = new Date();
+            verification.reviewNote = "Auto-verified by AI.";
+            await verification.save();
+
+            await User.findByIdAndUpdate(userId, { verified: true });
+
+            await Notification.create({
+                user: userId,
+                type: "verification",
+                message: "Your ID verification has been approved by AI! ✅",
+                payload: { verificationId: verification._id, status: "verified" },
+            });
+
+            responseMessage = "Your ID has been automatically verified! ✅";
+        } else if (aiResult.decision === "rejected") {
+            // Auto-reject
+            verification.status = "rejected";
+            verification.reviewedByAI = true;
+            verification.reviewedAt = new Date();
+            verification.reviewNote = `AI rejection: ${aiResult.reason}`;
+            await verification.save();
+
+            await Notification.create({
+                user: userId,
+                type: "verification",
+                message: "Your ID verification was not approved. Please re-submit a valid university ID card.",
+                payload: { verificationId: verification._id, status: "rejected", note: aiResult.reason },
+            });
+
+            responseMessage = "Your document could not be verified. Please re-submit a valid university ID card.";
+        } else {
+            // Pending — AI was inconclusive, admin will review
+            await verification.save();
+            responseMessage = "Your ID has been submitted. An admin will review it shortly.";
+        }
+
+        console.log(`🤖 AI decision for verification ${verification._id}: ${aiResult.decision} (${aiResult.confidence}%)`);
+
         res.status(201).json({
-            message: "Verification submitted successfully. You'll be notified after review.",
+            message: responseMessage,
             verification: {
                 _id: verification._id,
                 status: verification.status,
                 submittedAt: verification.submittedAt,
+                aiResult: verification.aiResult,
             },
         });
     } catch (err) {
@@ -81,10 +151,38 @@ export const getMyVerificationStatus = async (req, res, next) => {
                 submittedAt: verification.submittedAt,
                 reviewedAt: verification.reviewedAt,
                 reviewNote: verification.reviewNote || "",
+                aiResult: verification.aiResult || null,
+                reviewedByAI: verification.reviewedByAI || false,
             },
         });
     } catch (err) {
         console.error("❌ Get verification status error:", err);
+        next(err);
+    }
+};
+
+/**
+ * DELETE /api/verify/cancel
+ * Authenticated user cancels their own pending verification so they can re-submit.
+ */
+export const cancelMyVerification = async (req, res, next) => {
+    try {
+        const verification = await Verification.findOne({
+            user: req.user._id,
+            status: "pending",
+        });
+
+        if (!verification) {
+            return res.status(404).json({ message: "No pending verification to cancel." });
+        }
+
+        await Verification.findByIdAndDelete(verification._id);
+
+        console.log(`🗑️ Verification ${verification._id} cancelled by user ${req.user._id}`);
+
+        res.json({ message: "Verification cancelled. You can submit a new one." });
+    } catch (err) {
+        console.error("❌ Cancel verification error:", err);
         next(err);
     }
 };

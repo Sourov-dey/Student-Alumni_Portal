@@ -47,6 +47,17 @@ const verificationSchema = new mongoose.Schema(
     reviewedAt: {
       type: Date,
     },
+    // --- AI Verification Fields ---
+    aiResult: {
+      isValid: { type: Boolean },
+      confidence: { type: Number, min: 0, max: 100 },
+      reason: { type: String, maxlength: 500 },
+      analyzedAt: { type: Date },
+    },
+    reviewedByAI: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

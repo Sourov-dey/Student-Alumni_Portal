@@ -89,7 +89,7 @@ export default function Navbar() {
                 active={location.pathname === "/chat"}
               />
             )}
-            {user && (
+            {user?.role === "alumni" && (
               <NavLink
                 to="/alumni-map"
                 label="Map"
