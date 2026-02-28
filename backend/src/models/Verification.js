@@ -51,7 +51,7 @@ const verificationSchema = new mongoose.Schema(
     aiResult: {
       isValid: { type: Boolean },
       confidence: { type: Number, min: 0, max: 100 },
-      reason: { type: String, maxlength: 500 },
+      reason: { type: String, maxlength: 5000 },
       analyzedAt: { type: Date },
     },
     reviewedByAI: {

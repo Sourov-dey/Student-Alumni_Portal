@@ -3,9 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import http from '../api/http';
 import { useAuth } from '../context/AuthContext';
 import ApplicationVerifyModal from '../components/ApplicationVerifyModal';
-import { 
-  ArrowLeft, Building2, MapPin, Clock, Briefcase, CheckCircle, 
-  FileText, Phone, Upload, Mail, User, TrendingUp, Users 
+import {
+  ArrowLeft, Building2, MapPin, Clock, Briefcase, CheckCircle,
+  FileText, Phone, Upload, Mail, User, TrendingUp, Users
 } from 'lucide-react';
 import '../styles/pages/jobdetail.css';
 
@@ -229,8 +229,8 @@ export default function JobDetail() {
                         <div className="applicant-info">
                           <h4>{app.student?.name || app.student?.email}</h4>
                           <span className="application-date">
-                            Applied {new Date(app.createdAt).toLocaleDateString('en-US', { 
-                              month: 'short', day: 'numeric', year: 'numeric' 
+                            Applied {new Date(app.createdAt).toLocaleDateString('en-US', {
+                              month: 'short', day: 'numeric', year: 'numeric'
                             })}
                           </span>
                         </div>
@@ -285,7 +285,7 @@ export default function JobDetail() {
 
           {/* Right Column - Application Form */}
           <aside className="job-sidebar">
-            {user?.role === 'student' ? (
+            {user?.role === 'student' && (
               <div className="application-card">
                 <div className="application-header">
                   <Briefcase size={24} />
@@ -377,15 +377,6 @@ export default function JobDetail() {
                     </div>
                   )}
                 </div>
-              </div>
-            ) : (
-              <div className="info-card">
-                <Briefcase size={32} />
-                <h4>Student Login Required</h4>
-                <p>Only students can apply for job positions</p>
-                <Link to="/login" className="btn-login">
-                  Login to Apply
-                </Link>
               </div>
             )}
           </aside>

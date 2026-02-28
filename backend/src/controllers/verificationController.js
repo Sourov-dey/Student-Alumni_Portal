@@ -62,11 +62,12 @@ export const submitIdCard = async (req, res, next) => {
 
         const aiResult = await analyzeIdCard(filePath, req.file.mimetype, userInfo);
 
-        // Store AI result
+        // Store AI result (truncate reason to fit schema limits)
+        const truncatedReason = aiResult.reason?.substring(0, 5000) || '';
         verification.aiResult = {
             isValid: aiResult.isValid,
             confidence: aiResult.confidence,
-            reason: aiResult.reason,
+            reason: truncatedReason,
             analyzedAt: new Date(),
         };
 
@@ -95,7 +96,7 @@ export const submitIdCard = async (req, res, next) => {
             verification.status = "rejected";
             verification.reviewedByAI = true;
             verification.reviewedAt = new Date();
-            verification.reviewNote = `AI rejection: ${aiResult.reason}`;
+            verification.reviewNote = `AI rejection: ${truncatedReason}`.substring(0, 1000);
             await verification.save();
 
             await Notification.create({
@@ -169,16 +170,16 @@ export const cancelMyVerification = async (req, res, next) => {
     try {
         const verification = await Verification.findOne({
             user: req.user._id,
-            status: "pending",
+            status: { $in: ["pending", "rejected"] },
         });
 
         if (!verification) {
-            return res.status(404).json({ message: "No pending verification to cancel." });
+            return res.status(404).json({ message: "No pending or rejected verification to cancel." });
         }
 
-        await Verification.findByIdAndDelete(verification._id);
+        console.log(`🗑️ Cancelling verification ${verification._id} (status: ${verification.status}) for user ${req.user._id}`);
 
-        console.log(`🗑️ Verification ${verification._id} cancelled by user ${req.user._id}`);
+        await Verification.findByIdAndDelete(verification._id);
 
         res.json({ message: "Verification cancelled. You can submit a new one." });
     } catch (err) {

@@ -90,6 +90,11 @@ export default function VerifyId() {
     } catch (err) {
       const apiMsg = err?.response?.data?.message || err?.message || "Upload failed. Please try again.";
       setMsg({ type: "error", text: apiMsg });
+      // Refresh status so user can see Cancel button if a pending record exists
+      try {
+        const res = await http.get("/api/verify/status");
+        setVerificationData(res.data);
+      } catch (_) { /* ignore */ }
     } finally {
       setSubmitting(false);
     }
@@ -180,7 +185,25 @@ export default function VerifyId() {
               {currentStatus === "rejected" && (
                 <>
                   Your submission was rejected{verificationData?.verification?.reviewNote ? `: "${verificationData.verification.reviewNote}"` : "."}
-                  {" "}You can re-submit below.
+                  {" "}
+                  <button
+                    onClick={cancelVerification}
+                    disabled={cancelling}
+                    style={{
+                      display: "inline-block",
+                      marginLeft: 12,
+                      padding: "4px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #fca5a5",
+                      background: "#fff",
+                      color: "#dc2626",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: cancelling ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {cancelling ? "Clearing…" : "Clear & Re-submit"}
+                  </button>
                 </>
               )}
               {currentStatus === "none" && "Upload your university ID card below to get verified."}
