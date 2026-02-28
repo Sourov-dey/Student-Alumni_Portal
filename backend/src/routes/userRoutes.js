@@ -15,7 +15,7 @@ import {
   searchUsers,              // 🔍 SEARCH USERS
   getAlumniLocations,       // 🗺️ ALUMNI MAP
 } from "../controllers/userController.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -42,8 +42,8 @@ router.get("/all", requireAuth, getAllUsersForGroups);
 // 📋 List users (admin / pagination / filters)
 router.get("/list", requireAuth, listUsers);
 
-// 🗺️ Get alumni with locations (for map)
-router.get("/alumni-locations", requireAuth, getAlumniLocations);
+// 🗺️ Get alumni with locations (for map) — alumni only
+router.get("/alumni-locations", requireAuth, requireRole('alumni'), getAlumniLocations);
 
 /* =====================================================
    🔴 GENERIC ROUTES LAST (VERY IMPORTANT)
