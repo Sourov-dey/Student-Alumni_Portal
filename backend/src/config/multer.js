@@ -10,7 +10,7 @@ function makeDiskStorage(dirRel) {
     destination: (_req, _file, cb) => cb(null, uploadDir),
     filename: (_req, file, cb) => {
       const ext = path.extname(file.originalname);
-      const name = `${Date.now()}-${Math.random().toString(36).slice(2,8)}${ext}`;
+      const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
       cb(null, name);
     }
   });
@@ -24,7 +24,7 @@ export const idUpload = multer({
   storage: idStorage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (_req, file, cb) => {
-    const allowed = /\.(jpe?g|png|pdf)$/i;
+    const allowed = /\.(jpe?g|png|webp|pdf)$/i;
     if (allowed.test(file.originalname)) return cb(null, true);
     cb(new Error('Only images (jpeg/png) and pdf are allowed'));
   }

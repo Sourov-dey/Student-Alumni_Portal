@@ -3,6 +3,24 @@ import sharp from "sharp";
 import stringSimilarity from "string-similarity";
 import fs from "fs";
 import path from "path";
+import { execSync } from "child_process";
+
+/**
+ * Convert the first page of a PDF to a PNG image using pdftoppm.
+ * Returns the path to the generated image.
+ */
+function convertPdfToImage(pdfPath) {
+    const outputPrefix = pdfPath.replace(/\.pdf$/i, "-converted");
+    execSync(
+        `pdftoppm -png -f 1 -l 1 -r 300 -singlefile "${pdfPath}" "${outputPrefix}"`,
+        { timeout: 30000 }
+    );
+    const pngPath = `${outputPrefix}.png`;
+    if (!fs.existsSync(pngPath)) {
+        throw new Error("PDF to image conversion failed — no output file created.");
+    }
+    return pngPath;
+}
 
 const AUTO_APPROVE_THRESHOLD = 75;
 const AUTO_REJECT_THRESHOLD = 40;
@@ -275,8 +293,9 @@ function checkNameMatch(extractedText, submittedName) {
  * Same signature, same return format.
  */
 export async function analyzeIdCard(filePath, mimeType, userInfo = {}) {
+    let convertedImagePath = null; // track temp file for cleanup
     try {
-        const absolutePath = path.isAbsolute(filePath)
+        let absolutePath = path.isAbsolute(filePath)
             ? filePath
             : path.join(process.cwd(), filePath);
 
@@ -285,6 +304,15 @@ export async function analyzeIdCard(filePath, mimeType, userInfo = {}) {
         }
 
         console.log(`🔍 OCR Verification starting for: ${path.basename(absolutePath)}`);
+
+        // Step 0: If PDF, convert first page to PNG
+        const isPdf = /\.pdf$/i.test(absolutePath) || mimeType === "application/pdf";
+        if (isPdf) {
+            console.log("  📑 PDF detected — converting first page to image...");
+            convertedImagePath = convertPdfToImage(absolutePath);
+            absolutePath = convertedImagePath;
+            console.log("  ✅ PDF converted successfully.");
+        }
 
         // Step 1: Preprocess the image
         const { buffer, metadata } = await preprocessImage(absolutePath);
@@ -388,6 +416,11 @@ export async function analyzeIdCard(filePath, mimeType, userInfo = {}) {
             extractedText: "",
             nameMatch: false,
         };
+    } finally {
+        // Clean up temporary converted image
+        if (convertedImagePath && fs.existsSync(convertedImagePath)) {
+            try { fs.unlinkSync(convertedImagePath); } catch (_) { /* ignore */ }
+        }
     }
 }
 

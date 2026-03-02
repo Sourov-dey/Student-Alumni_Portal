@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import "./verifyId.css";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
 function ScoreBar({ value }) {
   const color = value >= 70 ? "#22c55e" : value >= 40 ? "#f59e0b" : "#ef4444";
@@ -74,7 +74,7 @@ export default function VerifyId() {
   const handleFile = useCallback((f) => {
     if (!f) return;
     if (!ALLOWED_TYPES.includes(f.type)) {
-      setMsg({ type: "error", text: "Only JPG, PNG, or WEBP images are allowed." });
+      setMsg({ type: "error", text: "Only JPG, PNG, WEBP, or PDF files are allowed." });
       return;
     }
     if (f.size > MAX_BYTES) {
@@ -83,9 +83,13 @@ export default function VerifyId() {
     }
     setMsg({ type: "", text: "" });
     setFile(f);
-    const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target.result);
-    reader.readAsDataURL(f);
+    if (f.type === "application/pdf") {
+      setImagePreview("pdf");
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => setImagePreview(e.target.result);
+      reader.readAsDataURL(f);
+    }
   }, []);
 
   const handleDrop = (e) => {
@@ -105,7 +109,7 @@ export default function VerifyId() {
       return;
     }
     if (!file) {
-      setMsg({ type: "error", text: "Please upload your ID card image." });
+      setMsg({ type: "error", text: "Please upload your ID card image or PDF." });
       return;
     }
 
@@ -583,11 +587,18 @@ export default function VerifyId() {
                 >
                   {imagePreview ? (
                     <>
-                      <img
-                        src={imagePreview}
-                        className="verify-preview-img"
-                        alt="ID Preview"
-                      />
+                      {imagePreview === "pdf" ? (
+                        <div className="verify-pdf-preview">
+                          <div className="verify-pdf-icon">📄</div>
+                          <div className="verify-pdf-name">{file?.name}</div>
+                        </div>
+                      ) : (
+                        <img
+                          src={imagePreview}
+                          className="verify-preview-img"
+                          alt="ID Preview"
+                        />
+                      )}
                       <div className="verify-preview-overlay">
                         <button
                           className="verify-change-btn"
@@ -596,7 +607,7 @@ export default function VerifyId() {
                             fileRef.current.click();
                           }}
                         >
-                          Change Image
+                          Change File
                         </button>
                       </div>
                     </>
@@ -609,7 +620,7 @@ export default function VerifyId() {
                           browse files
                         </strong>
                         <br />
-                        JPG, PNG, WEBP supported · Max 5 MB
+                        JPG, PNG, WEBP, PDF supported · Max 5 MB
                       </div>
                     </>
                   )}
@@ -617,7 +628,7 @@ export default function VerifyId() {
                 <input
                   ref={fileRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
                   style={{ display: "none" }}
                   onChange={(e) => handleFile(e.target.files[0])}
                 />

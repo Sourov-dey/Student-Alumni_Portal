@@ -266,6 +266,29 @@
     display: block;
 }
 
+.verify-pdf-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 240px;
+    gap: 12px;
+}
+
+.verify-pdf-icon {
+    font-size: 48px;
+}
+
+.verify-pdf-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--v-text);
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .verify-preview-overlay {
     position: absolute;
     inset: 0;
