@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
   withCredentials: true,
 });
 
@@ -16,11 +16,11 @@ http.interceptors.request.use(
     console.log("  Token:", token ? "✅ Found" : "❌ Missing");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-     console.log("  ✅ Authorization header added");
+      console.log("  ✅ Authorization header added");
     } else {
       console.warn("  ⚠️ No token found in localStorage!");
     }
-    
+
     return config;
   },
   (error) => {
@@ -42,7 +42,7 @@ http.interceptors.response.use(
       // localStorage.removeItem("au_user");
       // window.location.href = "/login";
     }
-    
+
     return Promise.reject(error);
   }
 );
