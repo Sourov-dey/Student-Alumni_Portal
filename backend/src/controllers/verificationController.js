@@ -62,12 +62,17 @@ export const submitIdCard = async (req, res, next) => {
 
         const aiResult = await analyzeIdCard(filePath, req.file.mimetype, userInfo);
 
-        // Store AI result (truncate reason to fit schema limits)
+        // Store AI result (truncate fields to fit schema limits)
         const truncatedReason = aiResult.reason?.substring(0, 5000) || '';
+        const truncatedExtractedText = (aiResult.extractedText || '').substring(0, 20000);
         verification.aiResult = {
             isValid: aiResult.isValid,
             confidence: aiResult.confidence,
             reason: truncatedReason,
+            extractedText: truncatedExtractedText,
+            scores: aiResult.scores || null,
+            nameMatch: aiResult.nameMatch ?? false,
+            autoDecision: aiResult.decision || 'pending',
             analyzedAt: new Date(),
         };
 

@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
-import { NotificationProvider } from './context/NotificationContext'; // uncomment if you have this
+import { NotificationProvider } from './context/NotificationContext';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -16,7 +16,7 @@ createRoot(container).render(
     <BrowserRouter>
       <AuthProvider>
         <NotificationProvider>
-        <App />
+          <App />
         </NotificationProvider>
       </AuthProvider>
     </BrowserRouter>

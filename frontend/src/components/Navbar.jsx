@@ -266,66 +266,68 @@ export default function Navbar() {
             </div>
 
             {/* Mobile User Section or Auth Buttons */}
-            {user ? (
-              <div className="mobile-user-section">
-                <div className="mobile-user-info">
-                  <div className="user-details">
-                    <span className="user-email-text">{user.email}</span>
-                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                      <span className={`role-badge ${user.role}`}>
-                        {user.role}
-                      </span>
-                      {user.role !== "admin" && (
-                        user.verified ? (
-                          <span title="Verified" style={{ fontSize: 14, cursor: "default" }}>✅</span>
-                        ) : (
-                          <Link to="/verify-id" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}
-                            onClick={() => setShowMobileMenu(false)}>Verify</Link>
-                        )
-                      )}
+            {
+              user ? (
+                <div className="mobile-user-section" >
+                  <div className="mobile-user-info">
+                    <div className="user-details">
+                      <span className="user-email-text">{user.email}</span>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <span className={`role-badge ${user.role}`}>
+                          {user.role}
+                        </span>
+                        {user.role !== "admin" && (
+                          user.verified ? (
+                            <span title="Verified" style={{ fontSize: 14, cursor: "default" }}>✅</span>
+                          ) : (
+                            <Link to="/verify-id" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}
+                              onClick={() => setShowMobileMenu(false)}>Verify</Link>
+                          )
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="mobile-actions">
-                  {user.role === "alumni" && (
-                    <Link
-                      to="/post-job"
-                      className="btn-3d btn-primary"
-                      onClick={() => setShowMobileMenu(false)}
+                  <div className="mobile-actions">
+                    {user.role === "alumni" && (
+                      <Link
+                        to="/post-job"
+                        className="btn-3d btn-primary"
+                        onClick={() => setShowMobileMenu(false)}
+                      >
+                        Post Job
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="btn-3d btn-outline-danger"
                     >
-                      Post Job
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="btn-3d btn-outline-danger"
-                  >
-                    Logout
-                  </button>
+                      Logout
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="mobile-auth-buttons">
-                <Link
-                  to="/signup"
-                  className="btn-3d btn-primary"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  Sign Up
-                </Link>
-                <Link
-                  to="/login"
-                  className="btn-3d btn-primary"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
+              ) : (
+                <div className="mobile-auth-buttons">
+                  <Link
+                    to="/signup"
+                    className="btn-3d btn-primary"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    Sign Up
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="btn-3d btn-primary"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    Sign In
+                  </Link>
+                </div>
+              )}
           </div>
         </>
-      )}
+      )
+      }
     </>
   );
 }
