@@ -325,7 +325,6 @@ export default function VerifyId() {
               {/* AI confidence badge in status banner */}
               {aiResult && aiResult.confidence > 0 && !inlineResult && (
                 <div className="verify-ai-badge">
-                  <span className="verify-ai-badge-icon">🤖</span>
                   <div>
                     <span style={{ fontWeight: 600, color: "var(--v-text)" }}>
                       AI Analysis{" "}
