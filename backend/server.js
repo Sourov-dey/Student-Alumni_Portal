@@ -40,18 +40,17 @@ import User from './src/models/User.js';
 // ---------- Parsers (MUST come before routes) ----------
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-
+// ---------- Security & CORS ----------
+app.use(
+  cors({
+    origin: "https://student-alumni-portal-3.onrender.com",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
 // Static uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ---------- Security & CORS ----------
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
-app.use(
-  cors({
-    origin: CLIENT_URL,
-    credentials: true,
-  })
-);
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
