@@ -48,6 +48,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+app.options("*", cors());
 // Static uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
