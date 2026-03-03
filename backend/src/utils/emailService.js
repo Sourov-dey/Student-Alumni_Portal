@@ -1,16 +1,27 @@
 import nodemailer from 'nodemailer';
 
-// Create a transporter using SMTP
-// Assumes environment variables SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS are set
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
+// Lazy transporter — created on first use so env vars are guaranteed to be loaded
+let transporter = null;
+function getTransporter() {
+    if (!transporter) {
+        console.log('📧 Creating SMTP transporter with:', {
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: process.env.SMTP_PORT || '587',
+            user: process.env.SMTP_USER ? '✅ set' : '❌ missing',
+            pass: process.env.SMTP_PASS ? '✅ set' : '❌ missing',
+        });
+        transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
+    }
+    return transporter;
+}
 
 /**
  * Send an OTP email
@@ -42,11 +53,13 @@ export const sendOtpEmail = async (to, otp) => {
       `,
         };
 
-        const info = await transporter.sendMail(mailOptions);
+        const smtp = getTransporter();
+        const info = await smtp.sendMail(mailOptions);
         console.log('✅ OTP Email sent:', info.messageId);
         return true;
     } catch (error) {
-        console.error('❌ Error sending OTP email:', error);
+        console.error('❌ Error sending OTP email:', error.message);
+        console.error('   Full error:', error);
         return false;
     }
 };
