@@ -46,7 +46,12 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ---------- Security & CORS ----------
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
-app.use(cors());
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
