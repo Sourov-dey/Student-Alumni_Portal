@@ -31,8 +31,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Frontend URL
-const CLIENT_URL = "https://student-alumni-portal-3.onrender.com";
+// Frontend URL(s)
+const ALLOWED_ORIGINS = [
+  "https://student-alumni-portal-3.onrender.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
 
 // ---------- Database ----------
 await connectDB();
@@ -43,7 +47,14 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 // ---------- CORS ----------
 const corsOptions = {
-  origin: CLIENT_URL,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 };
@@ -72,7 +83,7 @@ const httpServer = createServer(app);
 // ---------- Socket.IO ----------
 const io = new Server(httpServer, {
   cors: {
-    origin: CLIENT_URL,
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   },
   pingTimeout: 60000,
