@@ -21,52 +21,55 @@ import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import applicationRoutes from "./src/routes/applicationRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
-
 import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 import verifyRoutes from "./src/routes/verifyRoutes.js";
 import notificationRoutes from "./src/routes/notificationRoutes.js";
-
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// ---------- Database Connection FIRST ----------
+// Frontend URL
+const CLIENT_URL = "https://student-alumni-portal-3.onrender.com";
+
+// ---------- Database ----------
 await connectDB();
-import User from './src/models/User.js';
-// ---------- Parsers (MUST come before routes) ----------
+
+// ---------- Parsers ----------
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-// ---------- Security & CORS ----------
-app.use(
-  cors({
-    origin: "https://student-alumni-portal-3.onrender.com",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  })
-);
-app.options("*", cors());
-// Static uploads
+
+// ---------- CORS ----------
+const corsOptions = {
+  origin: CLIENT_URL,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // handle preflight
+
+// ---------- Static ----------
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// ---------- Security ----------
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
 app.use(hpp());
 
-// Logging
+// ---------- Logging ----------
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-// Rate limiter for /api (apply BEFORE routes)
+// ---------- Rate Limiter ----------
 app.use("/api", apiLimiter);
 
-// ---------- Create HTTP Server for Socket.IO ----------
+// ---------- HTTP Server ----------
 const httpServer = createServer(app);
 
-// ---------- Socket.IO Setup ----------
+// ---------- Socket.IO ----------
 const io = new Server(httpServer, {
   cors: {
     origin: CLIENT_URL,
@@ -76,16 +79,14 @@ const io = new Server(httpServer, {
   pingInterval: 25000,
 });
 
-// Socket.IO user tracking
 const userIdToSocketIdMap = {};
 
 export function getReceiverSocketId(receiverId) {
-  const socketId = userIdToSocketIdMap[receiverId];
-  return socketId || null; // Return socketId for given userId
+  return userIdToSocketIdMap[receiverId] || null;
 }
 
 export function getOnlineUsers() {
-  return Object.keys(userIdToSocketIdMap); // Return array of online userIds
+  return Object.keys(userIdToSocketIdMap);
 }
 
 io.on("connection", (socket) => {
@@ -99,44 +100,40 @@ io.on("connection", (socket) => {
     return;
   }
 
-  // Map user ID to socket ID
   userIdToSocketIdMap[userId] = socket.id;
+
   console.log(`🔐 User ${userId} mapped to socket ${socket.id}`);
   console.log("👥 Online users:", getOnlineUsers().length);
 
-  // Broadcast online users to everyone
   io.emit("getOnlineUsers", getOnlineUsers());
 
-  // Handle disconnection
   socket.on("disconnect", () => {
     console.log("❌ User disconnected:", socket.id);
 
-    // Find and remove the user from the map
     const disconnectedUserId = Object.keys(userIdToSocketIdMap).find(
       (uid) => userIdToSocketIdMap[uid] === socket.id
     );
 
     if (disconnectedUserId) {
       delete userIdToSocketIdMap[disconnectedUserId];
-      console.log(`👋 User ${disconnectedUserId} removed from online list`);
+
+      console.log(`👋 User ${disconnectedUserId} removed`);
       console.log("👥 Online users:", getOnlineUsers().length);
 
-      // Broadcast updated online users
       io.emit("getOnlineUsers", getOnlineUsers());
     }
   });
 
-  // Handle errors
   socket.on("error", (error) => {
     console.error("❌ Socket error:", error);
   });
 });
 
-// Export io for use in controllers
 export { io };
 
-console.log("✅ Socket.IO initialized successfully");
-// ---------- API routes (AFTER all middleware) ----------
+console.log("✅ Socket.IO initialized");
+
+// ---------- API ----------
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
@@ -145,7 +142,7 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// ✅ Mount ALL routes - Make sure groupRoutes is here
+// ---------- Routes ----------
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/users", userRoutes);
@@ -155,15 +152,16 @@ app.use("/api/messages", chatRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/verify", verifyRoutes);
 app.use("/api/notifications", notificationRoutes);
-console.log("✅ All API routes mounted successfully");
 
+console.log("✅ All API routes mounted");
 
-// 404 + error handler
+// ---------- Errors ----------
 app.use(notFound);
 app.use(errorHandler);
 
-// ---------- Boot server ----------
+// ---------- Start Server ----------
 const PORT = process.env.PORT || 5000;
+
 httpServer.listen(PORT, () => {
-  console.log(`✅ API running on PORT:${PORT}`);
+  console.log(`🚀 API running on PORT ${PORT}`);
 });
