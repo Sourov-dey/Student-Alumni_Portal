@@ -5,13 +5,13 @@ let transporter = null;
 function getTransporter() {
     if (!transporter) {
         console.log('📧 Creating SMTP transporter with:', {
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
             port: process.env.SMTP_PORT || '587',
             user: process.env.SMTP_USER ? '✅ set' : '❌ missing',
             pass: process.env.SMTP_PASS ? '✅ set' : '❌ missing',
         });
         transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
             port: parseInt(process.env.SMTP_PORT || '587'),
             secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
             auth: {
@@ -36,7 +36,7 @@ export const sendOtpEmail = async (to, otp) => {
         }
 
         const mailOptions = {
-            from: `"Assam University Portal" <${process.env.SMTP_USER}>`,
+            from: process.env.SMTP_FROM || `"Assam University Portal" <${process.env.SMTP_USER}>`,
             to,
             subject: 'Your Verification Code',
             html: `
