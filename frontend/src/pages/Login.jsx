@@ -105,6 +105,8 @@ export default function Login() {
 
         if (status === 401) {
           setError('Invalid email or password');
+        } else if (status === 403) {
+          setError(message || 'Your account has been suspended. Please contact an administrator.');
         } else if (status === 404) {
           setError('Account not found. Please sign up first.');
         } else if (status === 400) {

@@ -48,18 +48,22 @@ export default function AdminUsers() {
         }
     };
 
-    const suspend = async (id) => {
-        if (!window.confirm("Suspend this user? They won't be able to login or post.")) return;
+    const suspend = async (id, isSuspended) => {
+        const action = isSuspended ? "unsuspend" : "suspend";
+        const msg = isSuspended
+            ? "Reactivate this user? They will be able to login and use the portal again."
+            : "Suspend this user? They won't be able to login or post.";
+        if (!window.confirm(msg)) return;
         try {
             await http.patch(`/api/admin/users/${id}/suspend`);
             await fetchUsers();
         } catch (e) {
-            alert(e?.response?.data?.message || "Suspend failed");
+            alert(e?.response?.data?.message || `${action} failed`);
         }
     };
 
     const remove = async (id) => {
-        if (!window.confirm("Permanently delete this user? This cannot be undone."))
+        if (!window.confirm("Permanently delete this user and ALL their data (jobs, messages, applications)? This cannot be undone."))
             return;
         try {
             await http.delete(`/api/admin/users/${id}`);
@@ -116,12 +120,12 @@ export default function AdminUsers() {
                                 <th>Verified</th>
                                 <th>Status</th>
                                 <th>Joined</th>
-                                <th style={{ width: 200 }}>Actions</th>
+                                <th style={{ width: 220 }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filtered.map((u) => (
-                                <tr key={u._id}>
+                                <tr key={u._id} className={u.suspended ? "row-suspended" : ""}>
                                     <td>{u.name || "–"}</td>
                                     <td>{u.email}</td>
                                     <td>
@@ -158,12 +162,12 @@ export default function AdminUsers() {
                                                     Verify
                                                 </button>
                                             )}
-                                            {!u.suspended && u.role !== "admin" && (
+                                            {u.role !== "admin" && (
                                                 <button
-                                                    className="admin-btn admin-btn-suspend"
-                                                    onClick={() => suspend(u._id)}
+                                                    className={`admin-btn ${u.suspended ? "admin-btn-unsuspend" : "admin-btn-suspend"}`}
+                                                    onClick={() => suspend(u._id, u.suspended)}
                                                 >
-                                                    Suspend
+                                                    {u.suspended ? "Unsuspend" : "Suspend"}
                                                 </button>
                                             )}
                                             {u.role !== "admin" && (

@@ -159,6 +159,8 @@ export const getMyVerificationStatus = async (req, res, next) => {
                 reviewNote: verification.reviewNote || "",
                 aiResult: verification.aiResult || null,
                 reviewedByAI: verification.reviewedByAI || false,
+                adminOverride: verification.adminOverride || false,
+                reviewedBy: verification.reviewedBy || null,
             },
         });
     } catch (err) {

@@ -341,6 +341,27 @@
   color: white;
 }
 
+.admin-btn-unsuspend {
+  background: #bbf7d0;
+  color: #14532d;
+  border: 1px solid #86efac;
+}
+
+.admin-btn-unsuspend:hover:not(:disabled) {
+  background: #16a34a;
+  color: white;
+  border-color: #16a34a;
+}
+
+/* Suspended row dim effect — exclude Actions column so buttons stay visible */
+.row-suspended td:not(:last-child) {
+  opacity: 0.65;
+}
+
+.row-suspended:hover td {
+  opacity: 1;
+}
+
 .admin-btn-preview {
   background: #dbeafe;
   color: #1e40af;

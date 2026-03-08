@@ -216,6 +216,14 @@ export const loginUser = async (req, res) => {
         .json({ message: 'Invalid email or password' });
     }
 
+    // Block suspended users from logging in
+    if (user.suspended) {
+      return res.status(403).json({
+        message: 'Your account has been suspended. Please contact an administrator.',
+        suspended: true,
+      });
+    }
+
     // ✅ FIXED: Use "id" to match middleware
     const token = jwt.sign(
       { id: user._id },  // ← Changed from userId

@@ -273,17 +273,18 @@ export default function VerifyId() {
             </span>
             <div style={{ flex: 1 }}>
               <div className="verify-status-title">
-                {currentStatus === "verified" && "Your ID is Verified"}
-                {currentStatus === "pending" && "Verification Pending"}
+                {currentStatus === "verified" && !reviewedByAI && "Fully Verified"}
+                {currentStatus === "verified" && reviewedByAI && "AI Verified"}
+                {currentStatus === "pending" && (aiResult && aiResult.confidence > 0 ? "Admin Verification Pending" : "Verification Pending")}
                 {currentStatus === "rejected" && "Verification Rejected"}
                 {currentStatus === "none" && "Not Yet Verified"}
               </div>
               <div className="verify-status-desc">
                 {currentStatus === "verified" && (
                   <>
-                    Your identity has been confirmed
-                    {reviewedByAI ? " by AI" : " by an admin"}. You have full
-                    access.
+                    {reviewedByAI
+                      ? "Your identity has been verified by AI. You have full access."
+                      : <>Your identity has been <strong>fully verified</strong> by an admin. You have full access.</>}
                   </>
                 )}
                 {currentStatus === "pending" && (
@@ -292,14 +293,16 @@ export default function VerifyId() {
                     {new Date(
                       verificationData.verification.submittedAt
                     ).toLocaleDateString()}
-                    . AI is analyzing your document or an admin will review
-                    shortly.
+                    .{" "}
+                    {aiResult && aiResult.confidence > 0
+                      ? "Admin verification pending."
+                      : "Your document is being analyzed."}
                     <button
                       className="verify-cancel-btn"
                       onClick={cancelVerification}
                       disabled={cancelling}
                     >
-                      {cancelling ? "Cancelling…" : "Cancel & Re-submit"}
+                      {cancelling ? "Cancelling\u2026" : "Cancel & Re-submit"}
                     </button>
                   </>
                 )}
@@ -339,6 +342,21 @@ export default function VerifyId() {
                         {aiResult.reason}
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Progress steps for pending verification */}
+              {currentStatus === "pending" && aiResult && aiResult.confidence > 0 && (
+                <div className="verify-progress-steps">
+                  <div className="verify-step completed">
+                    <span className="verify-step-dot">✓</span>
+                    <span className="verify-step-label">AI Analysis</span>
+                  </div>
+                  <div className="verify-step-line completed" />
+                  <div className="verify-step active">
+                    <span className="verify-step-dot">⏳</span>
+                    <span className="verify-step-label">Admin Review</span>
                   </div>
                 </div>
               )}

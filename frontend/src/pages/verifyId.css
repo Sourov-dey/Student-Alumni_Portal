@@ -801,6 +801,84 @@
     font-weight: 500;
 }
 
+/* ===== Progress Steps (Pending) ===== */
+.verify-progress-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: var(--v-surface);
+    border: 1px solid var(--v-border);
+    border-radius: 12px;
+}
+
+.verify-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.verify-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.verify-step.completed .verify-step-dot {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--v-success);
+    border: 1.5px solid rgba(34, 197, 94, 0.3);
+}
+
+.verify-step.active .verify-step-dot {
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--v-warn);
+    border: 1.5px solid rgba(245, 158, 11, 0.3);
+    animation: stepPulse 2s ease-in-out infinite;
+}
+
+@keyframes stepPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.15); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+}
+
+.verify-step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--v-text-secondary);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.verify-step.completed .verify-step-label {
+    color: var(--v-success);
+}
+
+.verify-step.active .verify-step-label {
+    color: var(--v-warn);
+}
+
+.verify-step-line {
+    flex: 1;
+    height: 2px;
+    min-width: 20px;
+    margin: 0 10px;
+    border-radius: 2px;
+}
+
+.verify-step-line.completed {
+    background: linear-gradient(90deg, var(--v-success), var(--v-warn));
+    opacity: 0.5;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 640px) {
     .verify-page {
@@ -834,6 +912,14 @@
 
     .verify-upload-zone {
         padding: 24px;
+    }
+
+    .verify-progress-steps {
+        padding: 10px 12px;
+    }
+
+    .verify-step-label {
+        font-size: 11px;
     }
 }
 

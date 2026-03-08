@@ -29,18 +29,22 @@ http.interceptors.request.use(
   }
 );
 
-// ✅ RESPONSE INTERCEPTOR - Handle 401 errors globally
+// ✅ RESPONSE INTERCEPTOR - Handle 401/403 errors globally
 http.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       console.error("🔴 401 Unauthorized - Token may be invalid or missing");
-      console.error("  Request URL:", error.config?.url);
-      console.error("  Headers:", error.config?.headers);
-      // Optional: Auto-logout on 401
-      // localStorage.removeItem("au_token");
-      // localStorage.removeItem("au_user");
-      // window.location.href = "/login";
+    }
+
+    // Handle suspended user — force logout
+    if (error.response?.status === 403 && error.response?.data?.suspended) {
+      console.error("⛔ Account suspended — logging out");
+      localStorage.removeItem("au_token");
+      localStorage.removeItem("au_user");
+      alert(error.response.data.message || "Your account has been suspended.");
+      window.location.href = "/login";
+      return new Promise(() => {}); // prevent further .catch() handling
     }
 
     return Promise.reject(error);

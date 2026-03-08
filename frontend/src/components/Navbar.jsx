@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import http from "../api/http";
 import "./navbar.css";
 
 export default function Navbar() {
@@ -10,6 +11,7 @@ export default function Navbar() {
   const location = useLocation();
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [verifyStatus, setVerifyStatus] = useState(null); // "none"|"pending"|"verified"|"rejected"
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
@@ -18,6 +20,19 @@ export default function Navbar() {
     navigate("/");
     setShowMobileMenu(false);
   };
+
+  // Fetch verification status for non-admin users
+  useEffect(() => {
+    if (!user || user.role === "admin") return;
+    // If already marked verified in user object, skip API call
+    if (user.verified) {
+      setVerifyStatus("verified");
+      return;
+    }
+    http.get("/api/verify/status")
+      .then((res) => setVerifyStatus(res.data?.status || "none"))
+      .catch(() => setVerifyStatus("none"));
+  }, [user, location.pathname]); // re-fetch on navigation in case status changed
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -145,10 +160,14 @@ export default function Navbar() {
                           {user.role}
                         </span>
                         {user.role !== "admin" && (
-                          user.verified ? (
-                            <span title="Verified" style={{ fontSize: 14, cursor: "default" }}>✅</span>
+                          verifyStatus === "verified" ? (
+                            <span className="navbar-verify-badge verified" title="Verified">Verified ✅</span>
+                          ) : verifyStatus === "pending" ? (
+                            <Link to="/verify-id" className="navbar-verify-badge pending">Pending</Link>
+                          ) : verifyStatus === "rejected" ? (
+                            <Link to="/verify-id" className="navbar-verify-badge rejected">Rejected</Link>
                           ) : (
-                            <Link to="/verify-id" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}>Verify</Link>
+                            <Link to="/verify-id" className="navbar-verify-badge unverified">Verify</Link>
                           )
                         )}
                       </div>
@@ -277,10 +296,16 @@ export default function Navbar() {
                           {user.role}
                         </span>
                         {user.role !== "admin" && (
-                          user.verified ? (
-                            <span title="Verified" style={{ fontSize: 14, cursor: "default" }}>✅</span>
+                          verifyStatus === "verified" ? (
+                            <span className="navbar-verify-badge verified" title="Verified">Verified ✅</span>
+                          ) : verifyStatus === "pending" ? (
+                            <Link to="/verify-id" className="navbar-verify-badge pending"
+                              onClick={() => setShowMobileMenu(false)}>Pending</Link>
+                          ) : verifyStatus === "rejected" ? (
+                            <Link to="/verify-id" className="navbar-verify-badge rejected"
+                              onClick={() => setShowMobileMenu(false)}>Rejected</Link>
                           ) : (
-                            <Link to="/verify-id" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", fontWeight: 600 }}
+                            <Link to="/verify-id" className="navbar-verify-badge unverified"
                               onClick={() => setShowMobileMenu(false)}>Verify</Link>
                           )
                         )}

@@ -82,6 +82,17 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    suspended: {
+      type: Boolean,
+      default: false
+    },
+    suspendedAt: {
+      type: Date
+    },
+    suspendedReason: {
+      type: String,
+      maxlength: 500
+    },
     resetPasswordToken: {
       type: String,
       select: false
@@ -125,6 +136,8 @@ userSchema.methods.toPublicJSON = function () {
     bio: this.bio,
     skills: this.skills,
     location: this.location,
+    verified: this.verified,
+    suspended: this.suspended,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt
   };
