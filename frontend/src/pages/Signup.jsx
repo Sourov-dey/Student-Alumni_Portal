@@ -278,12 +278,6 @@ export default function Signup() {
                 <option value="admin" style={{ color: "#000" }}>
                   Admin
                 </option>
-                <option value="faculty" style={{ color: "#000" }}>
-                  Faculty
-                </option>
-                <option value="researcher" style={{ color: "#000" }}>
-                  Researcher
-                </option>
               </select>
             </div>
 

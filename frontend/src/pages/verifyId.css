@@ -159,6 +159,45 @@
     background: var(--v-border);
 }
 
+/* ===== Info Bar (read-only role & email) ===== */
+.verify-info-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.verify-info-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--v-surface2);
+    border: 1px solid var(--v-border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+.verify-info-chip-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--v-muted);
+    flex-shrink: 0;
+}
+
+.verify-info-chip-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--v-text);
+    text-transform: capitalize;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* ===== Form ===== */
 .verify-form-grid {
     display: grid;

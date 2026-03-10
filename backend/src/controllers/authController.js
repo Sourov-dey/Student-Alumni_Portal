@@ -30,58 +30,62 @@ export const sendOtp = async (req, res) => {
     const { email, captchaToken } = req.body;
 
     if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
+      return res.status(400).json({ message: "Email is required" });
     }
 
     if (!captchaToken) {
-      return res.status(400).json({ message: 'reCAPTCHA token is required' });
+      return res.status(400).json({ message: "reCAPTCHA token is required" });
     }
 
-    // Verify captcha
     const isHuman = await verifyCaptcha(captchaToken);
     if (!isHuman) {
-      return res.status(403).json({ message: 'Failed reCAPTCHA verification' });
+      return res.status(403).json({ message: "Failed reCAPTCHA verification" });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Check if email already registered
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered' });
+      return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Generate 6-digit OTP
+    // Prevent OTP spam (1 request per 60 sec)
+    const existingOtp = await Otp.findOne({ email: normalizedEmail });
+
+    if (existingOtp && Date.now() - existingOtp.createdAt < 60000) {
+      return res.status(429).json({
+        message: "Please wait 60 seconds before requesting another OTP",
+      });
+    }
+
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Hash OTP before saving
     const salt = await bcrypt.genSalt(10);
     const hashedOtp = await bcrypt.hash(otpCode, salt);
 
-    // Save/Update OTP in DB (upsert based on email)
     await Otp.findOneAndUpdate(
       { email: normalizedEmail },
-      { otp: hashedOtp, createdAt: Date.now() },
+      {
+        email: normalizedEmail,
+        otp: hashedOtp,
+        createdAt: new Date(),
+      },
       { upsert: true, new: true }
     );
 
-    // Send email
     const emailSent = await sendOtpEmail(normalizedEmail, otpCode);
 
-    if (emailSent) {
-      const responseData = { message: 'OTP sent successfully' };
-      // In development mode without SMTP, include OTP in response for testing
-      if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-        responseData.devOtp = otpCode;
-        responseData.message = 'OTP generated (dev mode — check response or console)';
-      }
-      res.status(200).json(responseData);
-    } else {
-      res.status(500).json({ message: 'Failed to send OTP email. Please try again later.' });
+    if (!emailSent) {
+      return res
+        .status(500)
+        .json({ message: "Failed to send OTP email. Please try again." });
     }
+
+    res.status(200).json({ message: "OTP sent successfully" });
+
   } catch (error) {
-    console.error('❌ sendOtp error:', error);
-    res.status(500).json({ message: 'Server error during OTP generation' });
+    console.error("❌ sendOtp error:", error);
+    res.status(500).json({ message: "Server error during OTP generation" });
   }
 };
 
@@ -94,47 +98,54 @@ export const signup = async (req, res) => {
     const { name, email, password, role, adminSecret, otp } = req.body;
 
     if (!name || !email || !password || !role || !otp) {
-      return res.status(400).json({ message: 'All fields and OTP are required' });
-    }
-
-    // Admin secret gate — only allow admin role with correct secret
-    if (role === 'admin') {
-      const ADMIN_SECRET = process.env.ADMIN_SECRET || '90210';
-      if (!adminSecret || adminSecret !== ADMIN_SECRET) {
-        return res.status(403).json({ message: 'Invalid admin secret code' });
-      }
-    }
-
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: 'Password must be at least 6 characters' });
+      return res.status(400).json({ message: "All fields and OTP are required" });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    const existingUser = await User.findOne({
-      email: normalizedEmail,
-    });
-
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: 'Email already registered' });
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
+      });
     }
 
-    // Verify OTP
+    // Admin access check
+    if (role === "admin") {
+      const ADMIN_SECRET = process.env.ADMIN_SECRET || "90210";
+      if (!adminSecret || adminSecret !== ADMIN_SECRET) {
+        return res.status(403).json({ message: "Invalid admin secret code" });
+      }
+    }
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
     const otpRecord = await Otp.findOne({ email: normalizedEmail });
+
     if (!otpRecord) {
-      return res.status(400).json({ message: 'OTP expired or not found' });
+      return res.status(400).json({ message: "OTP expired or not found" });
+    }
+
+    // OTP expiry check (10 minutes)
+    const OTP_EXPIRY = 10 * 60 * 1000;
+
+    if (Date.now() - otpRecord.createdAt > OTP_EXPIRY) {
+      await Otp.deleteOne({ email: normalizedEmail });
+
+      return res.status(400).json({
+        message: "OTP expired. Please request a new one.",
+      });
     }
 
     const isOtpValid = await bcrypt.compare(otp, otpRecord.otp);
+
     if (!isOtpValid) {
-      return res.status(400).json({ message: 'Invalid OTP' });
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    // Clear OTP after successful use
+    // delete OTP after success
     await Otp.deleteOne({ email: normalizedEmail });
 
     const salt = await bcrypt.genSalt(10);
@@ -147,15 +158,14 @@ export const signup = async (req, res) => {
       role,
     });
 
-    // ✅ FIXED: Use "id" to match middleware
     const token = jwt.sign(
-      { id: user._id },  // ← Changed from userId
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '7d' }
+      { id: user._id },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "7d" }
     );
 
     res.status(201).json({
-      message: 'User registered successfully',
+      message: "User registered successfully",
       token,
       user: {
         _id: user._id,
@@ -166,9 +176,10 @@ export const signup = async (req, res) => {
         createdAt: user.createdAt,
       },
     });
+
   } catch (error) {
-    console.error('❌ Signup error:', error);
-    res.status(500).json({ message: 'Server error during signup' });
+    console.error("❌ Signup error:", error);
+    res.status(500).json({ message: "Server error during signup" });
   }
 };
 

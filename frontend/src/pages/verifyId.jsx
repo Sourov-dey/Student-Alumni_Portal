@@ -1,6 +1,6 @@
 // frontend/src/pages/VerifyId.jsx
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import http from "../api/http";
 import { useAuth } from "../context/AuthContext";
 import "./verifyId.css";
@@ -23,7 +23,6 @@ function ScoreBar({ value }) {
 export default function VerifyId() {
   const { user } = useAuth();
   const nav = useNavigate();
-  const location = useLocation();
   const fileRef = useRef();
 
   // Verification status from API
@@ -31,13 +30,9 @@ export default function VerifyId() {
   const [loading, setLoading] = useState(true);
 
   // Form
-  const presetEmail =
-    (location?.state && location.state.email) || user?.email || "";
-  const [email, setEmail] = useState(presetEmail);
   const [form, setForm] = useState({
     name: user?.name || "",
     department: user?.department || "",
-    role: user?.role || "Student",
   });
   const [file, setFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -115,7 +110,7 @@ export default function VerifyId() {
 
     const fd = new FormData();
     fd.append("idcard", file);
-    fd.append("emailUsed", email);
+    fd.append("emailUsed", user?.email || "");
     fd.append("note", "");
 
     try {
@@ -488,7 +483,7 @@ export default function VerifyId() {
             <div className="verify-detail-row">
               <span className="verify-detail-label">Role</span>
               <span className="verify-detail-val">
-                {form.role || user?.role || "—"}
+                {user?.role || "—"}
               </span>
             </div>
 
@@ -537,8 +532,21 @@ export default function VerifyId() {
             <>
               <div className="verify-card">
                 <div className="verify-card-title">Personal Information</div>
-                <div className="verify-form-grid">
-                  <div className="verify-form-group full">
+
+                {/* Read-only info bar showing role & email */}
+                <div className="verify-info-bar">
+                  <div className="verify-info-chip">
+                    <span className="verify-info-chip-label">Role</span>
+                    <span className="verify-info-chip-value">{user?.role || "—"}</span>
+                  </div>
+                  <div className="verify-info-chip">
+                    <span className="verify-info-chip-label">Email</span>
+                    <span className="verify-info-chip-value">{user?.email || "—"}</span>
+                  </div>
+                </div>
+
+                <div className="verify-form-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <div className="verify-form-group">
                     <label>Full Name</label>
                     <input
                       type="text"
@@ -561,30 +569,6 @@ export default function VerifyId() {
                           department: e.target.value,
                         }))
                       }
-                    />
-                  </div>
-                  <div className="verify-form-group">
-                    <label>Role</label>
-                    <select
-                      value={form.role}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, role: e.target.value }))
-                      }
-                    >
-                      <option>Student</option>
-                      <option>Alumni</option>
-                      <option>Faculty</option>
-                      <option>Staff</option>
-                      <option>Researcher</option>
-                    </select>
-                  </div>
-                  <div className="verify-form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
                     />
                   </div>
                 </div>
