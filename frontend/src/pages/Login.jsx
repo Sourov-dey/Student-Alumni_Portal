@@ -137,7 +137,7 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-header">
           <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle" style={{ color: "black" }}>
+          <p className="auth-subtitle">
             Assam University Alumni-Student Portal
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function Login() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email address"
+              placeholder="name@example.com"
               className="form-input"
               autoComplete="email"
               disabled={loading}
@@ -209,15 +209,13 @@ export default function Login() {
             )}
           </button>
           <div className="auth-footer">
-            <Link to="/forgot-password" style={{ color: "#000000" }}>
+            <Link to="/forgot-password" className="auth-link">
               Forgot your password?
             </Link>
           </div>
         </form>
 
-        <div className="auth-footer"
-          style={{ color: "#000000" }}
-        >
+        <div className="auth-footer">
           Don't have an account?{' '}
           <Link to="/signup" className="auth-link">
             Sign Up

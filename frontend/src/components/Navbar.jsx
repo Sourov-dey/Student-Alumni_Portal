@@ -104,7 +104,7 @@ export default function Navbar() {
                 active={location.pathname === "/chat"}
               />
             )}
-            {user?.role === "alumni" && (
+            {user?.role === "admin" && (
               <NavLink
                 to="/alumni-map"
                 label="Map"
@@ -147,7 +147,7 @@ export default function Navbar() {
                 {/* Desktop User Controls */}
                 <div className="user-control-group">
                   {user.role === "alumni" && (
-                    <Link to="/post-job" className="btn-3d btn-primary">
+                    <Link to="/post-job" className="btn-primary">
                       Post Job
                     </Link>
                   )}
@@ -155,7 +155,7 @@ export default function Navbar() {
                   <div className="user-profile-tag">
                     <div className="user-details">
                       <span className="user-email-text">{user.email}</span>
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center", justifyContent: "flex-end" }}>
                         <span className={`role-badge ${user.role}`}>
                           {user.role}
                         </span>
@@ -174,7 +174,7 @@ export default function Navbar() {
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="btn-3d btn-outline-danger"
+                      className="btn-danger-outline"
                     >
                       Logout
                     </button>
@@ -199,7 +199,7 @@ export default function Navbar() {
                 {/* Desktop Auth Dropdown */}
                 <div className="auth-dropdown-wrapper" ref={dropdownRef}>
                   <button
-                    className="btn-3d btn-primary"
+                    className="btn-primary"
                     onClick={() => setShowAuthDropdown(!showAuthDropdown)}
                   >
                     Get Started{" "}
@@ -261,7 +261,7 @@ export default function Navbar() {
                   active={location.pathname === "/chat"}
                 />
               )}
-              {user && (
+              {user?.role === "admin" && (
                 <NavLink
                   to="/alumni-map"
                   label="Map"
@@ -317,7 +317,7 @@ export default function Navbar() {
                     {user.role === "alumni" && (
                       <Link
                         to="/post-job"
-                        className="btn-3d btn-primary"
+                        className="btn-primary"
                         onClick={() => setShowMobileMenu(false)}
                       >
                         Post Job
@@ -325,7 +325,7 @@ export default function Navbar() {
                     )}
                     <button
                       onClick={handleLogout}
-                      className="btn-3d btn-outline-danger"
+                      className="btn-danger-outline"
                     >
                       Logout
                     </button>
@@ -335,14 +335,14 @@ export default function Navbar() {
                 <div className="mobile-auth-buttons">
                   <Link
                     to="/signup"
-                    className="btn-3d btn-primary"
+                    className="btn-primary"
                     onClick={() => setShowMobileMenu(false)}
                   >
                     Sign Up
                   </Link>
                   <Link
                     to="/login"
-                    className="btn-3d btn-primary"
+                    className="btn-primary"
                     onClick={() => setShowMobileMenu(false)}
                   >
                     Sign In

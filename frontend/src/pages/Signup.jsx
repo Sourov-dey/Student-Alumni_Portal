@@ -138,214 +138,95 @@ export default function Signup() {
     }
   };
 
-  // --- 3D Glassmorphism Styles ---
-  const cardStyle = {
-    width: "100%",
-    maxWidth: "480px",
-    padding: "40px",
-    background: "rgba(255, 255, 255, 0.07)",
-    backdropFilter: "blur(20px) saturate(160%)",
-    WebkitBackdropFilter: "blur(20px) saturate(160%)",
-    borderRadius: "32px",
-    border: "1px solid rgba(255, 255, 255, 0.15)",
-    boxShadow: `
-      0 20px 40px rgba(0, 0, 0, 0.3),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.1)
-    `,
-    display: "flex",
-    flexDirection: "column",
-  };
-
-  const inputStyle = {
-    width: "100%",
-    padding: "14px 18px",
-    borderRadius: "16px",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    background: "rgba(0, 0, 0, 0.2)",
-    color: "#fff",
-    fontSize: "1rem",
-    outline: "none",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
-    boxSizing: "border-box",
-  };
-
-  const labelStyle = {
-    display: "block",
-    marginBottom: "8px",
-    fontWeight: "500",
-    color: "rgba(255, 255, 255, 0.85)",
-    fontSize: "0.85rem",
-    letterSpacing: "0.3px",
-    paddingLeft: "4px",
-  };
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background:
-          "radial-gradient(circle at top left, #2563eb, #1e3a8a, #0f172a)", // Deep 3D Space Gradient
-        padding: "24px",
-        fontFamily: "'Inter', system-ui, sans-serif",
-      }}
-    >
-      <div style={cardStyle}>
-        <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <h2
-            style={{
-              fontSize: "2.2rem",
-              fontWeight: "800",
-              color: "#fff",
-              margin: 0,
-              letterSpacing: "-0.5px",
-            }}
-          >
-            Join the Network
-          </h2>
-          <p
-            style={{
-              color: "rgba(255, 255, 255, 0.6)",
-              fontSize: "0.95rem",
-              marginTop: "8px",
-            }}
-          >
+    <div className="auth-page-wrapper">
+      <div className="auth-card" style={{ maxWidth: '480px' }}>
+        <div className="auth-header">
+          <h1 className="auth-title">Join the Network</h1>
+          <p className="auth-subtitle">
             Assam University Alumni-Student Portal
           </p>
         </div>
 
         {step === 1 ? (
-          <form onSubmit={handleSendOtp} noValidate>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={labelStyle}>Full Name</label>
+          <form onSubmit={handleSendOtp} className="auth-form" noValidate>
+            <div className="form-group">
+              <label className="form-label">Full Name</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter your name"
-                style={inputStyle}
-                onFocus={(e) => {
-                  e.target.style.background = "rgba(255, 255, 255, 0.1)";
-                  e.target.style.borderColor = "rgba(255, 255, 255, 0.4)";
-                  e.target.style.boxShadow = "0 0 0 4px rgba(59, 130, 246, 0.3)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.background = "rgba(0, 0, 0, 0.2)";
-                  e.target.style.borderColor = "rgba(255, 255, 255, 0.1)";
-                  e.target.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.3)";
-                }}
+                className="form-input"
               />
             </div>
 
-            <div style={{ marginBottom: "20px" }}>
-              <label style={labelStyle}>Email Address</label>
+            <div className="form-group">
+              <label className="form-label">Email Address</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email address"
-                style={inputStyle}
+                placeholder="name@example.com"
+                className="form-input"
               />
             </div>
 
-            <div style={{ marginBottom: "20px" }}>
-              <label style={labelStyle}>I am a...</label>
+            <div className="form-group">
+              <label className="form-label">I am a...</label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                style={{
-                  ...inputStyle,
-                  appearance: "none",
-                  cursor: "pointer",
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 16px center",
-                  backgroundSize: "18px",
-                }}
+                className="form-input"
               >
-                <option value="student" style={{ color: "#000" }}>
-                  Current Student
-                </option>
-                <option value="alumni" style={{ color: "#000" }}>
-                  Alumni
-                </option>
-                <option value="admin" style={{ color: "#000" }}>
-                  Admin
-                </option>
+                <option value="student">Current Student</option>
+                <option value="alumni">Alumni</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
 
             {formData.role === "admin" && (
-              <div style={{ marginBottom: "20px" }}>
-                <label style={labelStyle}>Admin Secret Code</label>
+              <div className="form-group">
+                <label className="form-label">Admin Secret Code</label>
                 <input
                   type="password"
                   name="adminSecret"
                   value={formData.adminSecret}
                   onChange={handleChange}
                   placeholder="Enter admin secret code"
-                  style={{
-                    ...inputStyle,
-                    borderColor: "rgba(251, 191, 36, 0.4)",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.background = "rgba(255, 255, 255, 0.1)";
-                    e.target.style.borderColor = "rgba(251, 191, 36, 0.6)";
-                    e.target.style.boxShadow = "0 0 0 4px rgba(251, 191, 36, 0.2)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.background = "rgba(0, 0, 0, 0.2)";
-                    e.target.style.borderColor = "rgba(251, 191, 36, 0.4)";
-                    e.target.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.3)";
-                  }}
+                  className="form-input"
+                  style={{ borderColor: 'var(--warning)', boxShadow: '0 0 0 1px var(--warning-bg)' }}
                 />
-                <p
-                  style={{
-                    color: "rgba(251, 191, 36, 0.8)",
-                    fontSize: "0.75rem",
-                    marginTop: "6px",
-                    paddingLeft: "4px",
-                  }}
-                >
+                <p style={{ fontSize: '0.75rem', color: 'var(--warning)', marginTop: '0.5rem' }}>
                   ⚠️ Admin access requires a secret code from the portal administrator.
                 </p>
               </div>
             )}
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-                marginBottom: "28px",
-              }}
-            >
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
               <div>
-                <label style={labelStyle}>Password</label>
+                <label className="form-label">Password</label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••"
-                  style={inputStyle}
+                  className="form-input"
                 />
               </div>
               <div>
-                <label style={labelStyle}>Confirm</label>
+                <label className="form-label">Confirm</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••"
-                  style={inputStyle}
+                  className="form-input"
                 />
               </div>
             </div>
@@ -355,80 +236,36 @@ export default function Signup() {
                 ref={recaptchaRef}
                 sitekey={recaptchaSiteKey}
                 onChange={(token) => setCaptchaToken(token)}
-                theme="dark"
               />
             </div>
 
             {error && (
-              <div
-                style={{
-                  color: "#fda4af",
-                  background: "rgba(159, 18, 57, 0.4)",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  marginBottom: "20px",
-                  fontSize: "0.85rem",
-                  textAlign: "center",
-                  border: "1px solid rgba(251, 113, 133, 0.3)",
-                  animation: "shake 0.2s ease-in-out",
-                }}
-              >
-                {error}
+              <div className="error-message" role="alert">
+                <span className="error-icon">⚠️</span>
+                <span>{error}</span>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              style={{
-                width: "100%",
-                padding: "16px",
-                borderRadius: "16px",
-                background: loading
-                  ? "rgba(255,255,255,0.1)"
-                  : "linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)",
-                color: loading ? "#94a3b8" : "#1e3a8a",
-                border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
-                fontWeight: "700",
-                fontSize: "1rem",
-                transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.target.style.transform = "scale(1.02) translateY(-2px)";
-                  e.target.style.boxShadow = "0 15px 30px rgba(0,0,0,0.4)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.target.style.transform = "scale(1) translateY(0)";
-                  e.target.style.boxShadow = "0 10px 20px rgba(0,0,0,0.2)";
-                }
-              }}
+              className={`submit-btn ${loading ? 'loading' : ''}`}
             >
               {loading ? (
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                >
+                <>
+                  <span className="spinner"></span>
                   Setting up...
-                </span>
+                </>
               ) : (
                 "Continue & Send OTP"
               )}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleSubmit} noValidate>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={labelStyle}>Enter 6-digit OTP</label>
-              <p style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.85rem", marginBottom: "12px", textAlign: "center" }}>
+          <form onSubmit={handleSubmit} className="auth-form" noValidate>
+            <div className="form-group">
+              <label className="form-label" style={{ textAlign: 'center', fontSize: '1rem' }}>Enter 6-digit OTP</label>
+              <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: "1rem", textAlign: "center" }}>
                 We sent a verification code to <strong>{formData.email}</strong>
               </p>
               <input
@@ -440,66 +277,37 @@ export default function Signup() {
                   setError("");
                 }}
                 placeholder="123456"
+                className="form-input"
                 style={{
-                  ...inputStyle,
                   textAlign: "center",
                   fontSize: "1.5rem",
-                  letterSpacing: "4px",
-                  fontWeight: "bold"
+                  letterSpacing: "0.5rem",
+                  fontWeight: "bold",
+                  padding: "1rem"
                 }}
               />
             </div>
 
             {error && (
-              <div
-                style={{
-                  color: "#fda4af",
-                  background: "rgba(159, 18, 57, 0.4)",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  marginBottom: "20px",
-                  fontSize: "0.85rem",
-                  textAlign: "center",
-                  border: "1px solid rgba(251, 113, 133, 0.3)",
-                  animation: "shake 0.2s ease-in-out",
-                }}
-              >
-                {error}
+              <div className="error-message" role="alert">
+                <span className="error-icon">⚠️</span>
+                <span>{error}</span>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              style={{
-                width: "100%",
-                padding: "16px",
-                borderRadius: "16px",
-                background: loading
-                  ? "rgba(255,255,255,0.1)"
-                  : "linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)",
-                color: loading ? "#94a3b8" : "#1e3a8a",
-                border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
-                fontWeight: "700",
-                fontSize: "1rem",
-                transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.target.style.transform = "scale(1.02) translateY(-2px)";
-                  e.target.style.boxShadow = "0 15px 30px rgba(0,0,0,0.4)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.target.style.transform = "scale(1) translateY(0)";
-                  e.target.style.boxShadow = "0 10px 20px rgba(0,0,0,0.2)";
-                }
-              }}
+              className={`submit-btn ${loading ? 'loading' : ''}`}
             >
-              {loading ? "Creating Account..." : "Verify & Create Account"}
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Creating Account...
+                </>
+              ) : (
+                "Verify & Create Account"
+              )}
             </button>
 
             <button
@@ -513,11 +321,11 @@ export default function Signup() {
               style={{
                 background: "transparent",
                 border: "none",
-                color: "rgba(255, 255, 255, 0.6)",
-                fontSize: "0.9rem",
+                color: "var(--text-muted)",
+                fontSize: "0.875rem",
                 display: "block",
                 width: "100%",
-                marginTop: "16px",
+                marginTop: "1rem",
                 cursor: "pointer",
                 textDecoration: "underline",
               }}
@@ -527,41 +335,13 @@ export default function Signup() {
           </form>
         )}
 
-        <div
-          style={{
-            marginTop: "28px",
-            textAlign: "center",
-            color: "rgba(255, 255, 255, 0.6)",
-            fontSize: "0.9rem",
-          }}
-        >
+        <div className="auth-footer">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            style={{
-              color: "#fff",
-              textDecoration: "none",
-              fontWeight: "600",
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
-            onMouseLeave={(e) => (e.target.style.opacity = "1")}
-          >
+          <Link to="/login" className="auth-link">
             Sign In
           </Link>
         </div>
       </div>
-
-      <style>
-        {`
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-          }
-          input::placeholder { color: rgba(255,255,255,0.3); }
-        `}
-      </style>
     </div>
   );
 }

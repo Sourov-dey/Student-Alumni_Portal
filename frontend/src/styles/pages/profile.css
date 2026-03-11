@@ -1,22 +1,22 @@
 /* ============================================================
-   Profile Page — LinkedIn-inspired Premium Design
+   Profile Page — Minimalist Premium Design
    ============================================================ */
 
 /* ---------- Page wrapper ---------- */
 .profile-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background-color: var(--bg-main);
     padding: 0 0 60px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: #e2e8f0;
+    color: var(--text-main);
 }
 
 /* ---------- Cover / Banner ---------- */
 .profile-banner {
     position: relative;
-    height: 220px;
-    background: linear-gradient(135deg, #1e40af 0%, #6366f1 50%, #8b5cf6 100%);
-    border-radius: 0 0 32px 32px;
+    height: 200px;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+    border-radius: 0 0 24px 24px;
     overflow: hidden;
 }
 
@@ -31,22 +31,20 @@
 .profile-header {
     position: relative;
     max-width: 900px;
-    margin: -70px auto 0;
+    margin: -60px auto 0;
     padding: 0 24px;
 }
 
 .profile-header-card {
-    background: rgba(30, 41, 59, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     padding: 32px;
     display: flex;
     gap: 28px;
     align-items: flex-start;
     position: relative;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Avatar */
@@ -60,9 +58,9 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid #6366f1;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-    background: #334155;
+    border: 4px solid var(--bg-card);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-main);
 }
 
 .profile-role-badge {
@@ -75,21 +73,22 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
 }
 
 .profile-role-badge.student {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: #fff;
+    background: var(--primary-bg);
+    color: var(--primary-dark);
 }
 
 .profile-role-badge.alumni {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: #fff;
+    background: var(--primary-blue);
+    color: white;
 }
 
 .profile-role-badge.admin {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff;
+    background: var(--warning-bg);
+    color: var(--warning);
 }
 
 /* Name area */
@@ -101,13 +100,14 @@
 .profile-name {
     font-size: 28px;
     font-weight: 800;
-    color: #f8fafc;
+    color: var(--text-main);
     margin: 0 0 4px;
     line-height: 1.2;
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    letter-spacing: -0.02em;
 }
 
 .verified-badge {
@@ -118,21 +118,21 @@
     border-radius: 10px;
     font-size: 12px;
     font-weight: 600;
-    background: rgba(34, 197, 94, 0.15);
-    color: #4ade80;
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .profile-email {
     font-size: 15px;
-    color: #94a3b8;
+    color: var(--text-muted);
     margin: 0 0 12px;
     word-break: break-all;
 }
 
 .profile-bio {
     font-size: 14px;
-    color: #cbd5e1;
+    color: var(--text-main);
     line-height: 1.6;
     margin: 0;
     max-width: 520px;
@@ -147,34 +147,37 @@
     align-items: center;
     gap: 6px;
     padding: 8px 18px;
-    border-radius: 12px;
-    border: 1px solid rgba(99, 102, 241, 0.4);
-    background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     font-family: inherit;
+    box-shadow: var(--shadow-sm);
 }
 
 .profile-edit-btn:hover {
-    background: rgba(99, 102, 241, 0.3);
-    color: #c7d2fe;
+    background: var(--bg-main);
+    border-color: var(--border-focus);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
 }
 
 .profile-edit-btn.active {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: #fff;
-    border-color: transparent;
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+.profile-edit-btn.active:hover {
+    background: var(--primary-dark);
 }
 
 /* ---------- Content area ---------- */
 .profile-content {
     max-width: 900px;
-    margin: 28px auto 0;
+    margin: 24px auto 0;
     padding: 0 24px;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -183,18 +186,17 @@
 
 /* ---------- Info cards ---------- */
 .profile-section {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(99, 102, 241, 0.12);
-    border-radius: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     padding: 24px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .profile-section:hover {
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.08);
-    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-focus);
 }
 
 .profile-section.full-width {
@@ -204,17 +206,17 @@
 .section-title {
     font-size: 16px;
     font-weight: 700;
-    color: #e2e8f0;
-    margin: 0 0 18px;
+    color: var(--text-main);
+    margin: 0 0 16px;
     display: flex;
     align-items: center;
     gap: 8px;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .section-title svg {
-    color: #818cf8;
+    color: var(--primary-blue);
 }
 
 /* Info row */
@@ -222,7 +224,7 @@
     display: flex;
     align-items: baseline;
     padding: 10px 0;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    border-bottom: 1px dashed var(--border-color);
 }
 
 .info-row:last-child {
@@ -234,7 +236,7 @@
     flex: 0 0 130px;
     font-size: 13px;
     font-weight: 600;
-    color: #94a3b8;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.4px;
 }
@@ -242,12 +244,12 @@
 .info-value {
     flex: 1;
     font-size: 15px;
-    color: #e2e8f0;
+    color: var(--text-main);
     font-weight: 500;
 }
 
 .info-value.muted {
-    color: #64748b;
+    color: var(--text-light);
     font-style: italic;
     font-weight: 400;
 }
@@ -256,38 +258,38 @@
 .profile-input {
     width: 100%;
     padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(99, 102, 241, 0.25);
-    background: rgba(15, 23, 42, 0.6);
-    color: #e2e8f0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
     font-size: 14px;
     font-family: inherit;
     outline: none;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 .profile-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .profile-input::placeholder {
-    color: #64748b;
+    color: var(--text-light);
 }
 
 .profile-select {
     width: 100%;
     padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(99, 102, 241, 0.25);
-    background: rgba(15, 23, 42, 0.6);
-    color: #e2e8f0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
     font-size: 14px;
     font-family: inherit;
     outline: none;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
     appearance: none;
     -webkit-appearance: none;
@@ -298,34 +300,34 @@
 }
 
 .profile-select:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .profile-select option {
-    background: #1e293b;
-    color: #e2e8f0;
+    background: white;
+    color: var(--text-main);
 }
 
 .profile-textarea {
     width: 100%;
     padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(99, 102, 241, 0.25);
-    background: rgba(15, 23, 42, 0.6);
-    color: #e2e8f0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
     font-size: 14px;
     font-family: inherit;
     outline: none;
     min-height: 80px;
     resize: vertical;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 .profile-textarea:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 /* ---------- Skills ---------- */
@@ -337,32 +339,34 @@
 
 .skill-chip {
     padding: 5px 14px;
-    border-radius: 20px;
-    background: rgba(99, 102, 241, 0.12);
-    color: #a5b4fc;
+    border-radius: var(--radius-full);
+    background: var(--bg-main);
+    color: var(--text-main);
     font-size: 13px;
     font-weight: 500;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--border-color);
     transition: all 0.2s ease;
 }
 
 .skill-chip:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--primary-bg);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
 }
 
 /* ---------- Map section ---------- */
 .profile-map-container {
     height: 280px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     margin-top: 14px;
-    border: 1px solid rgba(99, 102, 241, 0.15);
+    border: 1px solid var(--border-color);
 }
 
 .profile-map-container .leaflet-container {
     height: 100%;
     width: 100%;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
 }
 
 .map-hint {
@@ -370,12 +374,12 @@
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--text-muted);
     margin-top: 10px;
 }
 
 .map-hint svg {
-    color: #818cf8;
+    color: var(--text-light);
     flex-shrink: 0;
 }
 
@@ -395,7 +399,7 @@
 .location-input-group label {
     font-size: 12px;
     font-weight: 600;
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 /* ---------- Action buttons ---------- */
@@ -411,22 +415,22 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 28px;
-    border-radius: 12px;
+    padding: 10px 24px;
+    border-radius: var(--radius-md);
     border: none;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: #fff;
+    background: var(--primary-blue);
+    color: white;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     font-family: inherit;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
 }
 
 .btn-save:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-save:disabled {
@@ -439,10 +443,10 @@
     align-items: center;
     gap: 6px;
     padding: 10px 24px;
-    border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    background: transparent;
-    color: #94a3b8;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-main);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -451,8 +455,8 @@
 }
 
 .btn-cancel:hover {
-    background: rgba(148, 163, 184, 0.1);
-    color: #cbd5e1;
+    background: var(--bg-main);
+    border-color: var(--border-focus);
 }
 
 /* ---------- Loading state ---------- */
@@ -463,22 +467,20 @@
     justify-content: center;
     min-height: 60vh;
     gap: 16px;
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 .profile-loading .spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid rgba(99, 102, 241, 0.2);
-    border-top-color: #6366f1;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary-blue);
     border-radius: 50%;
-    animation: spin 0.7s linear infinite;
+    animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
 /* ---------- Login prompt ---------- */
@@ -489,14 +491,15 @@
     justify-content: center;
     min-height: 60vh;
     gap: 16px;
-    color: #94a3b8;
+    color: var(--text-muted);
     text-align: center;
 }
 
 .profile-login-prompt h2 {
-    color: #e2e8f0;
+    color: var(--text-main);
     font-size: 24px;
     margin: 0;
+    font-weight: 800;
 }
 
 .profile-login-prompt p {
@@ -508,19 +511,20 @@
     align-items: center;
     gap: 6px;
     padding: 10px 28px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: #fff;
+    border-radius: var(--radius-md);
+    background: var(--primary-blue);
+    color: white;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 14px;
     margin-top: 8px;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
 }
 
 .profile-login-prompt a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 /* ============================================================
@@ -530,7 +534,7 @@
 @media (max-width: 768px) {
     .profile-banner {
         height: 160px;
-        border-radius: 0 0 24px 24px;
+        border-radius: 0 0 16px 16px;
     }
 
     .profile-header {
@@ -557,11 +561,7 @@
     }
 
     .profile-email {
-        font-size: 13px;
-    }
-
-    .profile-bio {
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .profile-edit-btn {
@@ -570,89 +570,13 @@
         right: 0;
         width: 100%;
         justify-content: center;
-        margin-top: 4px;
+        margin-top: 8px;
     }
 
     .profile-content {
         grid-template-columns: 1fr;
         padding: 0 16px;
-        gap: 18px;
-        margin-top: 20px;
-    }
-
-    .profile-section {
-        padding: 20px 18px;
-        border-radius: 16px;
-    }
-
-    .info-label {
-        flex: 0 0 100px;
-        font-size: 12px;
-    }
-
-    .info-value {
-        font-size: 14px;
-    }
-
-    .location-inputs {
-        grid-template-columns: 1fr;
-    }
-
-    .profile-map-container {
-        height: 220px;
-    }
-
-    .profile-actions {
-        flex-direction: column;
-    }
-
-    .btn-save,
-    .btn-cancel {
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-banner {
-        height: 130px;
-        border-radius: 0 0 18px 18px;
-    }
-
-    .profile-header-card {
-        padding: 20px 16px;
-        border-radius: 18px;
-    }
-
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-width: 3px;
-    }
-
-    .profile-name {
-        font-size: 20px;
-    }
-
-    .section-title {
-        font-size: 14px;
-    }
-
-    .info-row {
-        flex-direction: column;
-        gap: 4px;
-        padding: 8px 0;
-    }
-
-    .info-label {
-        flex: none;
-        font-size: 11px;
-    }
-
-    .info-value {
-        font-size: 13px;
-    }
-
-    .profile-map-container {
-        height: 180px;
+        gap: 16px;
+        margin-top: 16px;
     }
 }

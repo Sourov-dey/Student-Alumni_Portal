@@ -223,6 +223,17 @@ export default function AlumniMap() {
         }
     };
 
+    if (user?.role !== "admin") {
+        return (
+            <div className="alumni-map-page">
+                <div style={{ textAlign: "center", padding: "100px 20px" }}>
+                    <h2>Access Denied</h2>
+                    <p style={{ color: "var(--text-muted)" }}>Only administrators can view the Alumni Map.</p>
+                </div>
+            </div>
+        );
+    }
+
     // ——— Loading state ———
     if (loading) {
         return (

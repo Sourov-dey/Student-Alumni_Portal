@@ -511,135 +511,141 @@ export default function Profile() {
                 </div>
 
                 {/* ── Address / Location ── */}
-                <div className="profile-section full-width">
-                    <h3 className="section-title">
-                        <MapPin size={18} /> Address & Location
-                    </h3>
+                {p.role === 'alumni' && (
+                    <div className="profile-section full-width">
+                        <h3 className="section-title">
+                            <MapPin size={18} /> Address & Location
+                        </h3>
 
-                    {editing ? (
-                        <>
-                            <div className="location-inputs">
-                                <div className="location-input-group">
-                                    <label>City</label>
-                                    <input
-                                        className="profile-input"
-                                        name="city"
-                                        value={form.city}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Silchar"
-                                    />
-                                </div>
-                                <div className="location-input-group">
-                                    <label>Country</label>
-                                    <input
-                                        className="profile-input"
-                                        name="country"
-                                        value={form.country}
-                                        onChange={handleChange}
-                                        placeholder="e.g. India"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="profile-map-container">
-                                <MapContainer
-                                    center={[
-                                        lat ? parseFloat(lat) : 20.5937,
-                                        lng ? parseFloat(lng) : 78.9629,
-                                    ]}
-                                    zoom={lat && lng ? 13 : 5}
-                                    scrollWheelZoom={true}
-                                    style={{ height: "100%", width: "100%" }}
-                                >
-                                    <TileLayer
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-                                        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                                    />
-                                    <FlyToLocation lat={lat} lng={lng} />
-                                    <MapClickHandler onMapClick={handleMapClick} />
-                                    {lat && lng && (
-                                        <Marker
-                                            position={[parseFloat(lat), parseFloat(lng)]}
-                                            icon={myIcon}
-                                        >
-                                            <Popup>📍 Your selected location</Popup>
-                                        </Marker>
-                                    )}
-                                </MapContainer>
-                            </div>
-
-                            <div className="map-hint">
-                                <Info size={14} />
-                                <span>Click anywhere on the map to pick your address, or use geolocation below.</span>
-                            </div>
-
-                            <div style={{ marginTop: 10 }}>
-                                <button
-                                    className="btn-cancel"
-                                    onClick={handleGeolocate}
-                                    style={{ gap: 6 }}
-                                >
-                                    <Navigation size={14} /> Use My Current Location
-                                </button>
-                            </div>
-
-                            {lat && lng && (
-                                <div style={{ marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
-                                    📍 {parseFloat(lat).toFixed(4)}, {parseFloat(lng).toFixed(4)}
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            {/* View mode */}
-                            <div className="info-row">
-                                <span className="info-label">City</span>
-                                <span className={`info-value ${p.location?.city ? "" : "muted"}`}>
-                                    {p.location?.city || "Not specified"}
-                                </span>
-                            </div>
-                            <div className="info-row">
-                                <span className="info-label">Country</span>
-                                <span className={`info-value ${p.location?.country ? "" : "muted"}`}>
-                                    {p.location?.country || "Not specified"}
-                                </span>
-                            </div>
-
-                            {hasLocation && (
-                                <div className="profile-map-container">
-                                    <MapContainer
-                                        center={[
-                                            p.location.coordinates.lat,
-                                            p.location.coordinates.lng,
-                                        ]}
-                                        zoom={13}
-                                        scrollWheelZoom={false}
-                                        dragging={false}
-                                        zoomControl={false}
-                                        style={{ height: "100%", width: "100%" }}
-                                    >
-                                        <TileLayer
-                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-                                            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                        {editing ? (
+                            <>
+                                <div className="location-inputs">
+                                    <div className="location-input-group">
+                                        <label>City</label>
+                                        <input
+                                            className="profile-input"
+                                            name="city"
+                                            value={form.city}
+                                            onChange={handleChange}
+                                            placeholder="e.g. Silchar"
                                         />
-                                        <Marker
-                                            position={[
+                                    </div>
+                                    <div className="location-input-group">
+                                        <label>Country</label>
+                                        <input
+                                            className="profile-input"
+                                            name="country"
+                                            value={form.country}
+                                            onChange={handleChange}
+                                            placeholder="e.g. India"
+                                        />
+                                    </div>
+                                </div>
+
+                                {user?.role === 'admin' && (
+                                    <>
+                                        <div className="profile-map-container">
+                                            <MapContainer
+                                                center={[
+                                                    lat ? parseFloat(lat) : 20.5937,
+                                                    lng ? parseFloat(lng) : 78.9629,
+                                                ]}
+                                                zoom={lat && lng ? 13 : 5}
+                                                scrollWheelZoom={true}
+                                                style={{ height: "100%", width: "100%" }}
+                                            >
+                                                <TileLayer
+                                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+                                                    url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                                                />
+                                                <FlyToLocation lat={lat} lng={lng} />
+                                                <MapClickHandler onMapClick={handleMapClick} />
+                                                {lat && lng && (
+                                                    <Marker
+                                                        position={[parseFloat(lat), parseFloat(lng)]}
+                                                        icon={myIcon}
+                                                    >
+                                                        <Popup>📍 Your selected location</Popup>
+                                                    </Marker>
+                                                )}
+                                            </MapContainer>
+                                        </div>
+
+                                        <div className="map-hint">
+                                            <Info size={14} />
+                                            <span>Click anywhere on the map to pick your address, or use geolocation below.</span>
+                                        </div>
+
+                                        <div style={{ marginTop: 10 }}>
+                                            <button
+                                                className="btn-cancel"
+                                                onClick={handleGeolocate}
+                                                style={{ gap: 6 }}
+                                            >
+                                                <Navigation size={14} /> Use My Current Location
+                                            </button>
+                                        </div>
+
+                                        {lat && lng && (
+                                            <div style={{ marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
+                                                📍 {parseFloat(lat).toFixed(4)}, {parseFloat(lng).toFixed(4)}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {/* View mode */}
+                                <div className="info-row">
+                                    <span className="info-label">City</span>
+                                    <span className={`info-value ${p.location?.city ? "" : "muted"}`}>
+                                        {p.location?.city || "Not specified"}
+                                    </span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Country</span>
+                                    <span className={`info-value ${p.location?.country ? "" : "muted"}`}>
+                                        {p.location?.country || "Not specified"}
+                                    </span>
+                                </div>
+
+                                {hasLocation && user?.role === 'admin' && (
+                                    <div className="profile-map-container">
+                                        <MapContainer
+                                            center={[
                                                 p.location.coordinates.lat,
                                                 p.location.coordinates.lng,
                                             ]}
-                                            icon={myIcon}
+                                            zoom={13}
+                                            scrollWheelZoom={false}
+                                            dragging={false}
+                                            zoomControl={false}
+                                            style={{ height: "100%", width: "100%" }}
                                         >
-                                            <Popup>
-                                                📍 {p.location.city}
-                                                {p.location.country ? `, ${p.location.country}` : ""}
-                                            </Popup>
-                                        </Marker>
-                                    </MapContainer>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
+                                            <TileLayer
+                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+                                                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                                            />
+                                            <Marker
+                                                position={[
+                                                    p.location.coordinates.lat,
+                                                    p.location.coordinates.lng,
+                                                ]}
+                                                icon={myIcon}
+                                            >
+                                                <Popup>
+                                                    📍 {p.location.city}
+                                                    {p.location.country ? `, ${p.location.country}` : ""}
+                                                </Popup>
+                                            </Marker>
+                                        </MapContainer>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
 
                 {/* ── Save / Cancel buttons ── */}
                 {editing && (

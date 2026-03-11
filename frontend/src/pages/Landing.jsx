@@ -219,22 +219,22 @@ export default function Landing() {
               {user ? (
                 <>
                   {user.role === 'student' && (
-                    <a href="/jobs" className="btn btn-primary">
+                    <a href="/jobs" className="btn-cta-primary">
                       Explore Jobs
                     </a>
                   )}
                   {(user.role === 'alumni' || user.role === 'admin') && (
-                    <a href="/post-job" className="btn btn-primary">
+                    <a href="/post-job" className="btn-cta-primary">
                       Post a Job
                     </a>
                   )}
                 </>
               ) : (
                 <>
-                  <a href="/login" className="btn btn-primary">
+                  <a href="/login" className="btn-cta-primary">
                     Get Started
                   </a>
-                  <a href="/about" className="btn btn-secondary">
+                  <a href="/about" className="btn-cta-secondary">
                     Learn More
                   </a>
                 </>
