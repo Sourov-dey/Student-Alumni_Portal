@@ -271,7 +271,7 @@ export const getAlumniLocations = async (req, res) => {
       'location.coordinates.lat': { $exists: true },
       'location.coordinates.lng': { $exists: true },
     })
-      .select('name avatarUrl department graduationYear location')
+      .select('name avatarUrl department graduationYear location email phone bio skills')
       .lean();
 
     res.status(200).json(alumni);

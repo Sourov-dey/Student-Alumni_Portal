@@ -104,7 +104,7 @@ export default function Navbar() {
                 active={location.pathname === "/chat"}
               />
             )}
-            {user?.role === "admin" && (
+            {(user?.role === "admin" || user?.role === "alumni") && (
               <NavLink
                 to="/alumni-map"
                 label="Map"
@@ -261,7 +261,7 @@ export default function Navbar() {
                   active={location.pathname === "/chat"}
                 />
               )}
-              {user?.role === "admin" && (
+              {(user?.role === "admin" || user?.role === "alumni") && (
                 <NavLink
                   to="/alumni-map"
                   label="Map"

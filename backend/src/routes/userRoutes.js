@@ -43,7 +43,7 @@ router.get("/all", requireAuth, getAllUsersForGroups);
 router.get("/list", requireAuth, listUsers);
 
 // 🗺️ Get alumni with locations (for map) — alumni only
-router.get("/alumni-locations", requireAuth, requireRole('alumni'), getAlumniLocations);
+router.get("/alumni-locations", requireAuth, requireRole('alumni', 'admin'), getAlumniLocations);
 
 /* =====================================================
    🔴 GENERIC ROUTES LAST (VERY IMPORTANT)
