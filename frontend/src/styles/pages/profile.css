@@ -354,6 +354,231 @@
     color: var(--primary-blue);
 }
 
+/* Skill chip variants */
+.skill-chip.tech {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+.skill-chip.tech:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.skill-chip.soft {
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #b45309;
+}
+.skill-chip.soft:hover {
+    background: #fde68a;
+    border-color: #f59e0b;
+}
+
+.skill-chip.interest {
+    background: #fce7f3;
+    border-color: #f9a8d4;
+    color: #be185d;
+}
+.skill-chip.interest:hover {
+    background: #fbcfe8;
+    border-color: #f472b6;
+}
+
+/* ---------- Dynamic list (projects / certifications edit mode) ---------- */
+.dynamic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dynamic-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    transition: border-color 0.2s ease;
+}
+
+.dynamic-item:hover {
+    border-color: var(--border-focus);
+}
+
+.dynamic-item-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dynamic-item-fields.cert-fields {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dynamic-item-fields.cert-fields .profile-input {
+    flex: 1;
+    min-width: 120px;
+}
+
+.btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-color);
+    background: transparent;
+    color: var(--primary-blue);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    align-self: flex-start;
+}
+
+.btn-add:hover {
+    background: var(--primary-bg);
+    border-color: var(--primary-blue);
+}
+
+.btn-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.btn-remove:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #ef4444;
+}
+
+/* ---------- Project cards (view mode) ---------- */
+.project-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.project-card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    transition: all 0.2s ease;
+}
+
+.project-card:hover {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+.project-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 6px;
+}
+
+.project-card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+    line-height: 1.5;
+}
+
+.project-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.project-card-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* ---------- Certification rows (view mode) ---------- */
+.cert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cert-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+    transition: all 0.2s ease;
+}
+
+.cert-row:hover {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-sm);
+}
+
+.cert-icon {
+    color: #f59e0b;
+    flex-shrink: 0;
+}
+
+.cert-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cert-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.cert-issuer {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.cert-year {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
 /* ---------- Map section ---------- */
 .profile-map-container {
     height: 280px;

@@ -21,6 +21,19 @@ export const updateUserSchema = z.object({
       currentYear: z.number().int().min(1).max(8).optional(),
       bio: z.string().max(500).optional(),
       skills: z.array(z.string().min(1).max(60)).optional(),
+      technicalSkills: z.array(z.string().min(1).max(60)).optional(),
+      nonTechnicalSkills: z.array(z.string().min(1).max(60)).optional(),
+      projects: z.array(z.object({
+        title: z.string().min(1).max(120),
+        description: z.string().max(500).optional(),
+        link: z.string().max(300).optional(),
+      })).optional(),
+      certifications: z.array(z.object({
+        title: z.string().min(1).max(120),
+        issuer: z.string().max(120).optional(),
+        year: z.number().int().min(1950).max(2100).optional(),
+      })).optional(),
+      interests: z.array(z.string().min(1).max(60)).optional(),
       profileComplete: z.boolean().optional(),
       verifiedByAdmin: z.boolean().optional(),
       location: z.object({

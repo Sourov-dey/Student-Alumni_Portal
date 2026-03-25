@@ -29,6 +29,12 @@ import {
     Info,
     Navigation,
     Shield,
+    Award,
+    Star,
+    Lightbulb,
+    FolderKanban,
+    Plus,
+    Trash2,
 } from "lucide-react";
 import "../styles/pages/profile.css";
 
@@ -143,6 +149,11 @@ export default function Profile() {
                 graduationYear: profile.graduationYear || "",
                 bio: profile.bio || "",
                 skills: (profile.skills || []).join(", "),
+                technicalSkills: (profile.technicalSkills || []).join(", "),
+                nonTechnicalSkills: (profile.nonTechnicalSkills || []).join(", "),
+                projects: (profile.projects || []).map(p => ({ ...p })),
+                certifications: (profile.certifications || []).map(c => ({ ...c })),
+                interests: (profile.interests || []).join(", "),
                 city: profile.location?.city || "",
                 country: profile.location?.country || "",
             });
@@ -154,6 +165,44 @@ export default function Profile() {
     // ── Handlers ──
     const handleChange = (e) =>
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+    // ── Dynamic list handlers for projects ──
+    const addProject = () =>
+        setForm((prev) => ({
+            ...prev,
+            projects: [...(prev.projects || []), { title: "", description: "", link: "" }],
+        }));
+    const removeProject = (idx) =>
+        setForm((prev) => ({
+            ...prev,
+            projects: prev.projects.filter((_, i) => i !== idx),
+        }));
+    const updateProject = (idx, field, value) =>
+        setForm((prev) => ({
+            ...prev,
+            projects: prev.projects.map((p, i) =>
+                i === idx ? { ...p, [field]: value } : p
+            ),
+        }));
+
+    // ── Dynamic list handlers for certifications ──
+    const addCertification = () =>
+        setForm((prev) => ({
+            ...prev,
+            certifications: [...(prev.certifications || []), { title: "", issuer: "", year: "" }],
+        }));
+    const removeCertification = (idx) =>
+        setForm((prev) => ({
+            ...prev,
+            certifications: prev.certifications.filter((_, i) => i !== idx),
+        }));
+    const updateCertification = (idx, field, value) =>
+        setForm((prev) => ({
+            ...prev,
+            certifications: prev.certifications.map((c, i) =>
+                i === idx ? { ...c, [field]: value } : c
+            ),
+        }));
 
     const handleMapClick = useCallback((latlng) => {
         const newLat = latlng.lat.toFixed(6);
@@ -202,6 +251,9 @@ export default function Profile() {
     const handleSave = async () => {
         setSaving(true);
         try {
+            const splitCSV = (str) =>
+                str ? str.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
+
             const payload = {
                 name: form.name.trim() || undefined,
                 gender: form.gender || undefined,
@@ -209,9 +261,17 @@ export default function Profile() {
                 phone: form.phone.trim() || undefined,
                 department: form.department.trim() || undefined,
                 bio: form.bio.trim() || undefined,
-                skills: form.skills
-                    ? form.skills.split(",").map((s) => s.trim()).filter(Boolean)
-                    : undefined,
+                skills: splitCSV(form.skills),
+                technicalSkills: splitCSV(form.technicalSkills),
+                nonTechnicalSkills: splitCSV(form.nonTechnicalSkills),
+                interests: splitCSV(form.interests),
+                projects: (form.projects || []).filter((p) => p.title?.trim()),
+                certifications: (form.certifications || [])
+                    .filter((c) => c.title?.trim())
+                    .map((c) => ({
+                        ...c,
+                        year: c.year ? parseInt(c.year, 10) : undefined,
+                    })),
             };
 
             if (form.graduationYear) {
@@ -509,6 +569,225 @@ export default function Profile() {
                         )}
                     </div>
                 </div>
+
+                {/* ── Student Portfolio: Technical Skills, Non-Technical Skills, Interests ── */}
+                {p.role === 'student' && (
+                    <div className="profile-section">
+                        <h3 className="section-title">
+                            <Star size={18} /> Skills & Interests
+                        </h3>
+
+                        {/* Technical Skills */}
+                        <div className="info-row" style={{ flexDirection: "column", gap: 6 }}>
+                            <span className="info-label">Technical Skills</span>
+                            {editing ? (
+                                <input
+                                    className="profile-input"
+                                    name="technicalSkills"
+                                    value={form.technicalSkills}
+                                    onChange={handleChange}
+                                    placeholder="React, Python, SQL (comma-separated)"
+                                />
+                            ) : p.technicalSkills && p.technicalSkills.length > 0 ? (
+                                <div className="skills-list">
+                                    {p.technicalSkills.map((s, i) => (
+                                        <span key={i} className="skill-chip tech">{s}</span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="info-value muted">No technical skills added</span>
+                            )}
+                        </div>
+
+                        {/* Non-Technical Skills */}
+                        <div className="info-row" style={{ flexDirection: "column", gap: 6 }}>
+                            <span className="info-label">Non-Technical Skills</span>
+                            {editing ? (
+                                <input
+                                    className="profile-input"
+                                    name="nonTechnicalSkills"
+                                    value={form.nonTechnicalSkills}
+                                    onChange={handleChange}
+                                    placeholder="Communication, Leadership, Teamwork (comma-separated)"
+                                />
+                            ) : p.nonTechnicalSkills && p.nonTechnicalSkills.length > 0 ? (
+                                <div className="skills-list">
+                                    {p.nonTechnicalSkills.map((s, i) => (
+                                        <span key={i} className="skill-chip soft">{s}</span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="info-value muted">No non-technical skills added</span>
+                            )}
+                        </div>
+
+                        {/* Interests */}
+                        <div className="info-row" style={{ flexDirection: "column", gap: 6 }}>
+                            <span className="info-label">Areas of Interest</span>
+                            {editing ? (
+                                <input
+                                    className="profile-input"
+                                    name="interests"
+                                    value={form.interests}
+                                    onChange={handleChange}
+                                    placeholder="Web Dev, Machine Learning, Design (comma-separated)"
+                                />
+                            ) : p.interests && p.interests.length > 0 ? (
+                                <div className="skills-list">
+                                    {p.interests.map((s, i) => (
+                                        <span key={i} className="skill-chip interest">{s}</span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="info-value muted">No interests added</span>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Student Portfolio: Projects ── */}
+                {p.role === 'student' && (
+                    <div className="profile-section">
+                        <h3 className="section-title">
+                            <FolderKanban size={18} /> Projects
+                        </h3>
+
+                        {editing ? (
+                            <div className="dynamic-list">
+                                {(form.projects || []).map((proj, idx) => (
+                                    <div key={idx} className="dynamic-item project-item">
+                                        <div className="dynamic-item-fields">
+                                            <input
+                                                className="profile-input"
+                                                value={proj.title}
+                                                onChange={(e) => updateProject(idx, "title", e.target.value)}
+                                                placeholder="Project title *"
+                                            />
+                                            <input
+                                                className="profile-input"
+                                                value={proj.description || ""}
+                                                onChange={(e) => updateProject(idx, "description", e.target.value)}
+                                                placeholder="Short description"
+                                            />
+                                            <input
+                                                className="profile-input"
+                                                value={proj.link || ""}
+                                                onChange={(e) => updateProject(idx, "link", e.target.value)}
+                                                placeholder="Link (e.g. https://github.com/…)"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            className="btn-remove"
+                                            onClick={() => removeProject(idx)}
+                                            title="Remove project"
+                                        >
+                                            <Trash2 size={15} />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button type="button" className="btn-add" onClick={addProject}>
+                                    <Plus size={15} /> Add Project
+                                </button>
+                            </div>
+                        ) : p.projects && p.projects.length > 0 ? (
+                            <div className="project-cards">
+                                {p.projects.map((proj, i) => (
+                                    <div key={i} className="project-card">
+                                        <h4 className="project-card-title">{proj.title}</h4>
+                                        {proj.description && (
+                                            <p className="project-card-desc">{proj.description}</p>
+                                        )}
+                                        {proj.link && (
+                                            <a
+                                                className="project-card-link"
+                                                href={proj.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                View Project →
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <span className="info-value muted">No projects added</span>
+                        )}
+                    </div>
+                )}
+
+                {/* ── Student Portfolio: Certifications ── */}
+                {p.role === 'student' && (
+                    <div className="profile-section full-width">
+                        <h3 className="section-title">
+                            <Award size={18} /> Certifications
+                        </h3>
+
+                        {editing ? (
+                            <div className="dynamic-list">
+                                {(form.certifications || []).map((cert, idx) => (
+                                    <div key={idx} className="dynamic-item cert-item">
+                                        <div className="dynamic-item-fields cert-fields">
+                                            <input
+                                                className="profile-input"
+                                                value={cert.title}
+                                                onChange={(e) => updateCertification(idx, "title", e.target.value)}
+                                                placeholder="Certification name *"
+                                            />
+                                            <input
+                                                className="profile-input"
+                                                value={cert.issuer || ""}
+                                                onChange={(e) => updateCertification(idx, "issuer", e.target.value)}
+                                                placeholder="Issuing organization"
+                                            />
+                                            <input
+                                                className="profile-input"
+                                                type="number"
+                                                value={cert.year || ""}
+                                                onChange={(e) => updateCertification(idx, "year", e.target.value)}
+                                                placeholder="Year"
+                                                min={1950}
+                                                max={2100}
+                                                style={{ maxWidth: 100 }}
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            className="btn-remove"
+                                            onClick={() => removeCertification(idx)}
+                                            title="Remove certification"
+                                        >
+                                            <Trash2 size={15} />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button type="button" className="btn-add" onClick={addCertification}>
+                                    <Plus size={15} /> Add Certification
+                                </button>
+                            </div>
+                        ) : p.certifications && p.certifications.length > 0 ? (
+                            <div className="cert-list">
+                                {p.certifications.map((cert, i) => (
+                                    <div key={i} className="cert-row">
+                                        <Award size={16} className="cert-icon" />
+                                        <div className="cert-info">
+                                            <span className="cert-title">{cert.title}</span>
+                                            {cert.issuer && (
+                                                <span className="cert-issuer">{cert.issuer}</span>
+                                            )}
+                                        </div>
+                                        {cert.year && (
+                                            <span className="cert-year">{cert.year}</span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <span className="info-value muted">No certifications added</span>
+                        )}
+                    </div>
+                )}
 
                 {/* ── Address / Location ── */}
                 {p.role === 'alumni' && (

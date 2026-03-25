@@ -175,7 +175,7 @@ export const getUserById = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id)
-      .select('name email avatarUrl role createdAt department graduationYear bio skills gender dateOfBirth phone location verified')
+      .select('name email avatarUrl role createdAt department graduationYear bio skills technicalSkills nonTechnicalSkills projects certifications interests gender dateOfBirth phone location verified')
       .lean();
 
     if (!user) {

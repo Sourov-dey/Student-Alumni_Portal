@@ -83,11 +83,8 @@ export const getJobById = async (req, res, next) => {
     const job = await Job.findById(id).select('-__v');
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
-    // Include application stats for job owner or admin
-    if (req.user && (
-      req.user.role === 'admin' || 
-      (job.postedBy && job.postedBy.toString() === req.user._id.toString())
-    )) {
+    // Include application stats for alumni or admin
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'alumni')) {
       const applicationStats = await getApplicationStats(job._id);
       const jobObj = job.toObject();
       jobObj.applicationStats = applicationStats[job._id.toString()] || { totalApplications: 0, statusBreakdown: { submitted: 0, shortlisted: 0, rejected: 0, hired: 0 } };

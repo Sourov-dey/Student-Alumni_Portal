@@ -86,17 +86,15 @@ export const getApplicationsForJob = async (req, res, next) => {
     const user = req.user;
     if (!user || !user._id) return res.status(401).json({ message: 'Not authenticated' });
 
-    const postedById = job.postedBy ? String(job.postedBy) : null;
-    const userId = String(user._id);
-    const isOwner = postedById && postedById === userId;
+    const isAlumni = user.role === 'alumni';
     const isAdmin = user.role === 'admin';
 
-    if (!isOwner && !isAdmin) {
+    if (!isAlumni && !isAdmin) {
       return res.status(403).json({ message: 'Forbidden' });
     }
 
     const applications = await Application.find({ job: job._id })
-      .populate('student', 'name email department currentYear skills resumeUrl avatarUrl')
+      .populate('student', 'name email department currentYear skills technicalSkills nonTechnicalSkills projects certifications interests bio phone graduationYear avatarUrl')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -114,12 +112,10 @@ export const updateApplicationStatus = async (req, res, next) => {
 
     if (!req.user || !req.user._id) return res.status(401).json({ message: "Not authenticated" });
 
-    const postedById = app.job && app.job.postedBy ? String(app.job.postedBy) : null;
-    const userId = String(req.user._id);
-    const isOwner = postedById && postedById === userId;
+    const isAlumni = req.user.role === 'alumni';
     const isAdmin = req.user.role === 'admin';
 
-    if (!isOwner && !isAdmin) {
+    if (!isAlumni && !isAdmin) {
       return res.status(403).json({ message: "Forbidden" });
     }
 

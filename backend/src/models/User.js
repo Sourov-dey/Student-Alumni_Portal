@@ -70,6 +70,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true
     }],
+    // ── Student portfolio fields ──
+    technicalSkills: [{ type: String, trim: true }],
+    nonTechnicalSkills: [{ type: String, trim: true }],
+    projects: [{
+      title: { type: String, trim: true, required: true },
+      description: { type: String, trim: true },
+      link: { type: String, trim: true },
+    }],
+    certifications: [{
+      title: { type: String, trim: true, required: true },
+      issuer: { type: String, trim: true },
+      year: { type: Number },
+    }],
+    interests: [{ type: String, trim: true }],
     location: {
       city: { type: String, trim: true },
       country: { type: String, trim: true },
@@ -135,6 +149,11 @@ userSchema.methods.toPublicJSON = function () {
     graduationYear: this.graduationYear,
     bio: this.bio,
     skills: this.skills,
+    technicalSkills: this.technicalSkills,
+    nonTechnicalSkills: this.nonTechnicalSkills,
+    projects: this.projects,
+    certifications: this.certifications,
+    interests: this.interests,
     location: this.location,
     verified: this.verified,
     suspended: this.suspended,

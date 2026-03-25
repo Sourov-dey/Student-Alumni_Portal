@@ -186,7 +186,7 @@ function AlumniCard({ alumni, isMe, expanded, onToggle }) {
                         </div>
                     )}
                     {alumni.email && (
-                        <a href={`mailto:${alumni.email}`} className="detail-row detail-link">
+                        <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(alumni.email)}`} target="_blank" rel="noopener noreferrer" className="detail-row detail-link">
                             <Mail size={14} />
                             <span>{alumni.email}</span>
                         </a>
@@ -408,7 +408,7 @@ export default function AlumniMap() {
     };
 
     // ——— Access control ———
-    if (user?.role !== "admin" && user?.role !== "alumni") {
+    if (user?.role !== "admin" && user?.role !== "alumni" && user?.role !== "student") {
         return (
             <div className="alumni-map-page">
                 <div className="map-access-denied">
@@ -438,7 +438,7 @@ export default function AlumniMap() {
         <div className="alumni-map-page">
             {/* Header */}
             <div className="alumni-map-header">
-                <h1>🌍 Alumni World Map</h1>
+                <h1>Alumni World Map</h1>
                 <p>Discover where our alumni community is making an impact across the globe</p>
 
                 {/* Stats chips */}
@@ -527,7 +527,7 @@ export default function AlumniMap() {
                                                         </div>
                                                     )}
                                                     {a.email && (
-                                                        <a href={`mailto:${a.email}`} className="popup-detail-row popup-link">
+                                                        <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(a.email)}`} target="_blank" rel="noopener noreferrer" className="popup-detail-row popup-link">
                                                             <Mail size={12} /> {a.email}
                                                         </a>
                                                     )}
@@ -702,25 +702,6 @@ export default function AlumniMap() {
                                 />
                             </div>
 
-                            <div className="location-form-group">
-                                <label>Coordinates</label>
-                                <div className="location-coords">
-                                    <input
-                                        type="number"
-                                        step="any"
-                                        placeholder="Latitude"
-                                        value={lat}
-                                        onChange={(e) => setLat(e.target.value)}
-                                    />
-                                    <input
-                                        type="number"
-                                        step="any"
-                                        placeholder="Longitude"
-                                        value={lng}
-                                        onChange={(e) => setLng(e.target.value)}
-                                    />
-                                </div>
-                            </div>
 
                             <div className="location-hint">
                                 <Info size={14} />
