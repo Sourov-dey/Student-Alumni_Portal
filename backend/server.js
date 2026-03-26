@@ -39,7 +39,9 @@ const ALLOWED_ORIGINS = [
 ];
 
 // ---------- Database ----------
-await connectDB();
+if (process.env.NODE_ENV !== "test") {
+  await connectDB();
+}
 
 // ---------- Parsers ----------
 app.use(express.json({ limit: "20mb" }));

@@ -12,6 +12,4 @@ describe("GET /api/health", () => {
 });
 
 afterAll(async () => {
-  // Close mongoose connection if it was opened by server.js
-  await mongoose.connection.close();
-});
+  });

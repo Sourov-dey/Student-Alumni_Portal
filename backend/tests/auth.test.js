@@ -23,7 +23,6 @@ describe("Auth Routes", () => {
   afterAll(async () => {
     await User.deleteMany({ email: testEmail });
     await Otp.deleteMany({ email: testEmail });
-    await mongoose.connection.close();
   });
 
   describe("POST /api/auth/signup", () => {

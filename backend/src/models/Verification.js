@@ -102,6 +102,6 @@ const verificationSchema = new mongoose.Schema(
 );
 
 verificationSchema.index({ status: 1, submittedAt: -1 });
-verificationSchema.index({ imageHash: 1 });
+
 
 export default mongoose.model("Verification", verificationSchema);

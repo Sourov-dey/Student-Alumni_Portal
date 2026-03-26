@@ -196,6 +196,11 @@ export const getUserById = async (req, res) => {
 /** PATCH /api/users/:id */
 export const updateUserById = async (req, res, next) => {
   try {
+    // Auth check: only the user themselves or an admin can update the profile
+    if (req.user._id.toString() !== req.params.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
