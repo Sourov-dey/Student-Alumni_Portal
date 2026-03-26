@@ -151,8 +151,9 @@ export default function Signup() {
         {step === 1 ? (
           <form onSubmit={handleSendOtp} className="auth-form" noValidate>
             <div className="form-group">
-              <label className="form-label">Full Name</label>
+              <label htmlFor="name" className="form-label">Full Name</label>
               <input
+                id="name"
                 type="text"
                 name="name"
                 value={formData.name}
@@ -163,8 +164,9 @@ export default function Signup() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Email Address</label>
+              <label htmlFor="email" className="form-label">Email Address</label>
               <input
+                id="email"
                 type="email"
                 name="email"
                 value={formData.email}
@@ -175,8 +177,9 @@ export default function Signup() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">I am a...</label>
+              <label htmlFor="role" className="form-label">I am a...</label>
               <select
+                id="role"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
@@ -190,8 +193,9 @@ export default function Signup() {
 
             {formData.role === "admin" && (
               <div className="form-group">
-                <label className="form-label">Admin Secret Code</label>
+                <label htmlFor="adminSecret" className="form-label">Admin Secret Code</label>
                 <input
+                  id="adminSecret"
                   type="password"
                   name="adminSecret"
                   value={formData.adminSecret}
@@ -208,8 +212,9 @@ export default function Signup() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
               <div>
-                <label className="form-label">Password</label>
+                <label htmlFor="password" className="form-label">Password</label>
                 <input
+                  id="password"
                   type="password"
                   name="password"
                   value={formData.password}
@@ -219,8 +224,9 @@ export default function Signup() {
                 />
               </div>
               <div>
-                <label className="form-label">Confirm</label>
+                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                 <input
+                  id="confirmPassword"
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
@@ -264,11 +270,12 @@ export default function Signup() {
         ) : (
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
             <div className="form-group">
-              <label className="form-label" style={{ textAlign: 'center', fontSize: '1rem' }}>Enter 6-digit OTP</label>
+              <label htmlFor="otp" className="form-label" style={{ textAlign: 'center', fontSize: '1rem' }}>Enter 6-digit OTP</label>
               <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: "1rem", textAlign: "center" }}>
                 We sent a verification code to <strong>{formData.email}</strong>
               </p>
               <input
+                id="otp"
                 type="text"
                 name="otp"
                 value={otp}
