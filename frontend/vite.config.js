@@ -11,5 +11,10 @@ export default defineConfig({
   preview: {
     host: true,
     allowedHosts: ['student-alumni-portal-2.onrender.com']
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js',
   }
 })

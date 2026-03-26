@@ -140,7 +140,7 @@ io.on("connection", (socket) => {
   });
 });
 
-export { io };
+export { io, app, httpServer };
 
 console.log("✅ Socket.IO initialized");
 
@@ -173,6 +173,8 @@ app.use(errorHandler);
 // ---------- Start Server ----------
 const PORT = process.env.PORT || 5000;
 
-httpServer.listen(PORT, () => {
-  console.log(`🚀 API running on PORT ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  httpServer.listen(PORT, () => {
+    console.log(`🚀 API running on PORT ${PORT}`);
+  });
+}
