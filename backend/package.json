@@ -9,7 +9,8 @@
     "dev": "cross-env NODE_ENV=development nodemon server.js",
     "start": "node server.js",
     "build": "echo 'No build step needed'",
-    "seed": "node src/seed/seed.js"
+    "seed": "node src/seed/seed.js",
+    "seed:e2e": "node scripts/seedE2E.js"
   },
   "jest": {
     "testEnvironment": "node",

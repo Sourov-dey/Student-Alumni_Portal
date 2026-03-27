@@ -1,0 +1,20 @@
+{
+  "alumni": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YzYzNTY4YTAwNzM4NDA5MGY4M2Y4ZSIsImlhdCI6MTc3NDU5NzQ4MCwiZXhwIjoxNzc0NjAxMDgwfQ.UahKXqFOM2tuvvlDY9eGu0lX7rUx-2QCKJPP5zaOvok",
+    "user": {
+      "_id": "69c63568a007384090f83f8e",
+      "name": "E2E Alumni User",
+      "email": "e2e_alumni@test.com",
+      "role": "alumni"
+    }
+  },
+  "student": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YzYzNTY4YTAwNzM4NDA5MGY4M2Y5MCIsImlhdCI6MTc3NDU5NzQ4MCwiZXhwIjoxNzc0NjAxMDgwfQ.ENc-Y9wWdOa9YG_2TEBue2q2jDoqD_iAMJQtIbm2Xn4",
+    "user": {
+      "_id": "69c63568a007384090f83f90",
+      "name": "E2E Student User",
+      "email": "e2e_student@test.com",
+      "role": "student"
+    }
+  }
+}
