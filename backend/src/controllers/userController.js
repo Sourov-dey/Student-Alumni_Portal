@@ -169,6 +169,8 @@ export const searchUsers = async (req, res) => {
 
 /**
  * Get user by ID
+ * If requester is a student viewing an alumni, check connection status.
+ * Unconnected → limited profile. Connected or admin → full profile.
  */
 export const getUserById = async (req, res) => {
   try {
@@ -180,6 +182,32 @@ export const getUserById = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    // If requester is a student and target is an alumni, check connection
+    if (req.user.role === 'student' && user.role === 'alumni' && req.user._id.toString() !== id) {
+      const Connection = (await import('../models/Connection.js')).default;
+      const connection = await Connection.findOne({
+        $or: [
+          { from: req.user._id, to: id, status: 'accepted' },
+          { from: id, to: req.user._id, status: 'accepted' },
+        ],
+      });
+
+      if (!connection) {
+        // Return limited profile
+        return res.status(200).json({
+          _id: user._id,
+          name: user.name,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+          department: user.department,
+          graduationYear: user.graduationYear,
+          location: user.location ? { city: user.location.city, country: user.location.country } : undefined,
+          verified: user.verified,
+          _limited: true, // flag for frontend
+        });
+      }
     }
 
     res.status(200).json(user);

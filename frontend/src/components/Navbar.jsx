@@ -118,6 +118,13 @@ export default function Navbar() {
                 active={location.pathname === "/profile"}
               />
             )}
+            {user && (
+              <NavLink
+                to="/connections"
+                label="Network"
+                active={location.pathname === "/connections"}
+              />
+            )}
             {user && user.role === "admin" && (
               <NavLink
                 to="/admin"
@@ -273,6 +280,13 @@ export default function Navbar() {
                   to="/profile"
                   label="Profile"
                   active={location.pathname === "/profile"}
+                />
+              )}
+              {user && (
+                <NavLink
+                  to="/connections"
+                  label="Network"
+                  active={location.pathname === "/connections"}
                 />
               )}
               {user && user.role === "admin" && (

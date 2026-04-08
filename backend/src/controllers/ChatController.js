@@ -1,6 +1,7 @@
 // backend/src/controllers/chatController.js
 import Message from "../models/Message.js";
 import User from "../models/User.js";
+import Connection from "../models/Connection.js";
 import { getReceiverSocketId, io } from "../../server.js";
 
 // Get all users for search (exclude current user)
@@ -101,6 +102,25 @@ export const sendMessage = async (req, res, next) => {
 
     if (!text && !image) {
       return res.status(400).json({ error: "Text or image is required" });
+    }
+
+    // ── Connection guard: students/admins must be connected to alumni ──
+    const receiver = await User.findById(receiverId).select("role");
+    if (receiver && receiver.role === "alumni") {
+      if (req.user.role === "student" || req.user.role === "admin") {
+        const connection = await Connection.findOne({
+          $or: [
+            { from: senderId, to: receiverId, status: "accepted" },
+            { from: receiverId, to: senderId, status: "accepted" },
+          ],
+        });
+        if (!connection) {
+          return res.status(403).json({
+            error: "You must be connected with this alumni to send messages. Send a connection request first.",
+            requiresConnection: true,
+          });
+        }
+      }
     }
 
     // Create and save the message

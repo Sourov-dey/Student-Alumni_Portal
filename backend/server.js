@@ -25,6 +25,7 @@ import chatRoutes from "./src/routes/chatRoutes.js";
 import groupRoutes from "./src/routes/groupRoutes.js";
 import verifyRoutes from "./src/routes/verifyRoutes.js";
 import notificationRoutes from "./src/routes/notificationRoutes.js";
+import connectionRoutes from "./src/routes/connectionRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -165,6 +166,7 @@ app.use("/api/messages", chatRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/verify", verifyRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/connections", connectionRoutes);
 
 console.log("✅ All API routes mounted");
 

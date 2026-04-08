@@ -6,7 +6,7 @@ const notificationSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", index: true, required: true },
     type: {
       type: String,
-      enum: ["message", "chat_request", "chat_accept", "system", "verification"],
+      enum: ["message", "chat_request", "chat_accept", "system", "verification", "connection_request", "connection_accepted", "connection_rejected"],
       required: true,
       index: true,
     },

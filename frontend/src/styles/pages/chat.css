@@ -1504,3 +1504,81 @@
     overflow: visible;
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   Connection badges in chat sidebar search results
+   ═══════════════════════════════════════════════════ */
+
+.user-item-locked {
+  opacity: 0.75;
+  position: relative;
+}
+
+.user-item-locked::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.chat-conn-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 20px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.chat-conn-badge.connected {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.chat-conn-badge.pending {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  font-size: 0.65rem;
+  padding: 2px 8px;
+}
+
+.chat-conn-action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.chat-connect-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.chat-connect-btn:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: #6366f1;
+  transform: scale(1.1);
+}
+
+.chat-connect-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,446 @@
+/* frontend/src/styles/pages/connectionRequests.css */
+
+/* ═══════════════════════════════════════════════════
+   Connection Requests Page
+   ═══════════════════════════════════════════════════ */
+
+.connections-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+  min-height: 70vh;
+}
+
+/* ── Header ── */
+.connections-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.connections-header-content h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #a78bfa 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.connections-header-content p {
+  color: #94a3b8;
+  font-size: 0.92rem;
+  margin: 0.25rem 0 0;
+}
+
+/* ── Stats ── */
+.connections-stats {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  color: #a5b4fc;
+}
+
+.stat-card svg {
+  color: #6366f1;
+}
+
+.stat-card div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.stat-number {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #e2e8f0;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+.stat-pending {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.15);
+}
+
+.stat-pending svg {
+  color: #fbbf24;
+}
+
+.stat-sent {
+  background: rgba(167, 139, 250, 0.08);
+  border-color: rgba(167, 139, 250, 0.15);
+}
+
+.stat-sent svg {
+  color: #a78bfa;
+}
+
+/* ── Tabs ── */
+.connections-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  padding-bottom: 0;
+}
+
+.conn-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #94a3b8;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.conn-tab:hover {
+  color: #e2e8f0;
+}
+
+.conn-tab.active {
+  color: #a78bfa;
+  border-bottom-color: #a78bfa;
+}
+
+.tab-badge {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Connection Cards ── */
+.connections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.connection-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(30, 32, 48, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 14px;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(12px);
+}
+
+.connection-card:hover {
+  border-color: rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.pending-card {
+  border-left: 3px solid #fbbf24;
+}
+
+.connected-card {
+  border-left: 3px solid #22c55e;
+}
+
+.sent-card {
+  border-left: 3px solid #a78bfa;
+}
+
+.sent-rejected {
+  opacity: 0.6;
+  border-left-color: #ef4444;
+}
+
+/* ── Avatar ── */
+.connection-card-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.connection-card-avatar img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.role-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #1e2030;
+}
+
+.student-dot {
+  background: #6366f1;
+}
+
+.alumni-dot {
+  background: #22c55e;
+}
+
+.admin-dot {
+  background: #f59e0b;
+}
+
+/* ── Card Info ── */
+.connection-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.connection-card-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.connected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+}
+
+.connection-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.connection-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.conn-tag {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+}
+
+.connection-time {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+/* ── Actions ── */
+.connection-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.conn-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.conn-accept {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.conn-accept:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.conn-reject {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.conn-reject:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.conn-remove {
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: #94a3b8;
+}
+
+.conn-remove:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.conn-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Status Badge (sent requests) ── */
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.status-accepted {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.status-rejected {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+/* ── Empty State ── */
+.connections-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.connections-empty svg {
+  color: #475569;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.connections-empty h3 {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin: 0 0 0.4rem;
+}
+
+.connections-empty p {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0;
+  max-width: 320px;
+}
+
+/* ── Spinning animation ── */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .connections-header {
+    flex-direction: column;
+  }
+
+  .connections-stats {
+    width: 100%;
+  }
+
+  .stat-card {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .connection-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .connection-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

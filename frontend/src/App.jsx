@@ -16,6 +16,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AlumniMap from './pages/AlumniMap';
 import Profile from './pages/Profile';
+import ConnectionRequests from './pages/ConnectionRequests';
 
 
 export default function App() {
@@ -42,6 +43,10 @@ export default function App() {
           <Route path="/alumni-map" element={<AlumniMap />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin/*" element={<AdminPanel />} />
+          <Route
+            path="/connections"
+            element={user ? <ConnectionRequests /> : <Navigate to="/login" />}
+          />
           <Route
             path="/chat"
             element={user ? <Chat /> : <Navigate to="/login" />}

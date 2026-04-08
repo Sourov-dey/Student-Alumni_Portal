@@ -12,10 +12,13 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import http from "../api/http";
 import { useAuth } from "../context/AuthContext";
+import { useConnectionStore } from "../store/useConnectionStore";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
     MapPin, Navigation, Trash2, Info, Users, Mail, Phone,
-    GraduationCap, Briefcase, ChevronDown, ChevronUp, X, Globe2
+    GraduationCap, Briefcase, ChevronDown, ChevronUp, X, Globe2,
+    UserPlus, UserCheck, Clock, MessageCircle, Loader2
 } from "lucide-react";
 import "../styles/pages/alumniMap.css";
 
@@ -141,11 +144,14 @@ function FlyToLocation({ center, zoom }) {
 // ═══════════════════════════════════════════════════
 // Alumni Card Component (inside popups / sidebar)
 // ═══════════════════════════════════════════════════
-function AlumniCard({ alumni, isMe, expanded, onToggle }) {
+function AlumniCard({ alumni, isMe, expanded, onToggle, connectionStatus, onConnect, onMessage, isConnecting, isStudent }) {
     const avatarSrc =
         alumni.avatarUrl && alumni.avatarUrl !== "/avatar.png"
             ? alumni.avatarUrl
             : null;
+
+    const isConnected = connectionStatus === "accepted";
+    const isPending = connectionStatus === "pending";
 
     return (
         <div className={`alumni-card ${isMe ? "alumni-card--me" : ""} ${expanded ? "alumni-card--expanded" : ""}`}>
@@ -159,6 +165,9 @@ function AlumniCard({ alumni, isMe, expanded, onToggle }) {
                         </div>
                     )}
                     {isMe && <span className="me-badge">You</span>}
+                    {!isMe && isConnected && (
+                        <span className="connected-dot" title="Connected" />
+                    )}
                 </div>
                 <div className="alumni-card-info">
                     <span className="alumni-card-name">{alumni.name}</span>
@@ -185,29 +194,63 @@ function AlumniCard({ alumni, isMe, expanded, onToggle }) {
                             </span>
                         </div>
                     )}
-                    {alumni.email && (
-                        <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(alumni.email)}`} target="_blank" rel="noopener noreferrer" className="detail-row detail-link">
-                            <Mail size={14} />
-                            <span>{alumni.email}</span>
-                        </a>
-                    )}
-                    {alumni.phone && (
-                        <a href={`tel:${alumni.phone}`} className="detail-row detail-link">
-                            <Phone size={14} />
-                            <span>{alumni.phone}</span>
-                        </a>
-                    )}
-                    {alumni.bio && (
-                        <div className="detail-row detail-bio">
+                    {/* Show full details only if connected or not a student */}
+                    {(!isStudent || isConnected || isMe) ? (
+                        <>
+                            {alumni.email && (
+                                <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(alumni.email)}`} target="_blank" rel="noopener noreferrer" className="detail-row detail-link">
+                                    <Mail size={14} />
+                                    <span>{alumni.email}</span>
+                                </a>
+                            )}
+                            {alumni.phone && (
+                                <a href={`tel:${alumni.phone}`} className="detail-row detail-link">
+                                    <Phone size={14} />
+                                    <span>{alumni.phone}</span>
+                                </a>
+                            )}
+                            {alumni.bio && (
+                                <div className="detail-row detail-bio">
+                                    <Info size={14} />
+                                    <span>{alumni.bio}</span>
+                                </div>
+                            )}
+                            {alumni.skills?.length > 0 && (
+                                <div className="detail-skills">
+                                    {alumni.skills.map((s, i) => (
+                                        <span key={i} className="skill-tag">{s}</span>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="detail-row detail-locked">
                             <Info size={14} />
-                            <span>{alumni.bio}</span>
+                            <span>Connect to see full profile details</span>
                         </div>
                     )}
-                    {alumni.skills?.length > 0 && (
-                        <div className="detail-skills">
-                            {alumni.skills.map((s, i) => (
-                                <span key={i} className="skill-tag">{s}</span>
-                            ))}
+
+                    {/* Connection Action Buttons — students only, not for self */}
+                    {isStudent && !isMe && (
+                        <div className="alumni-card-actions">
+                            {isConnected ? (
+                                <button className="map-conn-btn map-conn-message" onClick={() => onMessage(alumni)}>
+                                    <MessageCircle size={14} /> Message
+                                </button>
+                            ) : isPending ? (
+                                <button className="map-conn-btn map-conn-pending" disabled>
+                                    <Clock size={14} /> Request Pending
+                                </button>
+                            ) : (
+                                <button
+                                    className="map-conn-btn map-conn-connect"
+                                    onClick={() => onConnect(alumni._id)}
+                                    disabled={isConnecting}
+                                >
+                                    {isConnecting ? <Loader2 size={14} className="spinning" /> : <UserPlus size={14} />}
+                                    Connect
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -221,8 +264,11 @@ function AlumniCard({ alumni, isMe, expanded, onToggle }) {
 // ═══════════════════════════════════════════════════
 export default function AlumniMap() {
     const { user, setUser } = useAuth();
+    const navigate = useNavigate();
+    const { statusCache, checkBulkStatus, sendRequest, getStatus } = useConnectionStore();
     const [alumni, setAlumni] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [connectingTo, setConnectingTo] = useState(null);
 
     // form state for setting location
     const [city, setCity] = useState(user?.location?.city || "");
@@ -237,6 +283,7 @@ export default function AlumniMap() {
     const [flyTarget, setFlyTarget] = useState(null);
 
     const isAlumni = user?.role === "alumni";
+    const isStudent = user?.role === "student";
     const hasExistingLocation = !!(
         user?.location?.coordinates?.lat && user?.location?.coordinates?.lng
     );
@@ -267,6 +314,14 @@ export default function AlumniMap() {
             try {
                 const res = await http.get("/api/users/alumni-locations");
                 setAlumni(res.data);
+
+                // Bulk check connection status for students
+                if (isStudent && res.data.length > 0) {
+                    const alumniIds = res.data.map((a) => a._id).filter((id) => id !== user?._id);
+                    if (alumniIds.length > 0) {
+                        checkBulkStatus(alumniIds);
+                    }
+                }
             } catch (err) {
                 console.error("Failed to load alumni locations", err);
             } finally {
@@ -275,6 +330,25 @@ export default function AlumniMap() {
         };
         fetchLocations();
     }, []);
+
+    // ——— Handle connect request ———
+    const handleConnect = async (alumniId) => {
+        setConnectingTo(alumniId);
+        try {
+            await sendRequest(alumniId);
+            toast.success("Connection request sent!");
+        } catch (err) {
+            const msg = err.response?.data?.message || "Failed to send request";
+            toast.error(msg);
+        } finally {
+            setConnectingTo(null);
+        }
+    };
+
+    // ——— Navigate to chat with connected alumni ———
+    const handleMessage = (alumniData) => {
+        navigate("/chat", { state: { openChatWith: alumniData } });
+    };
 
     // ——— Handle map click (alumni only) ———
     const handleMapClick = useCallback(
@@ -509,6 +583,9 @@ export default function AlumniMap() {
                                                     <div>
                                                         <div className="popup-name-mini">
                                                             {a.name} {isMe && <span className="you-tag">You</span>}
+                                                            {!isMe && getStatus(a._id) === "accepted" && (
+                                                                <span className="you-tag" style={{ background: 'rgba(34,197,94,0.2)', color: '#22c55e' }}>Connected</span>
+                                                            )}
                                                         </div>
                                                         {a.department && (
                                                             <div className="popup-dept-mini">
@@ -526,18 +603,27 @@ export default function AlumniMap() {
                                                             {a.location.country ? `, ${a.location.country}` : ""}
                                                         </div>
                                                     )}
-                                                    {a.email && (
-                                                        <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(a.email)}`} target="_blank" rel="noopener noreferrer" className="popup-detail-row popup-link">
-                                                            <Mail size={12} /> {a.email}
-                                                        </a>
-                                                    )}
-                                                    {a.phone && (
-                                                        <a href={`tel:${a.phone}`} className="popup-detail-row popup-link">
-                                                            <Phone size={12} /> {a.phone}
-                                                        </a>
+                                                    {/* Show contact info only if connected or not a student */}
+                                                    {(!isStudent || getStatus(a._id) === "accepted" || isMe) ? (
+                                                        <>
+                                                            {a.email && (
+                                                                <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(a.email)}`} target="_blank" rel="noopener noreferrer" className="popup-detail-row popup-link">
+                                                                    <Mail size={12} /> {a.email}
+                                                                </a>
+                                                            )}
+                                                            {a.phone && (
+                                                                <a href={`tel:${a.phone}`} className="popup-detail-row popup-link">
+                                                                    <Phone size={12} /> {a.phone}
+                                                                </a>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <div className="popup-detail-row" style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                                                            Connect to see contact info
+                                                        </div>
                                                     )}
                                                 </div>
-                                                {a.skills?.length > 0 && (
+                                                {(!isStudent || getStatus(a._id) === "accepted" || isMe) && a.skills?.length > 0 && (
                                                     <div className="popup-skills-mini">
                                                         {a.skills.slice(0, 4).map((s, i) => (
                                                             <span key={i} className="popup-skill-tag">{s}</span>
@@ -546,6 +632,25 @@ export default function AlumniMap() {
                                                             <span className="popup-skill-tag popup-skill-more">
                                                                 +{a.skills.length - 4}
                                                             </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                {/* Connection action in popup */}
+                                                {isStudent && !isMe && (
+                                                    <div className="popup-connect-action">
+                                                        {getStatus(a._id) === "accepted" ? (
+                                                            <button className="map-conn-btn map-conn-message" onClick={() => handleMessage(a)}>
+                                                                <MessageCircle size={13} /> Message
+                                                            </button>
+                                                        ) : getStatus(a._id) === "pending" ? (
+                                                            <button className="map-conn-btn map-conn-pending" disabled>
+                                                                <Clock size={13} /> Pending
+                                                            </button>
+                                                        ) : (
+                                                            <button className="map-conn-btn map-conn-connect" onClick={() => handleConnect(a._id)} disabled={connectingTo === a._id}>
+                                                                {connectingTo === a._id ? <Loader2 size={13} className="spinning" /> : <UserPlus size={13} />}
+                                                                Connect
+                                                            </button>
                                                         )}
                                                     </div>
                                                 )}
@@ -655,6 +760,11 @@ export default function AlumniMap() {
                                             isMe={isMe}
                                             expanded={!!expandedCards[a._id]}
                                             onToggle={() => toggleCard(a._id)}
+                                            connectionStatus={getStatus(a._id)}
+                                            onConnect={handleConnect}
+                                            onMessage={handleMessage}
+                                            isConnecting={connectingTo === a._id}
+                                            isStudent={isStudent}
                                         />
                                     );
                                 })}
