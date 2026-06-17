@@ -37,10 +37,10 @@ L.Icon.Default.mergeOptions({
 // Custom DivIcon builder for cluster & single markers
 // ═══════════════════════════════════════════════════
 function createClusterIcon(count, isMyCluster) {
-    const color = isMyCluster ? "#22c55e" : "#6366f1";
+    const color = isMyCluster ? "var(--success)" : "var(--primary)";
     const shadowColor = isMyCluster
-        ? "rgba(34,197,94,0.4)"
-        : "rgba(99,102,241,0.4)";
+        ? "var(--success-bg)"
+        : "var(--primary-bg)";
     return L.divIcon({
         className: "custom-cluster-icon",
         html: `
@@ -55,10 +55,10 @@ function createClusterIcon(count, isMyCluster) {
 }
 
 function createSingleIcon(isMe) {
-    const color = isMe ? "#22c55e" : "#a78bfa";
+    const color = isMe ? "var(--success)" : "var(--accent)";
     const shadow = isMe
-        ? "rgba(34,197,94,0.45)"
-        : "rgba(167,139,250,0.45)";
+        ? "var(--success-bg)"
+        : "var(--accent-bg)";
     return L.divIcon({
         className: "custom-single-icon",
         html: `
@@ -234,9 +234,25 @@ function AlumniCard({ alumni, isMe, expanded, onToggle, connectionStatus, onConn
                     {isStudent && !isMe && (
                         <div className="alumni-card-actions">
                             {isConnected ? (
-                                <button className="map-conn-btn map-conn-message" onClick={() => onMessage(alumni)}>
-                                    <MessageCircle size={14} /> Message
-                                </button>
+                                <>
+                                    <button className="map-conn-btn map-conn-message" onClick={() => onMessage(alumni)}>
+                                        <MessageCircle size={14} /> Message
+                                    </button>
+                                    {(alumni.phone || alumni.email) && (
+                                        <div className="alumni-contact-below">
+                                            {alumni.phone && (
+                                                <a href={`tel:${alumni.phone}`} className="contact-below-item">
+                                                    <Phone size={12} /> {alumni.phone}
+                                                </a>
+                                            )}
+                                            {alumni.email && (
+                                                <a href={`mailto:${alumni.email}`} className="contact-below-item">
+                                                    <Mail size={12} /> {alumni.email}
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
+                                </>
                             ) : isPending ? (
                                 <button className="map-conn-btn map-conn-pending" disabled>
                                     <Clock size={14} /> Request Pending
@@ -265,7 +281,7 @@ function AlumniCard({ alumni, isMe, expanded, onToggle, connectionStatus, onConn
 export default function AlumniMap() {
     const { user, setUser } = useAuth();
     const navigate = useNavigate();
-    const { statusCache, checkBulkStatus, sendRequest, getStatus } = useConnectionStore();
+    const { checkBulkStatus, sendRequest, getStatus } = useConnectionStore();
     const [alumni, setAlumni] = useState([]);
     const [loading, setLoading] = useState(true);
     const [connectingTo, setConnectingTo] = useState(null);
@@ -584,7 +600,7 @@ export default function AlumniMap() {
                                                         <div className="popup-name-mini">
                                                             {a.name} {isMe && <span className="you-tag">You</span>}
                                                             {!isMe && getStatus(a._id) === "accepted" && (
-                                                                <span className="you-tag" style={{ background: 'rgba(34,197,94,0.2)', color: '#22c55e' }}>Connected</span>
+                                                                <span className="you-tag">Connected</span>
                                                             )}
                                                         </div>
                                                         {a.department && (
@@ -618,7 +634,7 @@ export default function AlumniMap() {
                                                             )}
                                                         </>
                                                     ) : (
-                                                        <div className="popup-detail-row" style={{ color: '#94a3b8', fontStyle: 'italic' }}>
+                                                        <div className="popup-detail-row" style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
                                                             Connect to see contact info
                                                         </div>
                                                     )}
@@ -639,9 +655,25 @@ export default function AlumniMap() {
                                                 {isStudent && !isMe && (
                                                     <div className="popup-connect-action">
                                                         {getStatus(a._id) === "accepted" ? (
-                                                            <button className="map-conn-btn map-conn-message" onClick={() => handleMessage(a)}>
-                                                                <MessageCircle size={13} /> Message
-                                                            </button>
+                                                            <>
+                                                                <button className="map-conn-btn map-conn-message" onClick={() => handleMessage(a)}>
+                                                                    <MessageCircle size={13} /> Message
+                                                                </button>
+                                                                {(a.phone || a.email) && (
+                                                                    <div className="alumni-contact-below">
+                                                                        {a.phone && (
+                                                                            <a href={`tel:${a.phone}`} className="contact-below-item">
+                                                                                <Phone size={12} /> {a.phone}
+                                                                            </a>
+                                                                        )}
+                                                                        {a.email && (
+                                                                            <a href={`mailto:${a.email}`} className="contact-below-item">
+                                                                                <Mail size={12} /> {a.email}
+                                                                            </a>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         ) : getStatus(a._id) === "pending" ? (
                                                             <button className="map-conn-btn map-conn-pending" disabled>
                                                                 <Clock size={13} /> Pending

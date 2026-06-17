@@ -1,6 +1,5 @@
 // frontend/src/pages/VerifyId.jsx
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import http from "../api/http";
 import { useAuth } from "../context/AuthContext";
 import "./verifyId.css";
@@ -9,7 +8,7 @@ const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 
 function ScoreBar({ value }) {
-  const color = value >= 70 ? "#22c55e" : value >= 40 ? "#f59e0b" : "#ef4444";
+  const color = value >= 70 ? "var(--success)" : value >= 40 ? "var(--warning)" : "var(--danger)";
   return (
     <div className="verify-score-bar">
       <div
@@ -22,7 +21,6 @@ function ScoreBar({ value }) {
 
 export default function VerifyId() {
   const { user } = useAuth();
-  const nav = useNavigate();
   const fileRef = useRef();
 
   // Verification status from API

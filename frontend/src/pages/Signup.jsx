@@ -124,7 +124,9 @@ export default function Signup() {
         return;
       }
       login(token, user);
-      if (!isUniEmail(formData.email) && !user.verified) {
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else if (!isUniEmail(formData.email) && !user.verified) {
         navigate("/verify-id");
       } else {
         navigate("/jobs");

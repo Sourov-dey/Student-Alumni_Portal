@@ -77,13 +77,13 @@ export default function Hero() {
         "-=0.4"
       );
 
-      // Animate images
+      // Animate floating visual elements
       tl.fromTo(
-        imagesRef.current.querySelectorAll(".hero-img"),
+        imagesRef.current.querySelectorAll(".floating-card"),
         {
           opacity: 0,
-          scale: 0.9,
-          x: 100,
+          scale: 0.8,
+          x: 50,
         },
         {
           opacity: 1,
@@ -95,14 +95,14 @@ export default function Hero() {
         "-=0.8"
       );
 
-      // Floating animation for images
-      gsap.to(imagesRef.current.querySelectorAll(".hero-img"), {
-        y: -20,
-        duration: 2,
+      // Floating animation for cards
+      gsap.to(imagesRef.current.querySelectorAll(".floating-card"), {
+        y: -15,
+        duration: 3,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
-        stagger: 0.3,
+        stagger: 0.5,
       });
 
       // Counter animation for stats
@@ -194,19 +194,46 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Hero Images */}
-        <div className="hero-images" ref={imagesRef}>
-          <div className="image-card image-card-1">
-            <img src="/campus.jpg" alt="Campus Life" className="hero-img" />
-            <div className="image-overlay">
-              <span className="image-label">Campus Life</span>
+        {/* Hero Visual Redesign */}
+        <div className="hero-visual" ref={imagesRef}>
+          <div className="visual-container">
+            {/* Background Glows */}
+            <div className="visual-glow"></div>
+            
+            {/* Floating UI Elements */}
+            <div className="floating-card card-job">
+              <div className="card-badge">New Opportunity</div>
+              <div className="card-icon">🚀</div>
+              <div className="card-info">
+                <h4>Software Engineer</h4>
+                <p>Google • Full-time</p>
+              </div>
             </div>
-          </div>
-          <div className="image-card image-card-2">
-            <img src="/alumni.jpg" alt="Alumni Event" className="hero-img" />
-            <div className="image-overlay">
-              <span className="image-label">Alumni Network</span>
+
+            <div className="floating-card card-network">
+              <div className="card-users">
+                <div className="user-avatar" style={{background: "linear-gradient(135deg, #6366f1, #a855f7)"}}>JD</div>
+                <div className="user-avatar" style={{background: "linear-gradient(135deg, #10b981, #3b82f6)"}}>AS</div>
+                <div className="user-avatar" style={{background: "linear-gradient(135deg, #f59e0b, #ef4444)"}}>MK</div>
+                <div className="user-avatar extra">+12</div>
+              </div>
+              <p>500+ Alumni Connected</p>
             </div>
+
+            <div className="floating-card card-event">
+              <div className="event-date">
+                <span className="month">MAY</span>
+                <span className="day">15</span>
+              </div>
+              <div className="event-info">
+                <h4>Tech Alumni Meetup</h4>
+                <p>Silicon Valley • Hybrid</p>
+              </div>
+            </div>
+
+            {/* Decorative Elements */}
+            <div className="abstract-shape shape-1"></div>
+            <div className="abstract-shape shape-2"></div>
           </div>
         </div>
       </div>

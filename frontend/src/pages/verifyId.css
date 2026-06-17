@@ -2,19 +2,19 @@
 
 /* ===== Tokens ===== */
 .verify-page {
-    --v-bg: var(--background-alt, #f8fafc);
-    --v-surface: var(--background, #ffffff);
-    --v-surface2: var(--background-alt, #f8fafc);
-    --v-border: var(--border, #e2e8f0);
+    --v-bg: var(--bg-main, #f8fafc);
+    --v-surface: var(--bg-card, #ffffff);
+    --v-surface2: var(--bg-main, #f8fafc);
+    --v-border: var(--border-color, #e2e8f0);
     --v-accent: var(--primary, #4f46e5);
     --v-accent-light: var(--primary-light, #6366f1);
     --v-accent-dark: var(--primary-dark, #3730a3);
-    --v-success: #22c55e;
-    --v-danger: #ef4444;
-    --v-warn: #f59e0b;
-    --v-text: var(--text-primary, #0f172a);
-    --v-text-secondary: var(--text-secondary, #64748b);
-    --v-muted: var(--text-muted, #94a3b8);
+    --v-success: var(--success, #22c55e);
+    --v-danger: var(--danger, #ef4444);
+    --v-warn: var(--warning, #f59e0b);
+    --v-text: var(--text-main, #0f172a);
+    --v-text-secondary: var(--text-muted, #64748b);
+    --v-muted: var(--text-light, #94a3b8);
 }
 
 /* ===== Layout ===== */

@@ -111,7 +111,7 @@
 }
 
 .chip.filled {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, var(--danger), hsl(342, 89%, 40%));
   color: white;
 }
 

@@ -866,7 +866,7 @@ export default function Profile() {
                                         </div>
 
                                         {lat && lng && (
-                                            <div style={{ marginTop: 8, fontSize: 12, color: "#94a3b8" }}>
+                                            <div style={{ marginTop: 8, fontSize: 12, color: "var(--text-light)" }}>
                                                 📍 {parseFloat(lat).toFixed(4)}, {parseFloat(lng).toFixed(4)}
                                             </div>
                                         )}

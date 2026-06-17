@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import http from "../api/http";
 import "./navbar.css";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -73,7 +74,7 @@ export default function Navbar() {
       <nav className="glass-navbar">
         <div className="navbar-container">
           {/* Brand Section */}
-          <Link to="/" className="brand-section">
+          <Link to={user?.role === "admin" ? "/admin" : "/"} className="brand-section">
             <div className="logo-3d-wrapper">
               <img
                 src="/assam-university-logo.png"
@@ -87,43 +88,50 @@ export default function Navbar() {
 
           {/* Desktop Navigation Links */}
           <div className="nav-central-links">
-            <NavLink
-              to="/"
-              label="Home"
-              active={location.pathname === "/"}
-            />
-            <NavLink
-              to="/jobs"
-              label="Jobs"
-              active={location.pathname === "/jobs"}
-            />
-            {user && (
-              <NavLink
-                to="/chat"
-                label="Chat"
-                active={location.pathname === "/chat"}
-              />
+            {(!user || user.role !== "admin") && (
+              <>
+                <NavLink
+                  to="/"
+                  label="Home"
+                  active={location.pathname === "/"}
+                />
+                <NavLink
+                  to="/jobs"
+                  label="Jobs"
+                  active={location.pathname === "/jobs"}
+                />
+              </>
             )}
-            {user && (
-              <NavLink
-                to="/alumni-map"
-                label="Map"
-                active={location.pathname === "/alumni-map"}
-              />
-            )}
-            {user && (
-              <NavLink
-                to="/profile"
-                label="Profile"
-                active={location.pathname === "/profile"}
-              />
-            )}
-            {user && (
-              <NavLink
-                to="/connections"
-                label="Network"
-                active={location.pathname === "/connections"}
-              />
+            {user && user.role !== "admin" && (
+              <>
+                <NavLink
+                  to="/chat"
+                  label="Chat"
+                  active={location.pathname === "/chat"}
+                />
+                <NavLink
+                  to="/alumni-map"
+                  label="Map"
+                  active={location.pathname === "/alumni-map"}
+                />
+                <NavLink
+                  to="/profile"
+                  label="Profile"
+                  active={location.pathname === "/profile"}
+                />
+                <NavLink
+                  to="/connections"
+                  label="Network"
+                  active={location.pathname === "/connections"}
+                />
+                {user.role === "student" && (
+                  <NavLink
+                    to="/my-applications"
+                    label="Applications"
+                    active={location.pathname === "/my-applications"}
+                  />
+                )}
+              </>
             )}
             {user && user.role === "admin" && (
               <NavLink
@@ -136,6 +144,7 @@ export default function Navbar() {
 
           {/* Right Action Section */}
           <div className="nav-right-actions">
+            <ThemeToggle />
             {user ? (
               <>
                 {/* Mobile Menu Toggle */}
@@ -251,43 +260,53 @@ export default function Navbar() {
           <div className="mobile-menu" ref={mobileMenuRef}>
             {/* Mobile Navigation Links */}
             <div className="mobile-nav-links">
-              <NavLink
-                to="/"
-                label="Home"
-                active={location.pathname === "/"}
-              />
-              <NavLink
-                to="/jobs"
-                label="Jobs"
-                active={location.pathname === "/jobs"}
-              />
-              {user && (
-                <NavLink
-                  to="/chat"
-                  label="Chat"
-                  active={location.pathname === "/chat"}
-                />
+              <div style={{ padding: '0 1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <ThemeToggle />
+              </div>
+              {(!user || user.role !== "admin") && (
+                <>
+                  <NavLink
+                    to="/"
+                    label="Home"
+                    active={location.pathname === "/"}
+                  />
+                  <NavLink
+                    to="/jobs"
+                    label="Jobs"
+                    active={location.pathname === "/jobs"}
+                  />
+                </>
               )}
-              {user && (
-                <NavLink
-                  to="/alumni-map"
-                  label="Map"
-                  active={location.pathname === "/alumni-map"}
-                />
-              )}
-              {user && (
-                <NavLink
-                  to="/profile"
-                  label="Profile"
-                  active={location.pathname === "/profile"}
-                />
-              )}
-              {user && (
-                <NavLink
-                  to="/connections"
-                  label="Network"
-                  active={location.pathname === "/connections"}
-                />
+              {user && user.role !== "admin" && (
+                <>
+                  <NavLink
+                    to="/chat"
+                    label="Chat"
+                    active={location.pathname === "/chat"}
+                  />
+                  <NavLink
+                    to="/alumni-map"
+                    label="Map"
+                    active={location.pathname === "/alumni-map"}
+                  />
+                  <NavLink
+                    to="/profile"
+                    label="Profile"
+                    active={location.pathname === "/profile"}
+                  />
+                  <NavLink
+                    to="/connections"
+                    label="Network"
+                    active={location.pathname === "/connections"}
+                  />
+                  {user.role === "student" && (
+                    <NavLink
+                      to="/my-applications"
+                      label="Applications"
+                      active={location.pathname === "/my-applications"}
+                    />
+                  )}
+                </>
               )}
               {user && user.role === "admin" && (
                 <NavLink

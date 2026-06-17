@@ -1,41 +1,47 @@
-/* frontend/src/components/chat/ChatProfilePage.css */
+/* frontend/src/components/chat/ChatProfilePage.css - Premium theme-aware styles */
 
 .chat-profile-page {
   flex: 1;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: white;
-  padding: 2rem;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  padding: 2.5rem;
   overflow-y: auto;
 }
 
 .back-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: transparent;
-  border: none;
-  color: #9ca3af;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
   font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  transition: all 0.2s;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  transition: all 0.2s var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--bg-main);
+  color: var(--text-main);
+  transform: translateX(-4px);
+  border-color: var(--border-focus);
 }
 
 .profile-container {
-  max-width: 500px;
+  max-width: 550px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 2rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-glass);
 }
 
 .profile-header {
@@ -44,14 +50,16 @@
 }
 
 .profile-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 800;
   margin: 0 0 0.5rem 0;
-  color: white;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
 .profile-subtitle {
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 0;
   font-size: 0.95rem;
 }
@@ -61,7 +69,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .avatar-wrapper {
@@ -74,7 +82,8 @@
   height: 128px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid rgba(255, 255, 255, 0.2);
+  border: 4px solid var(--bg-card);
+  box-shadow: var(--shadow-md);
 }
 
 .avatar-upload-btn {
@@ -83,19 +92,21 @@
   right: 0;
   width: 40px;
   height: 40px;
-  background: #3b82f6;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s var(--transition-smooth);
   color: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .avatar-upload-btn:hover {
-  background: #2563eb;
+  background: var(--primary-dark);
   transform: scale(1.1);
+  box-shadow: var(--shadow-md);
 }
 
 .avatar-upload-btn.uploading {
@@ -117,8 +128,8 @@
 }
 
 .avatar-hint {
-  color: #9ca3af;
-  font-size: 0.875rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
   margin: 0;
 }
 
@@ -126,8 +137,8 @@
 .info-section {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .info-group {
@@ -140,31 +151,35 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .info-value {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
+  background: var(--bg-card);
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
   margin: 0;
   font-size: 0.95rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
 }
 
 /* Account Section */
 .account-section {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
 }
 
 .account-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 1rem 0;
-  color: white;
+  color: var(--text-main);
 }
 
 .account-info {
@@ -178,7 +193,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px dashed var(--border-color);
 }
 
 .account-row:last-child {
@@ -186,25 +201,28 @@
 }
 
 .account-label {
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
 .account-value {
   font-size: 0.9rem;
-  color: white;
+  color: var(--text-main);
 }
 
 .role-badge {
   text-transform: capitalize;
-  background: rgba(59, 130, 246, 0.2);
+  background: var(--primary-bg);
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  color: #60a5fa;
+  border-radius: var(--radius-full);
+  color: var(--primary);
+  font-weight: 600;
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .status-active {
-  color: #10b981;
+  color: var(--success);
+  font-weight: 600;
 }
 
 .hidden {
@@ -214,7 +232,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .chat-profile-page {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .profile-container {

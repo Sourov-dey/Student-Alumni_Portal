@@ -69,9 +69,9 @@ export default function AdminVerifications() {
 
   /** Get color for AI confidence */
   const getConfidenceColor = (confidence) => {
-    if (confidence >= 75) return "#059669";
-    if (confidence >= 40) return "#d97706";
-    return "#dc2626";
+    if (confidence >= 75) return "var(--success)";
+    if (confidence >= 40) return "var(--warning)";
+    return "var(--danger)";
   };
 
   return (

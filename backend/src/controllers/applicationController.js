@@ -71,6 +71,23 @@ export const getMyApplications = async (req, res, next) => {
   }
 };
 
+/** GET /api/applications/job/:jobId/my-status -> student's application for a specific job */
+export const getMyApplicationForJob = async (req, res, next) => {
+  try {
+    const { jobId } = req.params;
+    if (!mongoose.isValidObjectId(jobId)) {
+      return res.status(400).json({ message: "Invalid job id" });
+    }
+    const app = await Application.findOne({ job: jobId, student: req.user._id });
+    if (!app) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+    res.json(app);
+  } catch (err) {
+    next(err);
+  }
+};
+
 /** GET /api/applications/job/:jobId -> list applications for a job (alumni/admin) */
 export const getApplicationsForJob = async (req, res, next) => {
   try {

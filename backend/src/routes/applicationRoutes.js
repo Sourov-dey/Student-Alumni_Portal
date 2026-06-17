@@ -12,6 +12,7 @@ import {
   getMyApplications,
   getApplicationsForJob,
   updateApplicationStatus,
+  getMyApplicationForJob,
 } from "../controllers/applicationController.js";
 import {resumeUpload} from "../config/multer.js"
 
@@ -35,6 +36,9 @@ router.get("/me", requireAuth, permit("student"), getMyApplications);
 
 // Alumni views apps for job
 router.get("/job/:jobId", requireAuth, permit("alumni", "admin"), getApplicationsForJob);
+
+// Student views own app for specific job
+router.get("/job/:jobId/my-status", requireAuth, permit("student"), getMyApplicationForJob);
 
 // Alumni updates status
 router.patch("/:id/status", requireAuth, permit("alumni", "admin"), validate(updateStatusSchema), updateApplicationStatus);

@@ -93,7 +93,11 @@ export default function Login() {
 
       // Store credentials and navigate
       login(token, user);
-      navigate('/jobs');
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/jobs');
+      }
     } catch (err) {
       console.error('❌ Login error:', err);
 

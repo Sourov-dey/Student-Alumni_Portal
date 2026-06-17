@@ -24,7 +24,7 @@
   width: 48px;
   height: 48px;
   border: 4px solid var(--border-color);
-  border-top-color: var(--primary-blue);
+  border-top-color: var(--primary);
   border-radius: var(--radius-full);
   animation: spin 0.8s linear infinite;
 }
@@ -35,7 +35,7 @@
 
 /* ========== Header Section ========== */
 .job-detail-header {
-  background-color: white;
+  background-color: var(--bg-card) ;
   border-bottom: 1px solid var(--border-color);
   padding: 2rem 2rem 2.5rem;
   position: relative;
@@ -55,7 +55,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: white;
+  background: var(--bg-card) ;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-main);
@@ -87,7 +87,7 @@
   height: 72px;
   background: var(--bg-main);
   border-radius: var(--radius-lg);
-  color: var(--primary-blue);
+  color: var(--primary);
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
   border: 1px solid var(--border-color);
@@ -174,7 +174,7 @@
 }
 
 .card-header svg {
-  color: var(--primary-blue);
+  color: var(--primary);
   flex-shrink: 0;
 }
 
@@ -188,7 +188,7 @@
 .badge {
   padding: 0.2rem 0.65rem;
   background: var(--primary-bg);
-  color: var(--primary-blue);
+  color: var(--primary);
   border-radius: var(--radius-full);
   font-size: 0.8rem;
   font-weight: 600;
@@ -232,7 +232,7 @@
 }
 
 /* ========== Application Stats ========== */
-.stats-grid {
+.applications-section .stats-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 0.75rem;
@@ -241,23 +241,23 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.stat-card {
+.applications-section .stat-card {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: white;
+  background: var(--bg-card) ;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
 }
 
-.stat-card.total {border-left: 4px solid var(--primary-blue);}
-.stat-card.submitted {border-left: 4px solid var(--text-light);}
-.stat-card.shortlisted {border-left: 4px solid var(--warning);}
-.stat-card.hired {border-left: 4px solid var(--success);}
+.applications-section .stat-card.total {border-left: 4px solid var(--primary);}
+.applications-section .stat-card.submitted {border-left: 4px solid var(--text-light);}
+.applications-section .stat-card.shortlisted {border-left: 4px solid var(--warning);}
+.applications-section .stat-card.hired {border-left: 4px solid var(--success);}
 
-.stat-icon {
+.applications-section .stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,12 +265,12 @@
   height: 44px;
   background: var(--primary-bg);
   border-radius: var(--radius-md);
-  color: var(--primary-blue);
+  color: var(--primary);
 }
 
-.stat-info {flex: 1;}
+.applications-section .stat-info {flex: 1;}
 
-.stat-value {
+.applications-section .stat-value {
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
@@ -279,7 +279,7 @@
   margin-bottom: 0.2rem;
 }
 
-.stat-label {
+.applications-section .stat-label {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 500;
@@ -309,7 +309,7 @@
   padding: 0.45rem 0.85rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
-  background: white;
+  background: var(--bg-card) ;
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--text-muted);
@@ -321,9 +321,9 @@
 .filter-tab:hover { border-color: var(--border-focus); }
 
 .filter-tab.active {
-  background: var(--primary-blue);
+  background: var(--primary);
   color: white;
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
 }
 
 .filter-tab.active.tab-shortlisted { background: var(--warning); border-color: var(--warning); }
@@ -385,7 +385,7 @@
 .applicant-card:hover { border-color: var(--border-focus); }
 
 .applicant-card.expanded {
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
 }
 
@@ -414,10 +414,10 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: var(--bg-surface, #f0f0f0);
+  background: var(--bg-main);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
-  color: var(--primary-blue);
+  color: var(--primary);
   flex-shrink: 0;
 }
 
@@ -482,10 +482,10 @@
   text-transform: capitalize;
 }
 
-.status-badge.status-submitted { background: #f1f5f9; color: #64748b; }
-.status-badge.status-shortlisted { background: #fef9c3; color: #a16207; }
-.status-badge.status-rejected { background: #fee2e2; color: #dc2626; }
-.status-badge.status-hired { background: #dcfce7; color: #16a34a; }
+.status-badge.status-submitted { background: var(--bg-main); color: var(--text-muted); border: 1px solid var(--border-color); }
+.status-badge.status-shortlisted { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+.status-badge.status-rejected { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+.status-badge.status-hired { background: var(--success-bg); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 
 /* ── Card Body (expanded) ── */
 .applicant-card-body {
@@ -544,7 +544,7 @@
 }
 
 .btn-resume {
-  background: var(--primary-blue);
+  background: var(--primary);
   color: white;
   border: none;
 }
@@ -554,7 +554,7 @@
 }
 
 .btn-mail {
-  background: white;
+  background: var(--bg-card) ;
   color: var(--text-main);
   border: 1px solid var(--border-color);
 }
@@ -562,7 +562,7 @@
 .btn-mail:hover { border-color: var(--border-focus); }
 
 .btn-phone {
-  background: white;
+  background: var(--bg-card) ;
   color: var(--text-muted);
   border: 1px solid var(--border-color);
 }
@@ -586,7 +586,7 @@
   margin: 0 0 0.6rem 0;
 }
 
-.profile-section h5 svg { color: var(--primary-blue); }
+.profile-section h5 svg { color: var(--primary); }
 
 .bio-text {
   font-size: 0.88rem;
@@ -598,10 +598,10 @@
 /* Cover Letter Box */
 .cover-letter-box {
   padding: 0.85rem 1rem;
-  background: white;
+  background: var(--bg-card) ;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  border-left: 3px solid var(--primary-blue);
+  border-left: 3px solid var(--primary);
 }
 
 .cover-letter-box p {
@@ -627,10 +627,10 @@
   font-weight: 500;
 }
 
-.tag-default { background: #f1f5f9; color: #475569; }
-.tag-tech    { background: #ede9fe; color: #6d28d9; }
-.tag-soft    { background: #fce7f3; color: #be185d; }
-.tag-interest{ background: #ecfdf5; color: #059669; }
+.tag-default { background: var(--bg-main); color: var(--text-muted); border: 1px solid var(--border-color); }
+.tag-tech    { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(139, 92, 246, 0.2); }
+.tag-soft    { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+.tag-interest{ background: var(--success-bg); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 
 /* ── Skills Grid ── */
 .skills-grid {
@@ -658,7 +658,7 @@
 
 .project-card {
   padding: 0.75rem 0.85rem;
-  background: white;
+  background: var(--bg-card) ;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   transition: border-color 0.2s;
@@ -677,7 +677,7 @@
 }
 
 .project-link {
-  color: var(--primary-blue);
+  color: var(--primary);
   display: inline-flex;
   transition: opacity 0.2s;
 }
@@ -714,7 +714,7 @@
 /* ========== Status Dropdown (reused) ========== */
 .status-dropdown {
   padding: 0.4rem 0.7rem;
-  background: white;
+  background: var(--bg-card) ;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   font-size: 0.82rem;
@@ -726,7 +726,7 @@
 
 .status-dropdown:focus {
   outline: none;
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
@@ -802,7 +802,7 @@
   font-size: 0.95rem;
   font-family: inherit;
   color: var(--text-main);
-  background: white;
+  background: var(--bg-card) ;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -815,7 +815,7 @@
 .field-input:focus,
 .field-textarea:focus {
   outline: none;
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
@@ -863,12 +863,12 @@
 
 .file-label:hover {
   background: var(--primary-bg);
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .file-input:focus+.file-label {
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
@@ -880,7 +880,7 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.875rem;
-  background: var(--primary-blue);
+  background: var(--primary);
   border: none;
   border-radius: var(--radius-md);
   color: white;
@@ -962,7 +962,7 @@
 .btn-login {
   display: inline-flex;
   padding: 0.75rem 1.5rem;
-  background: white;
+  background: var(--bg-card) ;
   border: 1px solid var(--border-color);
   color: var(--text-main);
   text-decoration: none;
@@ -988,7 +988,7 @@
     position: static;
     order: -1;
   }
-  .stats-grid {
+  .applications-section .stats-grid {
     grid-template-columns: 1fr 1fr;
   }
   .job-detail-header {
@@ -1003,7 +1003,7 @@
   }
 }
 @media (max-width: 480px) {
-  .stats-grid {
+  .applications-section .stats-grid {
     grid-template-columns: 1fr;
   }
   .filter-tabs {

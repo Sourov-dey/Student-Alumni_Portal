@@ -8,7 +8,7 @@
 /* ========== Sidebar ========== */
 .admin-sidebar {
   width: 260px;
-  background: white;
+  background: var(--bg-card) ;
   border-right: 1px solid var(--border-color);
   padding: 28px 16px;
   display: flex;
@@ -51,13 +51,13 @@
 
 .admin-nav-btn:hover {
   background: var(--bg-main);
-  color: var(--primary-blue);
+  color: var(--primary);
   transform: translateX(2px);
 }
 
 .admin-nav-btn.active {
   background: var(--primary-bg);
-  color: var(--primary-blue);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -87,7 +87,7 @@
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: var(--primary-blue);
+  background: var(--primary);
   color: white;
   font-size: 1.5rem;
   cursor: pointer;
@@ -130,8 +130,8 @@
   margin-bottom: 2.5rem;
 }
 
-.stat-card {
-  background: white;
+.stat-cards .stat-card {
+  background: var(--bg-card) ;
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   border: 1px solid var(--border-color);
@@ -141,16 +141,16 @@
   box-shadow: var(--shadow-sm);
 }
 
-.stat-card:hover {
+.stat-cards .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: var(--border-focus);
 }
 
-.stat-card.blue .stat-card-icon { color: var(--primary-blue); background: var(--primary-bg); }
-.stat-card.green .stat-card-icon { color: var(--success); background: var(--success-bg); }
-.stat-card.purple .stat-card-icon { color: #8b5cf6; background: #ede9fe; }
-.stat-card.amber .stat-card-icon { color: var(--warning); background: var(--warning-bg); }
+.stat-cards .stat-card.blue .stat-card-icon { color: var(--primary); background: var(--primary-bg); }
+.stat-cards .stat-card.green .stat-card-icon { color: var(--success); background: var(--success-bg); }
+.stat-cards .stat-card.purple .stat-card-icon { color: var(--accent); background: var(--accent-bg); }
+.stat-cards .stat-card.amber .stat-card-icon { color: var(--warning); background: var(--warning-bg); }
 
 .stat-card-icon {
   display: flex;
@@ -182,7 +182,7 @@
 
 /* ========== Data Tables ========== */
 .admin-table-wrap {
-  background: white;
+  background: var(--bg-card) ;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   overflow: hidden;
@@ -196,7 +196,7 @@
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
   flex-wrap: wrap;
-  background: white;
+  background: var(--bg-card) ;
 }
 
 .admin-search {
@@ -213,9 +213,9 @@
 
 .admin-search:focus {
   outline: none;
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-  background: white;
+  background: var(--bg-card) ;
 }
 
 .admin-filter-select {
@@ -236,9 +236,9 @@
 
 .admin-filter-select:focus {
   outline: none;
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-  background-color: white;
+  background-color: var(--bg-card) ;
 }
 
 .admin-table {
@@ -290,12 +290,12 @@
   white-space: nowrap;
 }
 
-.badge-student { background: var(--warning-bg); color: #92400e; border: 1px solid rgba(245, 158, 11, 0.2); }
-.badge-alumni { background: var(--primary-bg); color: var(--primary-blue); border: 1px solid rgba(79, 70, 229, 0.2); }
-.badge-admin { background: #ede9fe; color: #5b21b6; border: 1px solid rgba(139, 92, 246, 0.2); }
+.badge-student { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+.badge-alumni { background: var(--primary-bg); color: var(--primary); border: 1px solid rgba(79, 70, 229, 0.2); }
+.badge-admin { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(139, 92, 246, 0.2); }
 .badge-verified { background: var(--success-bg); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 .badge-unverified { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-.badge-pending { background: #fff7ed; color: #9a3412; border: 1px solid rgba(249, 115, 22, 0.2); }
+.badge-pending { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(249, 115, 22, 0.2); }
 .badge-rejected { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
 .badge-active { background: var(--success-bg); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
 .badge-suspended { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
@@ -316,7 +316,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  background: white;
+  background: var(--bg-card) ;
   color: var(--text-main);
 }
 
@@ -380,13 +380,13 @@
 }
 
 .admin-btn-preview {
-  color: var(--primary-blue);
+  color: var(--primary);
   border-color: rgba(79, 70, 229, 0.3);
 }
 
 .admin-btn-preview:hover:not(:disabled) {
   background: var(--primary-bg);
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
 }
 
 /* ========== Empty & Loading States ========== */
@@ -412,7 +412,7 @@
   width: 36px;
   height: 36px;
   border: 3px solid var(--border-color);
-  border-top-color: var(--primary-blue);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: admin-spin 0.8s linear infinite;
   margin-bottom: 1rem;
@@ -444,7 +444,7 @@
 .admin-modal {
   width: min(900px, 94vw);
   max-height: 90vh;
-  background: white;
+  background: var(--bg-card) ;
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -465,7 +465,7 @@
   border-bottom: 1px solid var(--border-color);
   font-weight: 700;
   color: var(--text-main);
-  background: white;
+  background: var(--bg-card) ;
 }
 
 .admin-modal-close {

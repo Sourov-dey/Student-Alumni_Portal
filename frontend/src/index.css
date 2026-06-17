@@ -1,31 +1,31 @@
 /* ========== Fonts ========== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ========== Global Variables ========== */
 :root {
-  /* Colors */
-  --primary-blue: #4f46e5;
-  --primary-dark: #3730a3;
-  --primary-light: #6366f1;
-  --primary-bg: #eef2ff;
-  
-  --bg-main: #f8fafc; /* Very light slate */
-  --bg-card: #ffffff;
-  
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-light: #94a3b8;
-  
-  --border-color: #e2e8f0;
-  --border-focus: #cbd5e1;
+  /* Brand Palette (Light) */
+  --primary: hsl(238, 77%, 59%);         /* Deep Indigo */
+  --primary-light: hsl(242, 83%, 68%);   /* Vibrant Purple-blue */
+  --primary-dark: hsl(238, 70%, 45%);    /* Midnight Indigo */
+  --primary-bg: hsl(238, 77%, 95%);
+  --accent: hsl(262, 83%, 58%);          /* Premium Violet */
+  --accent-light: hsl(262, 83%, 70%);
+  --accent-bg: hsl(262, 83%, 95%);
 
   /* State Colors */
-  --danger: #e11d48;
-  --danger-bg: #fff1f2;
-  --success: #16a34a;
-  --success-bg: #f0fdf4;
-  --warning: #f59e0b;
-  --warning-bg: #fffbeb;
+  --success: hsl(161, 84%, 39%);         /* Teal/Mint */
+  --success-bg: hsl(161, 84%, 95%);
+  --danger: hsl(342, 89%, 48%);          /* Crimson Rose */
+  --danger-bg: hsl(342, 89%, 96%);
+  --warning: hsl(38, 92%, 50%);          /* Amber Gold */
+  --warning-bg: hsl(38, 92%, 96%);
+
+  /* Surfaces & Backgrounds */
+  --bg-main: hsl(210, 40%, 98%);         /* Very light slate */
+  --bg-card: hsl(0, 0%, 100%);           /* Pure White */
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --border-color: hsl(214, 32%, 91%);
+  --border-glass: rgba(255, 255, 255, 0.45);
 
   /* Shadows - Minimalist and Soft */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -34,11 +34,60 @@
   --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 
   /* Geometry & Layout */
-  --radius-sm: 6px;
+  --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
   --navbar-height: 70px;
+
+  /* Transitions */
+  --transition-speed: 0.3s;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Text Colors */
+  --text-main: hsl(217, 33%, 17%);
+  --text-muted: hsl(215, 16%, 47%);
+  --text-light: hsl(215, 20%, 65%);
+}
+
+[data-theme='dark'] {
+  /* Brand Palette (Dark) */
+  --primary: hsl(238, 83%, 65%);
+  --primary-light: hsl(242, 83%, 75%);
+  --primary-dark: hsl(238, 60%, 35%);
+  --primary-bg: hsl(238, 40%, 16%);
+  --accent: hsl(262, 83%, 68%);
+  --accent-bg: hsl(262, 40%, 16%);
+
+  /* State Colors */
+  --success: hsl(161, 75%, 45%);
+  --success-bg: hsl(161, 75%, 8%);
+  --danger: hsl(342, 80%, 55%);
+  --danger-bg: hsl(342, 80%, 8%);
+  --warning: hsl(38, 85%, 52%);
+  --warning-bg: hsl(38, 85%, 8%);
+
+  /* Surfaces & Backgrounds */
+  --bg-main: hsl(222, 47%, 11%);          /* Midnight Navy */
+  --bg-card: hsl(222, 40%, 15%);          /* Slate Navy */
+  --bg-glass: rgba(30, 41, 59, 0.7);
+  --border-color: hsl(217, 30%, 26%);
+  --border-glass: rgba(255, 255, 255, 0.08);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+  /* Text Colors */
+  --text-main: hsl(210, 40%, 98%);
+  --text-muted: hsl(217, 19%, 81%);
+  --text-light: hsl(215, 16%, 57%);
+}
+
+/* Base Transition for Theme Switching */
+html, body {
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 /* ========== Base Reset ========== */
@@ -82,7 +131,24 @@ button {
 
 /* ========== Global Utilities ========== */
 
-/* Cards */
+/* Glass Cards & Standard Cards */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--primary-light);
+}
+
 .minimal-card {
   background: var(--bg-card);
   border-radius: var(--radius-md);
@@ -94,7 +160,7 @@ button {
 .minimal-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  border-color: var(--border-focus);
+  border-color: var(--primary-light);
 }
 
 /* Buttons */
@@ -104,21 +170,21 @@ button {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: var(--primary-blue);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: white;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
 }
 
 .btn-primary:active {
@@ -130,10 +196,10 @@ button {
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1.5rem;
-  background-color: white;
+  background-color: var(--bg-card);
   color: var(--text-main);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   cursor: pointer;
@@ -150,10 +216,10 @@ button {
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
-  background-color: white;
+  background-color: var(--bg-card);
   color: var(--danger);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: var(--radius-md);
   border: 1px solid var(--danger);
   cursor: pointer;
@@ -171,7 +237,7 @@ button {
   font-size: 0.95rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  background-color: white;
+  background-color: var(--bg-card);
   transition: all 0.2s ease;
   color: var(--text-main);
   outline: none;
@@ -204,34 +270,40 @@ button {
 
 /* Typography Classes */
 .heading-1 {
-  font-size: 2.5rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.75rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--text-main);
   line-height: 1.2;
 }
 
 .heading-2 {
+  font-family: 'Outfit', sans-serif;
   font-size: 2rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--text-main);
   line-height: 1.3;
 }
 
 .heading-3 {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text-main);
 }
 
 .text-body {
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
   color: var(--text-muted);
   line-height: 1.6;
 }
 
 .text-small {
+  font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   color: var(--text-light);
 }
@@ -245,7 +317,7 @@ button {
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   height: 100%;
-  transition: all 0.3s ease;
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
   position: relative;
   overflow: hidden;
 }
@@ -253,7 +325,7 @@ button {
 .job-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--border-focus);
+  border-color: var(--primary-light);
 }
 
 .job-card-head {
@@ -261,6 +333,7 @@ button {
 }
 
 .job-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-main);
@@ -275,7 +348,7 @@ button {
 }
 
 .job-title a:hover {
-  color: var(--primary-blue);
+  color: var(--primary);
 }
 
 .job-meta {
@@ -331,7 +404,7 @@ button {
 .btn.small {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  background: var(--primary-blue);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: white;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -339,7 +412,7 @@ button {
 }
 
 .btn.small:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
@@ -348,9 +421,22 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  background: var(--primary-bg);
-  color: var(--primary-dark);
+  background: var(--success-bg);
+  color: var(--success);
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+/* ========== Skeletons ========== */
+.skeleton-pulse {
+  background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-main) 50%, var(--border-color) 75%);
+  background-size: 200% 100%;
+  animation: loading-pulse 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes loading-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

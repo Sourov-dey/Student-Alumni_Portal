@@ -10,6 +10,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./src/config/swagger.js";
 
 import { connectDB } from "./src/config/db.js";
 import { notFound, errorHandler } from "./src/middleware/error.js";
@@ -155,6 +157,12 @@ app.get("/api/health", (_req, res) => {
     time: new Date().toISOString(),
   });
 });
+
+// ---------- Swagger Documentation ----------
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  console.log("📄 Swagger Docs available at /api-docs");
+}
 
 // ---------- Routes ----------
 app.use("/api/auth", authRoutes);

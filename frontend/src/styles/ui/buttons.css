@@ -1,6 +1,6 @@
 .btn{border:1px solid transparent; padding:8px 12px; border-radius:var(--radius); font-weight:600; cursor:pointer; background:transparent}
 .btn-primary{background:var(--primary); color:#fff}
 .btn-primary:hover{background:var(--primary-600); color:#fff}
-.btn-ghost{background:#fff; border:1px solid var(--border); color:var(--ink)}
+.btn-ghost{background: var(--bg-card) ; border:1px solid var(--border); color:var(--ink)}
 .btn-danger{background:var(--danger); color:#fff}
 .btn-sm{padding:6px 8px; font-size:13px}

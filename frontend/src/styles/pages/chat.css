@@ -3,23 +3,33 @@
 /* ========== CSS Variables for Consistency ========== */
 :root {
   --header-height: 80px;
-  --border-radius-sm: 8px;
-  --border-radius-md: 12px;
-  --border-radius-lg: 16px;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-danger: #dc2626;
-  --color-danger-hover: #b91c1c;
-  --color-border: #e5e7eb;
-  --color-text-primary: #1f2937;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-bg-tertiary: #f3f4f6;
+  --border-radius-sm: var(--radius-sm);
+  --border-radius-md: var(--radius-md);
+  --border-radius-lg: var(--radius-lg);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-dark);
+  --color-danger: var(--danger);
+  --color-danger-hover: hsl(342, 89%, 40%);
+  --color-border: var(--border-color);
+  --color-text-primary: var(--text-main);
+  --color-text-secondary: var(--text-muted);
+  --color-text-muted: var(--text-light);
+  --color-bg-primary: var(--bg-card);
+  --color-bg-secondary: var(--bg-main);
+  --color-bg-tertiary: var(--border-color);
   --sidebar-width: 320px;
   --sidebar-width-tablet: 280px;
   --sidebar-width-mobile: 80px;
+}
+
+[data-theme='dark'] {
+  --color-border: var(--border-color);
+  --color-text-primary: var(--text-main);
+  --color-text-secondary: var(--text-muted);
+  --color-text-muted: var(--text-light);
+  --color-bg-primary: var(--bg-card);
+  --color-bg-secondary: var(--bg-main);
+  --color-bg-tertiary: var(--border-color);
 }
 
 /* ========== Page Layout ========== */
@@ -127,7 +137,7 @@
 .search-input {
   flex: 1;
   padding: 0.625rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
   outline: none;
@@ -136,7 +146,7 @@
 
 .search-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
 .search-btn {
@@ -170,7 +180,7 @@
   width: 32px;
   height: 32px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #3b82f6;
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -180,7 +190,7 @@
 }
 
 .search-loading p {
-  color: #9ca3af;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -224,7 +234,7 @@
 }
 
 .user-item-active {
-  background: #dbeafe;
+  background: rgba(79, 70, 229, 0.08);
   border-left: 3px solid var(--color-primary);
 }
 
@@ -246,9 +256,9 @@
   right: 0;
   width: 12px;
   height: 12px;
-  background: #10b981;
+  background: var(--success);
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid var(--color-bg-primary);
 }
 
 .user-info {
@@ -295,17 +305,17 @@
 .search-loading {
   padding: 20px;
   text-align: center;
-  color: #9ca3af;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
 .search-results-header {
   padding: 12px 16px;
-  background: rgba(59, 130, 246, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--primary-bg);
+  border-bottom: 1px solid var(--color-border);
   font-size: 0.85rem;
   font-weight: 600;
-  color: #60a5fa;
+  color: var(--color-primary);
 }
 
 /* ========== Chat Main Area ========== */
@@ -416,6 +426,79 @@
 
 .close-btn:hover {
   color: var(--color-danger);
+}
+
+/* Contact toggle button active state */
+.contact-toggle-btn.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary);
+}
+
+/* Chat header wrapper — holds header + contact strip */
+.chat-header-wrapper {
+  flex-shrink: 0;
+}
+
+/* Contact info strip */
+.chat-contact-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  animation: contactSlideDown 0.2s ease;
+}
+
+@keyframes contactSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.chat-contact-item svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.chat-contact-link {
+  cursor: pointer;
+}
+
+.chat-contact-link:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.chat-contact-locked {
+  color: var(--color-text-muted);
+  font-style: italic;
+  border-style: dashed;
+}
+
+.chat-contact-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
 .chat-header-close {
@@ -613,8 +696,8 @@
 }
 
 .image-btn-active {
-  color: #10b981;
-  border-color: #10b981;
+  color: var(--success);
+  border-color: var(--success);
 }
 
 .send-btn {
@@ -664,7 +747,7 @@
 .no-chat-icon {
   width: 64px;
   height: 64px;
-  background: #dbeafe;
+  background: rgba(79, 70, 229, 0.08);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -701,7 +784,7 @@
 
 /* ========== Skeleton Loading ========== */
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-main) 50%, var(--border-color) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -814,7 +897,7 @@
   position: absolute;
   right: 8px;
   top: 100%;
-  background: white;
+  background: var(--bg-card) ;
   border-radius: var(--border-radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 150px;
@@ -833,7 +916,7 @@
   background: transparent;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--color-text-primary);
   transition: all 0.15s;
   text-align: left;
 }
@@ -847,7 +930,7 @@
 }
 
 .dropdown-item.delete-item:hover {
-  background: #fef2f2;
+  background: var(--danger-bg);
 }
 
 /* ========== Delete Confirmation Modal ========== */
@@ -876,7 +959,7 @@
 }
 
 .delete-modal {
-  background: white;
+  background: var(--bg-card) ;
   border-radius: var(--border-radius-lg);
   width: 90%;
   max-width: 400px;
@@ -922,7 +1005,7 @@
 .delete-modal-icon {
   width: 64px;
   height: 64px;
-  background: #fef2f2;
+  background: var(--danger-bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -994,7 +1077,7 @@
 .chat-tabs {
   display: flex;
   gap: 0.5rem;
-  background: white;
+  background: var(--bg-card) ;
   padding: 0.5rem;
   border-radius: var(--border-radius-md);
   margin-bottom: 1rem;
@@ -1537,14 +1620,14 @@
 }
 
 .chat-conn-badge.connected {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  background: var(--success-bg);
+  color: var(--success);
   border: 1px solid rgba(34, 197, 94, 0.25);
 }
 
 .chat-conn-badge.pending {
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
+  background: var(--warning-bg);
+  color: var(--warning);
   border: 1px solid rgba(251, 191, 36, 0.2);
   font-size: 0.65rem;
   padding: 2px 8px;
@@ -1565,8 +1648,8 @@
   height: 30px;
   border-radius: 50%;
   border: 1px solid rgba(99, 102, 241, 0.3);
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  background: var(--primary-bg);
+  color: var(--primary-light);
   cursor: pointer;
   transition: all 0.2s ease;
   padding: 0;
@@ -1574,7 +1657,7 @@
 
 .chat-connect-btn:hover:not(:disabled) {
   background: rgba(99, 102, 241, 0.25);
-  border-color: #6366f1;
+  border-color: var(--primary);
   transform: scale(1.1);
 }
 

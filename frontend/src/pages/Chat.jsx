@@ -7,7 +7,6 @@ import NoChatSelected from "../components/Chat/NoChatSelected";
 import ChatContainer from "../components/Chat/ChatContainer";
 import ChatProfilePage from "../components/Chat/ChatProfilePage";
 import GroupChatInterface from "../components/groupChat/GroupChatInterface";
-import { debugAuthState, verifyToken } from "../utils/tokenUtils";
 import { MessageSquare, Users } from "lucide-react";
 import "../styles/pages/chat.css";
 

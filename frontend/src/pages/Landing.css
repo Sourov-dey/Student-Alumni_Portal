@@ -1,4 +1,4 @@
-/* frontend/src/pages/Landing.css - MINIMALIST REDESIGN */
+/* Landing Page Styles */
 
 .landing-page {
   background: var(--bg-main);
@@ -36,6 +36,7 @@
 }
 
 .section-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 2.5rem;
   font-weight: 800;
   color: var(--text-main);
@@ -49,9 +50,9 @@
   line-height: 1.6;
 }
 
-/* Stats Section (Replacing gradient background with clean light bg) */
+/* Stats Section */
 .stats-section {
-  background: white;
+  background: var(--bg-card);
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   padding: 4rem 0;
@@ -64,27 +65,30 @@
   text-align: center;
 }
 
-.stat-card {
-  padding: 2rem;
-  background: var(--bg-main);
+.stats-section .stat-card {
+  padding: 2.5rem 2rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-glass);
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
-.stat-card:hover {
+.stats-section .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-focus);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
 }
 
-.stat-icon {
+.stats-section .stat-icon {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: var(--primary-blue);
+  color: var(--primary);
 }
 
-.stat-number {
+.stats-section .stat-number {
+  font-family: 'Outfit', sans-serif;
   font-size: 3rem;
   font-weight: 800;
   color: var(--text-main);
@@ -93,10 +97,12 @@
   letter-spacing: -0.025em;
 }
 
-.stat-label {
+.stats-section .stat-label {
   font-size: 1rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* Featured Section */
@@ -120,20 +126,20 @@
   display: inline-flex;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: white;
-  color: var(--primary-blue);
+  background-color: var(--bg-card);
+  color: var(--primary);
   text-decoration: none;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   font-weight: 600;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: all var(--transition-smooth);
   box-shadow: var(--shadow-sm);
 }
 
 .btn-view-all:hover {
   background-color: var(--bg-main);
-  border-color: var(--primary-blue);
+  border-color: var(--primary);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -148,7 +154,7 @@
   width: 40px;
   height: 40px;
   border: 3px solid var(--border-color);
-  border-top-color: var(--primary-blue);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 1rem;
@@ -167,9 +173,9 @@
 .empty-state {
   text-align: center;
   padding: 5rem 2rem;
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
-  border: 1px dashed var(--border-focus);
+  border: 1px dashed var(--border-color);
 }
 
 .empty-icon {
@@ -179,6 +185,7 @@
 }
 
 .empty-state h3 {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-main);
@@ -192,7 +199,7 @@
 
 /* Stories Section */
 .stories-section {
-  background: white;
+  background: var(--bg-card);
   border-top: 1px solid var(--border-color);
 }
 
@@ -203,22 +210,24 @@
 }
 
 .story-card {
-  background: var(--bg-main);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
   padding: 2.5rem;
-  border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-glass);
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 .story-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-focus);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
 }
 
 .story-quote-icon {
   font-size: 1.5rem;
-  color: var(--primary-light);
+  color: var(--accent);
   margin-bottom: 1rem;
 }
 
@@ -244,15 +253,16 @@
 }
 
 .author-name {
-  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
   color: var(--text-main);
   font-size: 1rem;
 }
 
 .author-role {
   font-size: 0.875rem;
-  color: var(--primary-blue);
-  font-weight: 500;
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .author-year {
@@ -262,7 +272,7 @@
 
 /* Call to Action Section */
 .cta-section {
-  background: var(--primary-blue);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: white;
   text-align: center;
 }
@@ -273,6 +283,7 @@
 }
 
 .cta-title {
+  font-family: 'Outfit', sans-serif;
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 1.5rem;
@@ -295,28 +306,28 @@
 
 .btn-cta-primary {
   padding: 1rem 2rem;
-  background-color: white;
-  color: var(--primary-blue);
+  background-color: var(--bg-card);
+  color: var(--primary);
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.125rem;
-  transition: all 0.2s ease;
+  transition: all var(--transition-smooth);
 }
 
 .btn-cta-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .btn-cta-secondary {
   padding: 1rem 2rem;
   background-color: transparent;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 1.125rem;
-  transition: all 0.2s ease;
+  transition: all var(--transition-smooth);
 }
 
 .btn-cta-secondary:hover {

@@ -8,7 +8,16 @@ import { signup, loginUser, forgotPassword, resetPassword, sendOtp } from "../co
 
 const router = Router();
 
-// Health check
+/**
+ * @swagger
+ * /auth/health:
+ *   get:
+ *     summary: Health check for the auth service
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Auth service is healthy
+ */
 router.get("/health", (_req, res) => res.json({ ok: true, scope: "auth" }));
 
 router.post("/send-otp", sendOtp);
@@ -49,7 +58,20 @@ router.post(
   }
 );
 
-// Get current user
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current authenticated user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user data
+ *       401:
+ *         description: Unauthorized
+ */
 router.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.user });
 });

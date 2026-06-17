@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
-import { sendOtpEmail } from '../utils/emailService.js';
+import { sendOtpEmail, sendPasswordResetEmail } from '../utils/emailService.js';
 
 // Verify reCAPTCHA token using Google's API
 const verifyCaptcha = async (token) => {
@@ -101,11 +101,13 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "All fields and OTP are required" });
     }
 
+    const sanitizedPassword = password.trim();
     const normalizedEmail = email.toLowerCase().trim();
 
-    if (password.length < 6) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+    if (!passwordRegex.test(sanitizedPassword)) {
       return res.status(400).json({
-        message: "Password must be at least 6 characters",
+        message: "Password must be at least 6 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character",
       });
     }
 
@@ -149,7 +151,7 @@ export const signup = async (req, res) => {
     await Otp.deleteOne({ email: normalizedEmail });
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(sanitizedPassword, salt);
 
     const user = await User.create({
       name: name.trim(),
@@ -275,6 +277,7 @@ export const forgotPassword = async (req, res) => {
       email: email.toLowerCase().trim(),
     });
 
+    // Always return 200 so we don't reveal if the email exists
     if (!user) {
       return res.status(200).json({
         message: 'If the email exists, a reset link has been sent',
@@ -289,16 +292,30 @@ export const forgotPassword = async (req, res) => {
       .digest('hex');
 
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
 
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || process.env.CLIENT_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
-    console.log('🔗 Password reset link:', resetUrl);
+    console.log('🔗 Sending password reset link to:', user.email);
+
+    const emailSent = await sendPasswordResetEmail(user.email, resetUrl);
+
+    if (!emailSent) {
+      // If email fails, clear the token so user can retry cleanly
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(500).json({
+        message: 'Failed to send reset email. Please try again later.',
+      });
+    }
 
     res.status(200).json({
-      message: 'Password reset link sent to email',
+      message: 'If the email exists, a reset link has been sent',
     });
   } catch (error) {
     console.error('❌ Forgot password error:', error);
@@ -314,9 +331,17 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!password || password.length < 6) {
+    if (!password) {
       return res.status(400).json({
-        message: 'Password must be at least 6 characters',
+        message: 'Password is required',
+      });
+    }
+
+    const sanitizedPassword = password.trim();
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+    if (!passwordRegex.test(sanitizedPassword)) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character",
       });
     }
 
@@ -337,7 +362,7 @@ export const resetPassword = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    user.password = await bcrypt.hash(sanitizedPassword, salt);
 
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;

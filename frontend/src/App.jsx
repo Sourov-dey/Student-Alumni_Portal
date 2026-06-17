@@ -17,12 +17,19 @@ import ResetPassword from './pages/ResetPassword';
 import AlumniMap from './pages/AlumniMap';
 import Profile from './pages/Profile';
 import ConnectionRequests from './pages/ConnectionRequests';
+import MyApplications from './pages/MyApplications'; // ✅ ADD THIS IMPORT
+import { useThemeStore } from './store/useThemeStore';
+import { useEffect } from 'react';
 
 
 export default function App() {
   const auth = useAuth();
   const user = auth?.user;
-  const logout = auth?.logout;
+  const { theme } = useThemeStore();
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   return (
     <div>
@@ -30,27 +37,47 @@ export default function App() {
 
       <main style={{ padding: 20 }}>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/verify-id" element={<VerifyId />} />
-          <Route path="/jobs/:id" element={<JobDetail />} />
-          <Route path="/post-job" element={<PostJob />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/alumni-map" element={<AlumniMap />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/admin/*" element={<AdminPanel />} />
-          <Route
-            path="/connections"
-            element={user ? <ConnectionRequests /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/chat"
-            element={user ? <Chat /> : <Navigate to="/login" />}
-          />
+          {user?.role === "admin" ? (
+            <>
+              <Route path="/admin/*" element={<AdminPanel />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </>
+          ) : (
+            <>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/verify-id" element={<VerifyId />} />
+              <Route path="/jobs/:id" element={<JobDetail />} />
+              <Route path="/post-job" element={<PostJob />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/alumni-map" element={<AlumniMap />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/admin/*" element={<AdminPanel />} />
+              <Route
+                path="/my-applications"
+                element={
+                  user ? <MyApplications /> : <Navigate to="/login" />
+                }
+              />
+              <Route
+                path="/connections"
+                element={
+                  user ? <ConnectionRequests /> : <Navigate to="/login" />
+                }
+              />
+              <Route
+                path="/chat"
+                element={user ? <Chat /> : <Navigate to="/login" />}
+              />
+            </>
+          )}
         </Routes>
       </main>
     </div>

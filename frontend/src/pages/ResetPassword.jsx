@@ -38,7 +38,11 @@ export default function ResetPassword() {
       // 🔐 Auto-login after reset
       if (res.data.token && res.data.user) {
         login(res.data.token, res.data.user);
-        navigate('/jobs');
+        if (res.data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/jobs');
+        }
         return;
       }
 

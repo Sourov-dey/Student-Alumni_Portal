@@ -5,14 +5,15 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-glass);
   padding: 0;
   min-height: var(--navbar-height);
   display: flex;
   align-items: center;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
 
 .navbar-container {
@@ -46,10 +47,11 @@
 }
 
 .brand-text {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: var(--text-main);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
@@ -70,7 +72,7 @@
   font-size: 0.95rem;
   padding: 8px 16px;
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  transition: all var(--transition-smooth);
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -82,14 +84,14 @@
 }
 
 .nav-link-item.active {
-  color: var(--primary-blue);
+  color: var(--primary);
   font-weight: 600;
-  background: var(--primary-bg);
+  background: rgba(79, 70, 229, 0.08);
 }
 
 /* Active Indicator Line */
 .active-indicator {
-  display: none; /* Removed for minimalist look in favor of solid background */
+  display: none;
 }
 
 /* ========== Action Section (Right Side) ========== */
@@ -141,8 +143,8 @@
 }
 
 .role-badge.alumni {
-  background: var(--primary-bg);
-  color: var(--primary-dark);
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--primary);
 }
 
 .role-badge.student {
@@ -202,8 +204,10 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: white;
-  border: 1px solid var(--border-color);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   min-width: 180px;
   box-shadow: var(--shadow-lg);
@@ -229,7 +233,7 @@
 
 .dropdown-item:hover {
   background: var(--bg-main);
-  color: var(--primary-blue);
+  color: var(--primary);
 }
 
 .dropdown-divider {
@@ -301,7 +305,7 @@
   top: var(--navbar-height);
   left: 0;
   right: 0;
-  background: white;
+  background: var(--bg-card) ;
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-lg);
   padding: 1.5rem;

@@ -223,6 +223,7 @@ export default function JobDetail() {
 
   const [job, setJob] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [myApplication, setMyApplication] = useState(null);
   const [message, setMessage] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -247,8 +248,16 @@ export default function JobDetail() {
       http.get(`/api/applications/job/${id}`)
         .then(r => setApplications(r.data.items || r.data || []))
         .catch(err => console.error('Failed to fetch applications:', err));
+    } else if (user && user.role === 'student') {
+      http.get(`/api/applications/job/${id}/my-status`)
+        .then(r => setMyApplication(r.data))
+        .catch(err => {
+          if (err.response && err.response.status !== 404) {
+            console.error('Failed to fetch my application:', err);
+          }
+        });
     }
-  }, [id, isJobOwner]);
+  }, [id, isJobOwner, user]);
 
   /* Filtered applications */
   const filteredApps = useMemo(() => {
@@ -293,6 +302,11 @@ export default function JobDetail() {
       setCover('');
       setContactNumber('');
       setResumeFile(null);
+      
+      // Update application status in UI
+      http.get(`/api/applications/job/${id}/my-status`)
+        .then(r => setMyApplication(r.data))
+        .catch(console.error);
     } catch (err) {
       setMessage(err.response?.data?.message || 'Apply failed');
     } finally {
@@ -483,98 +497,119 @@ export default function JobDetail() {
           {/* Right Column - Application Form */}
           <aside className="job-sidebar">
             {user?.role === 'student' && (
-              <div className="application-card">
-                <div className="application-header">
-                  <Briefcase size={24} />
-                  <h3>Apply for this position</h3>
+              myApplication ? (
+                <div className="application-card">
+                  <div className="application-header" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <CheckCircle size={24} style={{ color: 'var(--success)' }} />
+                    <h3>Application Submitted</h3>
+                  </div>
+                  <div className="application-form" style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                    <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>You have already applied for this position.</p>
+                    <div style={{ display: 'inline-block', padding: '0.5rem 1.25rem', borderRadius: '2rem', fontSize: '0.9rem', fontWeight: 600, textTransform: 'capitalize' }} className={`status-badge status-${myApplication.status}`}>
+                      Status: {myApplication.status}
+                    </div>
+                    <p style={{ marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      Applied on {new Date(myApplication.createdAt).toLocaleDateString()}
+                    </p>
+                    <Link to="/my-applications" className="btn-secondary" style={{ marginTop: '1.5rem', display: 'inline-block', width: '100%', textDecoration: 'none', textAlign: 'center' }}>
+                      View All My Applications
+                    </Link>
+                  </div>
                 </div>
-
-                <div className="application-form">
-                  <div className="form-field">
-                    <label className="field-label">
-                      <Phone size={16} />
-                      Contact Number
-                      <span className="required">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      value={contactNumber}
-                      onChange={e => setContactNumber(e.target.value)}
-                      placeholder="Enter your phone number"
-                      className="field-input"
-                    />
+              ) : (
+                <div className="application-card">
+                  <div className="application-header">
+                    <Briefcase size={24} />
+                    <h3>Apply for this position</h3>
                   </div>
 
-                  <div className="form-field">
-                    <label className="field-label">
-                      <Upload size={16} />
-                      Resume
-                      <span className="required">*</span>
-                    </label>
-                    <div className="file-upload">
-                      <input
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        onChange={e => setResumeFile(e.target.files?.[0] || null)}
-                        className="file-input"
-                        id="resume-upload"
-                      />
-                      <label htmlFor="resume-upload" className="file-label">
-                        {resumeFile ? (
-                          <>
-                            <CheckCircle size={16} />
-                            {resumeFile.name}
-                          </>
-                        ) : (
-                          <>
-                            <Upload size={16} />
-                            Choose file (PDF/DOC/DOCX)
-                          </>
-                        )}
+                  <div className="application-form">
+                    <div className="form-field">
+                      <label className="field-label">
+                        <Phone size={16} />
+                        Contact Number
+                        <span className="required">*</span>
                       </label>
+                      <input
+                        type="tel"
+                        value={contactNumber}
+                        onChange={e => setContactNumber(e.target.value)}
+                        placeholder="Enter your phone number"
+                        className="field-input"
+                      />
                     </div>
-                  </div>
 
-                  <div className="form-field">
-                    <label className="field-label">
-                      <FileText size={16} />
-                      Cover Letter
-                      <span className="optional">(Optional)</span>
-                    </label>
-                    <textarea
-                      placeholder="Tell us why you're a great fit..."
-                      value={cover}
-                      onChange={e => setCover(e.target.value)}
-                      rows={6}
-                      className="field-textarea"
-                    />
-                  </div>
+                    <div className="form-field">
+                      <label className="field-label">
+                        <Upload size={16} />
+                        Resume
+                        <span className="required">*</span>
+                      </label>
+                      <div className="file-upload">
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={e => setResumeFile(e.target.files?.[0] || null)}
+                          className="file-input"
+                          id="resume-upload"
+                        />
+                        <label htmlFor="resume-upload" className="file-label">
+                          {resumeFile ? (
+                            <>
+                              <CheckCircle size={16} />
+                              {resumeFile.name}
+                            </>
+                          ) : (
+                            <>
+                              <Upload size={16} />
+                              Choose file (PDF/DOC/DOCX)
+                            </>
+                          )}
+                        </label>
+                      </div>
+                    </div>
 
-                  <button
-                    className="btn-apply"
-                    onClick={openVerify}
-                    disabled={applying}
-                  >
-                    {applying ? (
-                      <>
-                        <div className="spinner"></div>
-                        Applying...
-                      </>
-                    ) : (
-                      <>
-                        <Briefcase size={18} />
-                        Review & Apply
-                      </>
+                    <div className="form-field">
+                      <label className="field-label">
+                        <FileText size={16} />
+                        Cover Letter
+                        <span className="optional">(Optional)</span>
+                      </label>
+                      <textarea
+                        placeholder="Tell us why you're a great fit..."
+                        value={cover}
+                        onChange={e => setCover(e.target.value)}
+                        rows={6}
+                        className="field-textarea"
+                      />
+                    </div>
+
+                    <button
+                      className="btn-apply"
+                      onClick={openVerify}
+                      disabled={applying}
+                    >
+                      {applying ? (
+                        <>
+                          <div className="spinner"></div>
+                          Applying...
+                        </>
+                      ) : (
+                        <>
+                          <Briefcase size={18} />
+                          Review & Apply
+                        </>
+                      )}
+                    </button>
+
+                    {message && (
+                      <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
+                        {message}
+                      </div>
                     )}
-                  </button>
-
-                  {message && (
-                    <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
-                      {message}
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )
             )}
           </aside>
         </div>

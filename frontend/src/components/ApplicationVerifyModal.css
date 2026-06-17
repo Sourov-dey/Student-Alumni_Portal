@@ -1,33 +1,53 @@
+/* ApplicationVerifyModal.css - Premium theme-aware styles */
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeInBg 0.2s ease;
+}
+
+@keyframes fadeInBg {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
   width: 90%;
-  max-width: 500px;
+  max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .modal-content h2 {
-  color: var(--au-primary);
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-main);
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
+  font-weight: 800;
   text-align: center;
+  letter-spacing: -0.02em;
 }
 
 .verification-details {
@@ -40,24 +60,29 @@
 
 .detail-group label {
   display: block;
-  font-weight: 500;
-  color: #4a5568;
+  font-weight: 600;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .detail-group p {
-  background: #f8fafc;
-  padding: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-main);
+  color: var(--text-main);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   margin: 0;
   word-break: break-word;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .file-name {
-  color: var(--au-primary);
-  font-weight: 500;
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .cover-preview {
@@ -75,46 +100,50 @@
 }
 
 .modal-actions button {
-  padding: 0.5rem 1.25rem;
-  border-radius: 6px;
-  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s var(--transition-smooth);
 }
 
 .modal-actions button:disabled {
-  opacity: 0.7;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .btn-primary {
-  background: var(--au-primary);
+  background: var(--primary);
   color: white;
   border: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #004d45;
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #4a5568;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: var(--bg-main);
+  border-color: var(--text-muted);
 }
 
 .btn-outline {
   background: transparent;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #f8fafc;
+  background: var(--bg-main);
+  color: var(--text-main);
 }
