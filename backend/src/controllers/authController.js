@@ -5,6 +5,13 @@ import User from '../models/User.js';
 import Otp from '../models/Otp.js';
 import { sendOtpEmail, sendPasswordResetEmail } from '../utils/emailService.js';
 
+// Ensure JWT_SECRET is set in production
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is not set in production!');
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-insecure-secret-change-me';
+
 // Verify reCAPTCHA token using Google's API
 const verifyCaptcha = async (token) => {
   try {
@@ -162,7 +169,7 @@ export const signup = async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET || "your-secret-key",
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
 
@@ -240,7 +247,7 @@ export const loginUser = async (req, res) => {
     // ✅ FIXED: Use "id" to match middleware
     const token = jwt.sign(
       { id: user._id },  // ← Changed from userId
-      process.env.JWT_SECRET || 'your-secret-key',
+      JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -372,7 +379,7 @@ export const resetPassword = async (req, res) => {
     // ✅ FIXED: Use "id" to match middleware
     const jwtToken = jwt.sign(
       { id: user._id },  // ← Changed from userId
-      process.env.JWT_SECRET || 'your-secret-key',
+      JWT_SECRET,
       { expiresIn: '7d' }
     );
 

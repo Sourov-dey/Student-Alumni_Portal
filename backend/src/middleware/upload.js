@@ -17,12 +17,15 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
   if (file.fieldname === "avatar") {
-    const ok = ["image/png", "image/jpeg", "image/jpg", "image/webp"].includes(file.mimetype);
-    return cb(ok ? null : new Error("Invalid avatar type"), ok);
+    const allowedMimes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const allowedExts = [".png", ".jpg", ".jpeg", ".webp"];
+    const ok = allowedMimes.includes(file.mimetype) && allowedExts.includes(ext);
+    return cb(ok ? null : new Error("Invalid avatar type (PNG/JPG/WEBP only)"), ok);
   }
   if (file.fieldname === "resume") {
-    const ok = ["application/pdf"].includes(file.mimetype);
+    const ok = file.mimetype === "application/pdf" && ext === ".pdf";
     return cb(ok ? null : new Error("Invalid resume type (PDF only)"), ok);
   }
   cb(new Error("Unknown upload field"));

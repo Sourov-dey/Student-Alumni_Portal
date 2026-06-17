@@ -137,8 +137,11 @@ export const updateApplicationStatus = async (req, res, next) => {
     }
 
     const { status } = req.body;
-    if (typeof status !== 'string' || !status.trim()) {
-      return res.status(400).json({ message: 'Invalid status' });
+    const ALLOWED_STATUSES = ['submitted', 'shortlisted', 'rejected', 'hired'];
+    if (!status || !ALLOWED_STATUSES.includes(status)) {
+      return res.status(400).json({
+        message: `Invalid status. Must be one of: ${ALLOWED_STATUSES.join(', ')}`,
+      });
     }
 
     app.status = status;

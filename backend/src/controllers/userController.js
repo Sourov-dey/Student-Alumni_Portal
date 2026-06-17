@@ -7,41 +7,16 @@ import User from '../models/User.js';
  */
 export const getUsers = async (req, res) => {
   try {
-    console.log('\n' + '='.repeat(80));
-    console.log('🔥 GET USERS FOR CHAT - DETAILED DEBUG');
-    console.log('='.repeat(80));
-
     const currentUserId = req.user?._id || req.user?.id;
 
-    console.log('📋 Request Details:');
-    console.log('  - Current User ID:', currentUserId);
-    console.log('  - Current User Name:', req.user?.name);
-    console.log('  - Current User Email:', req.user?.email);
-    console.log('  - User Object:', JSON.stringify(req.user, null, 2));
-
-    // First, get TOTAL count of users in database
-    const totalUsers = await User.countDocuments();
-    console.log('\n📊 Database Stats:');
-    console.log('  - Total users in database:', totalUsers);
-
-    // Get ALL users to see what we have
-    const allUsers = await User.find({})
-      .select('name email avatarUrl role createdAt')
-      .lean();
-
-    console.log('\n👥 ALL Users in Database:');
-    allUsers.forEach((u, i) => {
-      console.log(`  ${i + 1}. ${u.name} (${u.email}) [ID: ${u._id}]`);
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('\n' + '='.repeat(80));
+      console.log('🔥 GET USERS FOR CHAT');
+      console.log('  - Current User ID:', currentUserId);
+    }
 
     // Build query - EXCLUDE current user
-    let query = {};
-    if (currentUserId) {
-      query = { _id: { $ne: currentUserId } };
-      console.log('\n🔍 Query:', JSON.stringify(query));
-    } else {
-      console.log('\n⚠️  WARNING: No current user ID found!');
-    }
+    const query = currentUserId ? { _id: { $ne: currentUserId } } : {};
 
     // Fetch users excluding current user
     const users = await User.find(query)
@@ -49,37 +24,15 @@ export const getUsers = async (req, res) => {
       .sort({ name: 1 })
       .lean();
 
-    console.log('\n✅ Query Results:');
-    console.log('  - Users found (excluding current user):', users.length);
-
-    if (users.length > 0) {
-      console.log('\n👥 Users Being Returned:');
-      users.forEach((u, i) => {
-        console.log(`  ${i + 1}. ${u.name} (${u.email}) [ID: ${u._id}]`);
-      });
-    } else {
-      console.log('\n❌ NO USERS FOUND!');
-      console.log('This means either:');
-      console.log('  1. Only 1 user exists in database (the current user)');
-      console.log('  2. Database is empty');
-      console.log('  3. Query is filtering out all users');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`  - Users found (excluding current user): ${users.length}`);
     }
-
-    console.log('\n📤 Sending Response:', users.length, 'users');
-    console.log('='.repeat(80) + '\n');
 
     res.status(200).json(users);
 
   } catch (error) {
-    console.error('\n❌ GET USERS ERROR:');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    console.error('='.repeat(80) + '\n');
-
-    res.status(500).json({
-      message: 'Failed to fetch users',
-      error: error.message
-    });
+    console.error('❌ GET USERS ERROR:', error.message);
+    res.status(500).json({ message: 'Failed to fetch users' });
   }
 };
 
@@ -88,14 +41,9 @@ export const getUsers = async (req, res) => {
  */
 export const getAllUsersForGroups = async (req, res) => {
   try {
-    console.log('\n' + '='.repeat(80));
-    console.log('🔥 GET ALL USERS FOR GROUPS');
-    console.log('='.repeat(80));
-
-    const currentUserId = req.user?._id || req.user?.id;
-    const currentUserName = req.user?.name;
-
-    console.log('Current User:', currentUserName, '(ID:', currentUserId + ')');
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔥 GET ALL USERS FOR GROUPS');
+    }
 
     // Get ALL users including current user
     const users = await User.find({})
@@ -103,28 +51,11 @@ export const getAllUsersForGroups = async (req, res) => {
       .sort({ name: 1 })
       .lean();
 
-    console.log(`✅ Found ${users.length} total users`);
-
-    if (users.length > 0) {
-      console.log('👥 All users:');
-      users.forEach((u, i) => {
-        const isCurrent = u._id.toString() === currentUserId?.toString();
-        console.log(`  ${i + 1}. ${u.name} (${u.email}) ${isCurrent ? '← CURRENT USER' : ''}`);
-      });
-    } else {
-      console.log('⚠️  No users found in database!');
-    }
-
-    console.log('='.repeat(80) + '\n');
-
     res.status(200).json(users);
 
   } catch (error) {
-    console.error('❌ Get All Users Error:', error);
-    res.status(500).json({
-      message: 'Failed to fetch users',
-      error: error.message
-    });
+    console.error('❌ Get All Users Error:', error.message);
+    res.status(500).json({ message: 'Failed to fetch users' });
   }
 };
 
@@ -140,30 +71,26 @@ export const searchUsers = async (req, res) => {
       return res.status(400).json({ message: 'Search query is required' });
     }
 
-    console.log('🔍 Search Users:', q);
+    // Escape regex special chars to prevent ReDoS
+    const escapedQ = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     // Search by name or email (case-insensitive) - EXCLUDE current user
     const users = await User.find({
       _id: { $ne: currentUserId },
       $or: [
-        { name: { $regex: q, $options: 'i' } },
-        { email: { $regex: q, $options: 'i' } }
+        { name: { $regex: escapedQ, $options: 'i' } },
+        { email: { $regex: escapedQ, $options: 'i' } }
       ]
     })
       .select('name email avatarUrl role createdAt')
       .limit(20)
       .lean();
 
-    console.log(`✅ Found ${users.length} users matching "${q}"`);
-
     res.status(200).json(users);
 
   } catch (error) {
-    console.error('❌ Search Users Error:', error);
-    res.status(500).json({
-      message: 'Failed to search users',
-      error: error.message
-    });
+    console.error('❌ Search Users Error:', error.message);
+    res.status(500).json({ message: 'Failed to search users' });
   }
 };
 
@@ -229,7 +156,21 @@ export const updateUserById = async (req, res, next) => {
       return res.status(403).json({ message: 'Forbidden' });
     }
 
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    // Field whitelist — prevent privilege escalation via mass-assignment
+    const ALLOWED_FIELDS = [
+      'name', 'bio', 'gender', 'dateOfBirth', 'phone', 'department',
+      'graduationYear', 'currentCompany', 'position', 'currentYear',
+      'skills', 'technicalSkills', 'nonTechnicalSkills', 'projects',
+      'certifications', 'interests', 'location', 'profileComplete', 'avatarUrl',
+    ];
+    const sanitizedBody = {};
+    ALLOWED_FIELDS.forEach((field) => {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        sanitizedBody[field] = req.body[field];
+      }
+    });
+
+    const user = await User.findByIdAndUpdate(req.params.id, sanitizedBody, {
       new: true,
       runValidators: true,
     }).select("-password -__v");
@@ -309,10 +250,7 @@ export const getAlumniLocations = async (req, res) => {
 
     res.status(200).json(alumni);
   } catch (error) {
-    console.error('❌ Get Alumni Locations Error:', error);
-    res.status(500).json({
-      message: 'Failed to fetch alumni locations',
-      error: error.message,
-    });
+    console.error('❌ Get Alumni Locations Error:', error.message);
+    res.status(500).json({ message: 'Failed to fetch alumni locations' });
   }
 };

@@ -3,6 +3,7 @@ import { Router } from "express";
 import { validate } from "../middleware/validate.js";
 import { devLoginSchema } from "../validators/authSchemas.js";
 import { issueJWT, requireAuth } from "../middleware/auth.js";
+import { authLimiter, requestCodeLimiter } from "../middleware/ratelimiter.js";
 import User from "../models/User.js";
 import { signup, loginUser, forgotPassword, resetPassword, sendOtp } from "../controllers/authController.js";
 
@@ -20,43 +21,45 @@ const router = Router();
  */
 router.get("/health", (_req, res) => res.json({ ok: true, scope: "auth" }));
 
-router.post("/send-otp", sendOtp);
-router.post("/signup", signup);
+router.post("/send-otp", requestCodeLimiter, sendOtp);
+router.post("/signup", authLimiter, signup);
 
-router.post("/login", loginUser);
+router.post("/login", authLimiter, loginUser);
 
 
-// Dev login (for testing)
-router.post(
-  "/dev-login",
-  validate(devLoginSchema),
-  async (req, res, next) => {
-    try {
-      const { email, role = "student", name } = req.body;
+// Dev login (for testing) — ONLY available outside of production
+if (process.env.NODE_ENV !== "production") {
+  router.post(
+    "/dev-login",
+    validate(devLoginSchema),
+    async (req, res, next) => {
+      try {
+        const { email, role = "student", name } = req.body;
 
-      let user = await User.findOne({ email: email.toLowerCase() });
+        let user = await User.findOne({ email: email.toLowerCase() });
 
-      if (!user) {
-        user = await User.create({
-          email: email.toLowerCase(),
-          role,
-          name: name || email.split("@")[0],
-          verified: true,
-          profileComplete: false,
-        });
-      } else {
-        user.role = role;
-        if (name) user.name = name;
-        await user.save();
+        if (!user) {
+          user = await User.create({
+            email: email.toLowerCase(),
+            role,
+            name: name || email.split("@")[0],
+            verified: true,
+            profileComplete: false,
+          });
+        } else {
+          user.role = role;
+          if (name) user.name = name;
+          await user.save();
+        }
+
+        const token = issueJWT(user);
+        res.json({ token, user });
+      } catch (err) {
+        next(err);
       }
-
-      const token = issueJWT(user);
-      res.json({ token, user });
-    } catch (err) {
-      next(err);
     }
-  }
-);
+  );
+}
 
 /**
  * @swagger

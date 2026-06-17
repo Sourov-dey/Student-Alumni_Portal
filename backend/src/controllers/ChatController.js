@@ -72,8 +72,6 @@ export const getMessages = async (req, res, next) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
-    console.log(`📬 Fetching messages between ${senderId} and ${receiverId}`);
-
     const messages = await Message.find({
       $or: [
         { senderId: senderId, receiverId: receiverId },
@@ -83,7 +81,6 @@ export const getMessages = async (req, res, next) => {
       .sort({ createdAt: 1 })
       .select("-__v");
 
-    console.log(`✅ Found ${messages.length} messages`);
     res.status(200).json(messages);
   } catch (error) {
     console.error("❌ Error in getMessages:", error.message);
@@ -97,8 +94,6 @@ export const sendMessage = async (req, res, next) => {
     const { id: receiverId } = req.params;
     const { text, image } = req.body;
     const senderId = req.user._id;
-
-    console.log(`📤 Sending message from ${senderId} to ${receiverId}`);
 
     if (!text && !image) {
       return res.status(400).json({ error: "Text or image is required" });
@@ -132,25 +127,17 @@ export const sendMessage = async (req, res, next) => {
     });
 
     await newMessage.save();
-    console.log(`✅ Message saved to database:`, newMessage._id);
 
     // Get sender details to send to receiver
     const senderDetails = await User.findById(senderId).select(
       "name email avatarUrl role"
     );
-    console.log(`👤 Sender details:`, senderDetails.name);
 
     // Send to receiver via Socket.IO if they're online
     const receiverSocketId = getReceiverSocketId(receiverId);
 
     if (receiverSocketId) {
-      console.log(`🔌 Receiver is ONLINE, socket ID: ${receiverSocketId}`);
-
-      // Send the new message
       io.to(receiverSocketId).emit("newMessage", newMessage);
-      console.log(`📨 Sent newMessage event to receiver`);
-
-      // Notify receiver about new conversation (so sender appears in their sidebar)
       io.to(receiverSocketId).emit("newConversation", {
         _id: senderDetails._id,
         name: senderDetails.name,
@@ -158,16 +145,9 @@ export const sendMessage = async (req, res, next) => {
         avatarUrl: senderDetails.avatarUrl,
         role: senderDetails.role,
       });
-      console.log(`🆕 Sent newConversation event to receiver`);
-    } else {
-      console.log(
-        `⚠️ Receiver ${receiverId} is OFFLINE - they'll see message on login`
-      );
     }
 
-    // IMPORTANT: Return success - the frontend will reload conversation list
     res.status(201).json(newMessage);
-    console.log(`✅ Message send complete`);
   } catch (error) {
     console.error("❌ Error in sendMessage:", error.message);
     next(error);
